@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Telegram Sender | Чёрно-белый градиент</title>
+    <title>Telegram Sender | Ручное количество</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,6 @@
             overflow-x: hidden;
         }
 
-        /* 3D Canvas */
         #bgCanvas {
             position: fixed;
             top: 0;
@@ -84,6 +83,21 @@
             font-family: inherit;
         }
 
+        .count-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .count-row input {
+            flex: 1;
+        }
+
+        .count-row span {
+            color: #aaa;
+            font-size: 14px;
+        }
+
         button {
             background: linear-gradient(135deg, #555, #222);
             border: none;
@@ -122,13 +136,6 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
         }
 
         .user-info {
@@ -220,7 +227,7 @@
 
     <div class="card">
         <h1>📨 Telegram Sender</h1>
-        <div class="sub">Отправка сообщений от имени бота (без ограничений)</div>
+        <div class="sub">Отправка сообщений от имени бота</div>
 
         <label>🤖 Токен бота (от @BotFather)</label>
         <input type="text" id="tokenInput" placeholder="1234567890:ABCdefghijklm...">
@@ -239,11 +246,17 @@
         <label>💬 Текст сообщения</label>
         <textarea id="messageInput" placeholder="Введите текст..."></textarea>
 
+        <label>🔢 Количество отправок</label>
+        <div class="count-row">
+            <input type="number" id="countInput" min="1" max="1000000" value="1" step="1">
+            <span>раз(а)</span>
+        </div>
+
         <button id="sendBtn">📤 ОТПРАВИТЬ</button>
 
         <div class="status" id="status"></div>
         <div class="note">⚠️ Данные сохраняются в вашем браузере. Токен и Chat ID никуда не отправляются.</div>
-        <div class="note">💡 После подтверждения получателя сообщение отправится один раз (без ограничений).</div>
+        <div class="note">💡 Если бот не может написать пользователю — попросите его написать /start вашему боту.</div>
     </div>
 
     <script type="importmap">
@@ -274,19 +287,18 @@
         // Материал с чёрно-белым градиентом
         const geometry = new THREE.SphereGeometry(1.5, 128, 128);
         const material = new THREE.MeshStandardMaterial({
-            color: 0xffffff,
+            color: 0xdddddd,
             emissive: 0x111111,
             roughness: 0.3,
-            metalness: 0.7,
-            flatShading: false
+            metalness: 0.7
         });
         
         const sphere = new THREE.Mesh(geometry, material);
         scene.add(sphere);
         
-        // Добавляем точки (звёзды) вокруг
+        // Звёзды
         const starsGeometry = new THREE.BufferGeometry();
-        const starsCount = 800;
+        const starsCount = 1000;
         const starsPositions = new Float32Array(starsCount * 3);
         for (let i = 0; i < starsCount; i++) {
             starsPositions[i*3] = (Math.random() - 0.5) * 200;
@@ -294,7 +306,7 @@
             starsPositions[i*3+2] = (Math.random() - 0.5) * 80 - 40;
         }
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
-        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15, transparent: true, opacity: 0.6 });
+        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, transparent: true, opacity: 0.5 });
         const stars = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(stars);
         
@@ -333,6 +345,7 @@
         const chatIdInput = document.getElementById('chatIdInput');
         const usernameInput = document.getElementById('usernameInput');
         const messageInput = document.getElementById('messageInput');
+        const countInput = document.getElementById('countInput');
         const searchBtn = document.getElementById('searchBtn');
         const sendBtn = document.getElementById('sendBtn');
         const statusDiv = document.getElementById('status');
@@ -341,16 +354,17 @@
         let selectedChatId = null;
         let selectedName = null;
         let selectedUsername = null;
-        let selectedPhoto = null;
         
         // Загрузка сохранённых данных
         tokenInput.value = localStorage.getItem('tg_sender_token') || '';
         chatIdInput.value = localStorage.getItem('tg_sender_chatid') || '';
         messageInput.value = localStorage.getItem('tg_sender_message') || '';
+        countInput.value = localStorage.getItem('tg_sender_count') || '1';
         
         tokenInput.oninput = () => localStorage.setItem('tg_sender_token', tokenInput.value);
         chatIdInput.oninput = () => localStorage.setItem('tg_sender_chatid', chatIdInput.value);
         messageInput.oninput = () => localStorage.setItem('tg_sender_message', messageInput.value);
+        countInput.oninput = () => localStorage.setItem('tg_sender_count', countInput.value);
         
         async function callTelegramAPI(method, params) {
             const token = tokenInput.value.trim();
@@ -379,29 +393,21 @@
             
             try {
                 let chatId = username;
-                if (username.startsWith('@')) {
-                    chatId = username;
+                if (!username.startsWith('@') && isNaN(username)) {
+                    chatId = '@' + username;
                 }
                 
                 const chat = await callTelegramAPI('getChat', { chat_id: chatId });
                 selectedChatId = chat.id;
-                selectedName = chat.first_name || chat.title;
+                selectedName = chat.first_name || chat.title || chat.username;
                 selectedUsername = chat.username;
-                selectedPhoto = chat.photo?.small_file_id || null;
-                
-                let photoHtml = '';
-                if (selectedPhoto) {
-                    photoHtml = `<img src="https://avatars.githubusercontent.com/u/583231?v=4" alt="">`; // заглушка, реальное фото требует file download
-                }
                 
                 userPreviewDiv.style.display = 'block';
                 userPreviewDiv.innerHTML = `
                     <div class="user-preview">
-                        <div class="user-avatar">
-                            ${selectedPhoto ? `<img src="https://via.placeholder.com/50?text=👤">` : '👤'}
-                        </div>
+                        <div class="user-avatar">👤</div>
                         <div class="user-info">
-                            <div class="user-name">${selectedName}</div>
+                            <div class="user-name">${escapeHtml(selectedName)}</div>
                             <div class="user-username">${selectedUsername ? '@' + selectedUsername : 'ID: ' + selectedChatId}</div>
                         </div>
                     </div>
@@ -425,6 +431,7 @@
                     userPreviewDiv.style.display = 'none';
                     selectedChatId = null;
                     statusDiv.innerHTML = '';
+                    statusDiv.style.display = 'none';
                 };
                 
                 statusDiv.className = 'status success';
@@ -436,10 +443,21 @@
             }
         };
         
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
         sendBtn.onclick = async () => {
             const token = tokenInput.value.trim();
             const myChatId = chatIdInput.value.trim();
             const message = messageInput.value.trim();
+            const count = parseInt(countInput.value) || 1;
             
             if (!token) {
                 statusDiv.className = 'status error';
@@ -461,27 +479,42 @@
                 statusDiv.innerHTML = '❌ Введите текст сообщения';
                 return;
             }
+            if (count < 1 || count > 1000000) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ Количество должно быть от 1 до 1 000 000';
+                return;
+            }
             
             statusDiv.className = 'status loading';
-            statusDiv.innerHTML = '⏳ Отправка...';
+            statusDiv.innerHTML = `⏳ Отправка (${count} раз)...`;
             
-            try {
-                const result = await callTelegramAPI('sendMessage', {
-                    chat_id: selectedChatId,
-                    text: message
-                });
-                
+            let success = 0;
+            let errors = 0;
+            
+            for (let i = 0; i < count; i++) {
+                try {
+                    await callTelegramAPI('sendMessage', {
+                        chat_id: selectedChatId,
+                        text: message
+                    });
+                    success++;
+                    statusDiv.innerHTML = `⏳ Отправлено ${success} из ${count}...`;
+                } catch (err) {
+                    errors++;
+                    if (err.message.includes('can\'t initiate conversation')) {
+                        statusDiv.innerHTML = `❌ Ошибка: пользователь не начал диалог с ботом. Попросите написать /start`;
+                        break;
+                    }
+                }
+                if (i < count - 1) await new Promise(r => setTimeout(r, 200));
+            }
+            
+            if (success > 0) {
                 statusDiv.className = 'status success';
-                statusDiv.innerHTML = `✅ Сообщение отправлено пользователю ${selectedName}`;
-                
-                // Очищаем после отправки
-                selectedChatId = null;
-                userPreviewDiv.style.display = 'none';
-                messageInput.value = '';
-                localStorage.setItem('tg_sender_message', '');
-            } catch (err) {
+                statusDiv.innerHTML = `✅ Отправлено! Успешно: ${success}${errors > 0 ? `, ошибок: ${errors}` : ''}`;
+            } else if (errors > 0) {
                 statusDiv.className = 'status error';
-                statusDiv.innerHTML = `❌ ${err.message}`;
+                statusDiv.innerHTML = `❌ Не удалось отправить ни одного сообщения. Проверьте, что пользователь написал /start боту.`;
             }
         };
     </script>
