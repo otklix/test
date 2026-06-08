@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Тест бота</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:linear-gradient(135deg,#0a0a0a,#1a1a2e);min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:system-ui;padding:20px}
+        .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border-radius:30px;padding:30px;text-align:center;max-width:400px;width:100%;border:1px solid rgba(255,255,255,0.1)}
+        h1{color:#fff;margin-bottom:20px;font-size:28px}
+        button{background:linear-gradient(135deg,#ff4444,#cc0000);border:none;padding:15px 30px;border-radius:50px;font-size:18px;font-weight:bold;color:#fff;cursor:pointer;width:100%;transition:transform 0.1s}
+        button:active{transform:scale(.97)}
+        .status{margin-top:20px;font-size:14px}
+        .success{color:#4caf50}
+        .error{color:#ff4444}
+        .info{color:#aaa;margin-top:15px;font-size:12px}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔐 Тест Telegram бота</h1>
+        <button id="testBtn">📨 Отправить тестовое сообщение</button>
+        <div class="status" id="status"></div>
+        <div class="info">Используются секреты из GitHub: BOT_TOKEN и CHAT_ID</div>
+    </div>
+
+    <script>
+        // Плейсхолдеры — заменятся через GitHub Actions
+        const BOT_TOKEN = '__BOT_TOKEN__';
+        const CHAT_ID = '__CHAT_ID__';
+        
+        const testBtn = document.getElementById('testBtn');
+        const statusDiv = document.getElementById('status');
+        
+        async function sendTest() {
+            if (BOT_TOKEN === '__BOT_TOKEN__' || CHAT_ID === '__CHAT_ID__') {
+                statusDiv.innerHTML = '❌ Секреты не заменены. Запустите GitHub Actions.';
+                statusDiv.className = 'status error';
+                return;
+            }
+            
+            statusDiv.innerHTML = '⏳ Отправка...';
+            statusDiv.className = 'status';
+            
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: '✅ Тестовое сообщение от вашего трекера! Бот работает.'
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.ok) {
+                    statusDiv.innerHTML = '✅ Сообщение отправлено! Проверьте Telegram.';
+                    statusDiv.className = 'status success';
+                } else {
+                    statusDiv.innerHTML = `❌ Ошибка: ${result.description || 'Неверный токен или ID'}`;
+                    statusDiv.className = 'status error';
+                }
+            } catch(e) {
+                statusDiv.innerHTML = '❌ Ошибка соединения';
+                statusDiv.className = 'status error';
+            }
+        }
+        
+        testBtn.onclick = sendTest;
+    </script>
+</body>
+</html>
