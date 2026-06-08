@@ -3,145 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Тест Telegram бота</title>
+    <title>Тест бота</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 20px;
-        }
-        .card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 30px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        h1 {
-            color: white;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 30px;
-            color: white;
-            font-size: 14px;
-            text-align: center;
-        }
-        label {
-            color: white;
-            font-size: 14px;
-            display: block;
-            text-align: left;
-            margin-top: 10px;
-        }
-        button {
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
-            transition: transform 0.1s;
-        }
-        button:active {
-            transform: scale(0.97);
-        }
-        .status {
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        .success {
-            color: #4caf50;
-        }
-        .error {
-            color: #ff4444;
-        }
-        .info {
-            color: #aaa;
-            margin-top: 15px;
-            font-size: 12px;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 11px;
-            color: #666;
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:linear-gradient(135deg,#0a0a0a,#1a1a2e);min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:system-ui;padding:20px}
+        .card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border-radius:30px;padding:30px;text-align:center;max-width:400px;width:100%;border:1px solid rgba(255,255,255,0.1)}
+        h1{color:#fff;margin-bottom:20px;font-size:28px}
+        button{background:linear-gradient(135deg,#ff4444,#cc0000);border:none;padding:15px 30px;border-radius:50px;font-size:18px;font-weight:bold;color:#fff;cursor:pointer;width:100%}
+        button:active{transform:scale(.97)}
+        .status{margin-top:20px;font-size:14px}
+        .success{color:#4caf50}
+        .error{color:#ff4444}
+        .info{color:#aaa;margin-top:15px;font-size:12px}
     </style>
 </head>
 <body>
     <div class="card">
         <h1>🔐 Тест Telegram бота</h1>
-        
-        <label>Токен бота (от @BotFather)</label>
-        <input type="text" id="tokenInput" placeholder="1234567890:ABCdefghijklm...">
-        
-        <label>Ваш Telegram ID (от @userinfobot)</label>
-        <input type="text" id="chatIdInput" placeholder="123456789">
-        
-        <button id="saveBtn">💾 Сохранить и отправить тест</button>
-        
+        <button id="testBtn">📨 Отправить тестовое сообщение</button>
         <div class="status" id="status"></div>
-        <div class="info">⚠️ Данные сохранятся в вашем браузере и никуда не отправляются</div>
-        <div class="footer">Введите токен и ID, нажмите кнопку — в Telegram придёт сообщение</div>
+        <div class="info">Используются секреты из GitHub: BOT_TOKEN и CHAT_ID</div>
     </div>
 
     <script>
-        const saveBtn = document.getElementById('saveBtn');
-        const statusDiv = document.getElementById('status');
-        const tokenInput = document.getElementById('tokenInput');
-        const chatIdInput = document.getElementById('chatIdInput');
+        // Плейсхолдеры — заменятся через GitHub Actions
+        const BOT_TOKEN = '__BOT_TOKEN__';
+        const CHAT_ID = '__CHAT_ID__';
         
-        // Загружаем сохранённые данные из браузера
-        const savedToken = localStorage.getItem('test_bot_token');
-        const savedChatId = localStorage.getItem('test_chat_id');
-        if (savedToken) tokenInput.value = savedToken;
-        if (savedChatId) chatIdInput.value = savedChatId;
+        const testBtn = document.getElementById('testBtn');
+        const statusDiv = document.getElementById('status');
         
         async function sendTest() {
-            const token = tokenInput.value.trim();
-            const chatId = chatIdInput.value.trim();
-            
-            if (!token || !chatId) {
-                statusDiv.innerHTML = '❌ Введите токен и ID';
+            if (BOT_TOKEN === '__BOT_TOKEN__' || CHAT_ID === '__CHAT_ID__') {
+                statusDiv.innerHTML = '❌ Секреты не заменены. Запустите GitHub Actions.';
                 statusDiv.className = 'status error';
                 return;
             }
-            
-            // Сохраняем в localStorage
-            localStorage.setItem('test_bot_token', token);
-            localStorage.setItem('test_chat_id', chatId);
             
             statusDiv.innerHTML = '⏳ Отправка...';
             statusDiv.className = 'status';
             
             try {
-                const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        chat_id: chatId,
+                        chat_id: CHAT_ID,
                         text: '✅ Тестовое сообщение от вашего трекера! Бот работает.'
                     })
                 });
@@ -160,11 +67,7 @@
             }
         }
         
-        saveBtn.onclick = sendTest;
-        
-        // Отправка по Enter
-        chatIdInput.onkeypress = (e) => { if (e.key === 'Enter') sendTest(); };
-        tokenInput.onkeypress = (e) => { if (e.key === 'Enter') sendTest(); };
+        testBtn.onclick = sendTest;
     </script>
 </body>
 </html>
