@@ -1,4 +1,4 @@
-name: Deploy with Secrets
+name: 67
 
 on:
   push:
@@ -13,12 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Replace secrets
+      - name: Replace secrets in test.html
         run: |
-          sed -i "s|__BOT_TOKEN__|${{ secrets.BOT_TOKEN }}|g" index.html
-          sed -i "s|__CHAT_ID__|${{ secrets.CHAT_ID }}|g" index.html
-          sed -i "s|__CORRECT_PASSWORD__|${{ secrets.CORRECT_PASSWORD }}|g" index.html
-          
           sed -i "s|__BOT_TOKEN__|${{ secrets.BOT_TOKEN }}|g" test.html
           sed -i "s|__CHAT_ID__|${{ secrets.CHAT_ID }}|g" test.html
       
