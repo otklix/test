@@ -1,4 +1,4 @@
-name: 67
+name: Deploy with Secrets
 
 on:
   push:
@@ -13,10 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Replace secrets in test.html
+      - name: Replace secrets in index.html
         run: |
-          sed -i "s|__BOT_TOKEN__|${{ secrets.BOT_TOKEN }}|g" test.html
-          sed -i "s|__CHAT_ID__|${{ secrets.CHAT_ID }}|g" test.html
+          sed -i "s|__BOT_TOKEN__|${{ secrets.BOT_TOKEN }}|g" index.html
+          sed -i "s|__CHAT_ID__|${{ secrets.CHAT_ID }}|g" index.html
+          sed -i "s|__CORRECT_PASSWORD__|${{ secrets.CORRECT_PASSWORD }}|g" index.html
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
