@@ -18,8 +18,9 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -45,7 +46,7 @@
         .glow-point {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 120, 0.15), transparent 70%);
+            background: radial-gradient(circle, rgba(0, 255, 120, 0.12), transparent 70%);
             animation: floatGlow 15s infinite alternate ease-in-out;
         }
         .glow-point:nth-child(1) { width: 200px; height: 200px; top: 10%; left: 5%; animation-duration: 18s; }
@@ -63,23 +64,38 @@
             z-index: 1;
             width: 100%;
             max-width: 820px;
-            padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            max-height: 100vh;
-            overflow-y: auto;
         }
 
-        /* ===== ЗАГОЛОВОК ===== */
+        /* ===== ЗАГОЛОВОК С АНИМАЦИЕЙ (ЦЕНТР → ВВЕРХ) ===== */
         .header {
             text-align: center;
-            margin-bottom: 2rem;
             width: 100%;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 2rem;
+        }
+
+        .header.centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            z-index: 10;
+        }
+
+        .header.moved {
+            position: relative;
+            top: 0;
+            left: 0;
+            transform: none;
+            margin-bottom: 2rem;
         }
 
         .logo {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 900;
             letter-spacing: 3px;
             background: linear-gradient(135deg, #80ffa0, #00cc44, #40ff80);
@@ -88,7 +104,7 @@
             background-clip: text;
             display: inline-block;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(30px) scale(0.9);
             animation: logoIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
         }
         .logo span {
@@ -113,12 +129,12 @@
             100% { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
         }
         @keyframes logoIn {
-            0%   { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0%   { opacity: 0; transform: translateY(30px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .logo-emoji {
-            font-size: 2.8rem;
+            font-size: 3.2rem;
             -webkit-text-fill-color: initial;
             background: none;
         }
@@ -126,24 +142,28 @@
         .underline {
             width: 0%;
             height: 3px;
-            margin: 0.5rem auto 0;
+            margin: 0.6rem auto 0;
             background: linear-gradient(90deg, transparent, #00cc44, #40ff80, #00cc44, transparent);
             border-radius: 4px;
             animation: lineGrow 1.4s ease-out 0.9s forwards;
         }
         @keyframes lineGrow {
             0%   { width: 0%; opacity: 0; }
-            100% { width: 70%; opacity: 1; }
+            100% { width: 60%; opacity: 1; }
         }
 
         .subtitle {
             color: #5a7a5a;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            margin-top: 0.6rem;
             opacity: 0;
-            animation: fadeUp 0.8s ease 1.2s forwards;
-            letter-spacing: 4px;
+            animation: fadeUp 0.8s ease 1.4s forwards;
+            letter-spacing: 6px;
             text-transform: uppercase;
+            font-weight: 300;
+        }
+        .subtitle.show {
+            opacity: 1;
         }
         @keyframes fadeUp {
             0%   { opacity: 0; transform: translateY(10px); }
@@ -162,7 +182,7 @@
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(0, 255, 120, 0.05);
             opacity: 0;
             transform: translateY(40px);
-            animation: cardIn 1s cubic-bezier(0.16, 1, 0.3, 1) 1.4s forwards;
+            animation: cardIn 1s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
         }
         @keyframes cardIn {
             0%   { opacity: 0; transform: translateY(40px); }
@@ -299,14 +319,6 @@
             cursor: not-allowed;
             box-shadow: none;
         }
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: #889a88;
-        }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.07);
-        }
         .btn-danger {
             background: rgba(200, 50, 50, 0.12);
             color: #ff7a7a;
@@ -399,12 +411,12 @@
 
         /* ===== АДАПТИВ ===== */
         @media (max-width: 560px) {
-            .logo { font-size: 2.4rem; }
+            .logo { font-size: 2.6rem; }
             .card { padding: 1.2rem; }
             .btn { font-size: 0.85rem; padding: 0.6rem 1.2rem; }
             .drop-zone { padding: 1.2rem; }
             .drop-zone .icon { font-size: 2rem; }
-            .subtitle { font-size: 0.65rem; letter-spacing: 2px; }
+            .subtitle { font-size: 0.6rem; letter-spacing: 3px; }
             .cookie-card .avatar { width: 60px; height: 60px; }
             .result-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
         }
@@ -424,7 +436,7 @@
     <div class="main">
 
         <!-- ===== ЗАГОЛОВОК ===== -->
-        <div class="header">
+        <div class="header" id="header">
             <div class="logo">
                 <span class="logo-emoji">🍪</span>
                 <span>К</span><span>у</span><span>к</span><span>и</span>
@@ -432,18 +444,18 @@
                 <span>Ч</span><span>е</span><span>к</span><span>е</span><span>р</span>
             </div>
             <div class="underline"></div>
-            <div class="subtitle">✦ Проверка аккаунтов Roblox ✦</div>
+            <div class="subtitle" id="subtitle">✦ ПРОВЕРКА АККАУНТОВ ROBLOX ✦</div>
         </div>
 
         <!-- ===== КАРТОЧКА ===== -->
-        <div class="card">
+        <div class="card" id="card">
 
             <!-- ЗОНА ЗАГРУЗКИ -->
             <div class="drop-zone" id="dropZone">
                 <span class="icon">📂</span>
                 <p><strong>Нажмите или перетащите</strong> файлы с куками</p>
                 <div class="hint">.txt · .cookie · до 3 файлов · любое количество кук</div>
-                <input type="file" id="fileInput" multiple accept=".txt,.cookie,.roblox,.*" />
+                <input type="file" id="fileInput" multiple />
             </div>
 
             <!-- СПИСОК ФАЙЛОВ -->
@@ -478,9 +490,11 @@
             let allCookies = [];
             let results = [];
             let isChecking = false;
-            let userIdCache = {};
 
             // ===== DOM =====
+            const header = document.getElementById('header');
+            const subtitle = document.getElementById('subtitle');
+            const card = document.getElementById('card');
             const fileInput = document.getElementById('fileInput');
             const dropZone = document.getElementById('dropZone');
             const fileList = document.getElementById('fileList');
@@ -491,63 +505,56 @@
             const progressBar = document.getElementById('progressBar');
             const resultContainer = document.getElementById('resultContainer');
 
-            // ===== ПАРСИНГ КУК =====
+            // ===== АНИМАЦИЯ ПЕРЕМЕЩЕНИЯ =====
+            setTimeout(() => {
+                header.classList.add('moved');
+                subtitle.classList.add('show');
+            }, 1800);
+
+            // ===== ПАРСИНГ КУК (ИЩЕТ _|WARNING) =====
             function extractCookies(text) {
                 const lines = text.split(/\r?\n/);
                 const found = [];
 
                 for (let line of lines) {
                     line = line.trim();
-                    if (!line || line.length < 20) continue;
+                    if (!line) continue;
 
-                    const skipPatterns = [
-                        /username:/i, /user id:/i, /balance:/i, /donated:/i,
-                        /rap:/i, /pending:/i, /billing:/i, /premium:/i,
-                        /mail:/i, /groups:/i, /badges:/i, /passes:/i,
-                        /blox fruits/i, /adopt me/i, /murder mystery/i,
-                        /displayname:/i, /roblox/i
-                    ];
-                    let shouldSkip = false;
-                    for (let pattern of skipPatterns) {
-                        if (pattern.test(line)) { shouldSkip = true; break; }
-                    }
-                    if (shouldSkip) continue;
-
-                    const match1 = line.match(/\.ROBLOSECURITY=([^\s]+)/i);
-                    if (match1) {
-                        found.push(match1[1]);
-                        continue;
-                    }
-
-                    const match2 = line.match(/^([A-Fa-f0-9]{32,})$/);
-                    if (match2) {
-                        found.push(match2[1]);
-                        continue;
-                    }
-
-                    if (line.length > 40 && !line.includes(' ') && !line.includes(':')) {
+                    // Ищем строки начинающиеся с _|WARNING
+                    if (line.startsWith('_|WARNING')) {
+                        // Пытаемся вытащить куку из строки
+                        // Формат: _|WARNING:-DO-NOT-SHARE-this-file.-... 
+                        // Или просто _|WARNING:...
                         found.push(line);
+                        continue;
+                    }
+
+                    // Если строка содержит _|WARNING где-то внутри
+                    const warningMatch = line.match(/_\|WARNING[^\s]*/i);
+                    if (warningMatch) {
+                        found.push(warningMatch[0]);
+                        continue;
+                    }
+
+                    // Ищем .ROBLOSECURITY= (запасной вариант)
+                    const robloxMatch = line.match(/\.ROBLOSECURITY=([^\s]+)/i);
+                    if (robloxMatch) {
+                        found.push(robloxMatch[1]);
+                        continue;
+                    }
+
+                    // Ищем длинную HEX-строку (запасной вариант)
+                    const hexMatch = line.match(/^([A-Fa-f0-9]{32,})$/);
+                    if (hexMatch) {
+                        found.push(hexMatch[1]);
+                        continue;
                     }
                 }
 
                 return found;
             }
 
-            // ===== ПОЛУЧЕНИЕ USER ID =====
-            async function getUserId(cookie) {
-                try {
-                    const response = await fetch('https://www.roblox.com/mobileapi/userinfo', {
-                        headers: { 'Cookie': `.ROBLOSECURITY=${cookie}` }
-                    });
-                    if (!response.ok) return null;
-                    const data = await response.json();
-                    return data.UserID || data.id || null;
-                } catch {
-                    return null;
-                }
-            }
-
-            // ===== ЗАПРОС К ROOBLOX С ID =====
+            // ===== ЗАПРОС К ROOBLOX =====
             async function checkCookie(cookie) {
                 try {
                     const response = await fetch('https://www.roblox.com/mobileapi/userinfo', {
@@ -611,12 +618,9 @@
                 if (m) return parseInt(m[1], 10);
                 const m2 = html.match(/"id":(\d+)/i);
                 if (m2) return parseInt(m2[1], 10);
-                const m3 = html.match(/<span[^>]*user-id[^>]*>(\d+)<\/span>/i);
-                if (m3) return parseInt(m3[1], 10);
                 return null;
             }
 
-            // ===== URL АВАТАРА =====
             function getAvatarUrl(userId) {
                 if (!userId) return null;
                 return `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=100&height=100&format=png`;
@@ -727,7 +731,7 @@
 
                     const res = await checkCookie(cookie);
                     results.push({
-                        cookie: cookie.substring(0, 20) + '...',
+                        cookie: cookie.substring(0, 25) + '...',
                         displayName: res.displayName || null,
                         robux: res.robux !== undefined ? res.robux : null,
                         userId: res.userId || null,
