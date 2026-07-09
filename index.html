@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🍪 Куки Чекер</title>
     <style>
-        /* ===== БАЗА ===== */
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +23,6 @@
             position: relative;
         }
 
-        /* ===== ФОН ===== */
         .bg {
             position: fixed;
             inset: 0;
@@ -35,7 +33,6 @@
                 linear-gradient(145deg, #080c08 0%, #0d180d 50%, #080c08 100%);
         }
 
-        /* ===== СВЕТЯЩИЕСЯ ТОЧКИ ===== */
         .glow-points {
             position: fixed;
             inset: 0;
@@ -58,18 +55,16 @@
             100% { transform: translate(40px, -60px) scale(1.8); opacity: 0.8; }
         }
 
-        /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
         .main {
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 820px;
+            max-width: 860px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* ===== ЗАГОЛОВОК С АНИМАЦИЕЙ (ЦЕНТР → ВВЕРХ) ===== */
         .header {
             text-align: center;
             width: 100%;
@@ -170,7 +165,6 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== КАРТОЧКА ===== */
         .card {
             width: 100%;
             background: rgba(12, 22, 12, 0.85);
@@ -189,7 +183,6 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== ЗОНА ЗАГРУЗКИ ===== */
         .drop-zone {
             border: 2px dashed rgba(0, 255, 120, 0.15);
             border-radius: 18px;
@@ -222,7 +215,6 @@
             display: none;
         }
 
-        /* ===== ФАЙЛЫ ===== */
         .file-list {
             display: flex;
             flex-wrap: wrap;
@@ -256,7 +248,6 @@
             transform: scale(1.2);
         }
 
-        /* ===== СТАТУС ===== */
         .status {
             margin: 0.8rem 0 0.3rem;
             padding: 0.6rem 1rem;
@@ -269,7 +260,6 @@
             transition: 0.3s;
         }
 
-        /* ===== ПРОГРЕСС ===== */
         .progress-wrap {
             margin: 0.6rem 0;
             height: 4px;
@@ -286,7 +276,6 @@
             transition: width 0.3s ease;
         }
 
-        /* ===== КНОПКИ ===== */
         .btn-group {
             display: flex;
             flex-wrap: wrap;
@@ -327,73 +316,107 @@
             background: rgba(200, 50, 50, 0.22);
         }
 
-        /* ===== РЕЗУЛЬТАТЫ С АВАТАРАМИ ===== */
+        /* ===== РЕЗУЛЬТАТЫ С ИГРАМИ ===== */
         .result-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: 1fr;
             gap: 1rem;
             margin-top: 1.2rem;
         }
+
         .cookie-card {
             background: rgba(0, 255, 80, 0.02);
             border: 1px solid rgba(0, 255, 120, 0.06);
             border-radius: 16px;
-            padding: 1rem;
-            text-align: center;
+            padding: 1.2rem;
             transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .cookie-card:hover {
-            background: rgba(0, 255, 80, 0.06);
-            border-color: rgba(0, 255, 120, 0.20);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(0, 255, 80, 0.05);
+            border-color: rgba(0, 255, 120, 0.15);
         }
+
+        .cookie-card .top-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
         .cookie-card .avatar {
-            width: 80px;
-            height: 80px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             border: 2px solid rgba(0, 255, 120, 0.20);
-            margin-bottom: 0.6rem;
             background: #0d180d;
             object-fit: cover;
+            flex-shrink: 0;
         }
         .cookie-card .avatar.placeholder {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.5rem;
             background: rgba(0, 255, 80, 0.05);
             color: #4a6a4a;
         }
-        .cookie-card .name {
+
+        .cookie-card .user-info {
+            flex: 1;
+        }
+        .cookie-card .user-info .name {
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #d0f0d0;
-            margin-bottom: 0.2rem;
         }
-        .cookie-card .robux {
+        .cookie-card .user-info .robux {
             color: #40ff80;
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 600;
         }
-        .cookie-card .label {
+        .cookie-card .user-info .user-id {
             color: #4a6a4a;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
+            font-size: 0.7rem;
         }
         .cookie-card .error {
             color: #ff6b6b;
             font-size: 0.9rem;
         }
-        .cookie-card .cookie-preview {
+
+        /* ===== ИГРЫ ===== */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.4rem 1rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(0, 255, 120, 0.05);
+        }
+        .game-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.2rem 0;
+            font-size: 0.8rem;
+            color: #8aaa8a;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .game-item .game-name {
+            color: #b0d0b0;
+        }
+        .game-item .game-value {
+            color: #40ff80;
+            font-weight: 600;
+        }
+        .game-item .game-value.zero {
+            color: #4a6a4a;
+        }
+
+        .cookie-preview {
             color: #3a5a3a;
             font-size: 0.55rem;
             word-break: break-all;
-            margin-top: 0.4rem;
+            margin-top: 0.6rem;
             font-family: monospace;
             max-width: 100%;
             overflow: hidden;
@@ -409,7 +432,13 @@
             text-align: center;
         }
 
-        /* ===== АДАПТИВ ===== */
+        .no-games {
+            color: #4a6a4a;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+
         @media (max-width: 560px) {
             .logo { font-size: 2.6rem; }
             .card { padding: 1.2rem; }
@@ -417,14 +446,14 @@
             .drop-zone { padding: 1.2rem; }
             .drop-zone .icon { font-size: 2rem; }
             .subtitle { font-size: 0.6rem; letter-spacing: 3px; }
-            .cookie-card .avatar { width: 60px; height: 60px; }
-            .result-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .cookie-card .avatar { width: 44px; height: 44px; }
+            .games-grid { grid-template-columns: 1fr 1fr; }
+            .game-item { font-size: 0.7rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== ФОН ===== -->
     <div class="bg"></div>
     <div class="glow-points">
         <div class="glow-point"></div>
@@ -432,10 +461,8 @@
         <div class="glow-point"></div>
     </div>
 
-    <!-- ===== ОСНОВНОЙ БЛОК ===== -->
     <div class="main">
 
-        <!-- ===== ЗАГОЛОВОК ===== -->
         <div class="header" id="header">
             <div class="logo">
                 <span class="logo-emoji">🍪</span>
@@ -447,10 +474,8 @@
             <div class="subtitle" id="subtitle">✦ ПРОВЕРКА АККАУНТОВ ROBLOX ✦</div>
         </div>
 
-        <!-- ===== КАРТОЧКА ===== -->
         <div class="card" id="card">
 
-            <!-- ЗОНА ЗАГРУЗКИ -->
             <div class="drop-zone" id="dropZone">
                 <span class="icon">📂</span>
                 <p><strong>Нажмите или перетащите</strong> файлы с куками</p>
@@ -458,24 +483,19 @@
                 <input type="file" id="fileInput" multiple />
             </div>
 
-            <!-- СПИСОК ФАЙЛОВ -->
             <div class="file-list" id="fileList"></div>
 
-            <!-- СТАТУС -->
             <div class="status" id="status">📌 Загрузите файлы с куками Roblox</div>
 
-            <!-- ПРОГРЕСС -->
             <div class="progress-wrap" id="progressWrap">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
 
-            <!-- КНОПКИ -->
             <div class="btn-group">
                 <button class="btn btn-primary" id="checkBtn">🔍 Проверить</button>
                 <button class="btn btn-danger" id="clearBtn">🗑 Очистить</button>
             </div>
 
-            <!-- РЕЗУЛЬТАТЫ -->
             <div id="resultContainer"></div>
 
         </div>
@@ -485,16 +505,13 @@
         (function() {
             'use strict';
 
-            // ===== СОСТОЯНИЕ =====
             let rawFiles = [];
             let allCookies = [];
             let results = [];
             let isChecking = false;
 
-            // ===== DOM =====
             const header = document.getElementById('header');
             const subtitle = document.getElementById('subtitle');
-            const card = document.getElementById('card');
             const fileInput = document.getElementById('fileInput');
             const dropZone = document.getElementById('dropZone');
             const fileList = document.getElementById('fileList');
@@ -505,53 +522,122 @@
             const progressBar = document.getElementById('progressBar');
             const resultContainer = document.getElementById('resultContainer');
 
-            // ===== АНИМАЦИЯ ПЕРЕМЕЩЕНИЯ =====
             setTimeout(() => {
                 header.classList.add('moved');
                 subtitle.classList.add('show');
             }, 1800);
 
-            // ===== ПАРСИНГ КУК (ИЩЕТ _|WARNING) =====
+            // ===== ПАРСИНГ КУК =====
             function extractCookies(text) {
                 const lines = text.split(/\r?\n/);
                 const found = [];
-
                 for (let line of lines) {
                     line = line.trim();
                     if (!line) continue;
-
-                    // Ищем строки начинающиеся с _|WARNING
                     if (line.startsWith('_|WARNING')) {
-                        // Пытаемся вытащить куку из строки
-                        // Формат: _|WARNING:-DO-NOT-SHARE-this-file.-... 
-                        // Или просто _|WARNING:...
                         found.push(line);
                         continue;
                     }
-
-                    // Если строка содержит _|WARNING где-то внутри
                     const warningMatch = line.match(/_\|WARNING[^\s]*/i);
                     if (warningMatch) {
                         found.push(warningMatch[0]);
                         continue;
                     }
-
-                    // Ищем .ROBLOSECURITY= (запасной вариант)
                     const robloxMatch = line.match(/\.ROBLOSECURITY=([^\s]+)/i);
                     if (robloxMatch) {
                         found.push(robloxMatch[1]);
                         continue;
                     }
-
-                    // Ищем длинную HEX-строку (запасной вариант)
                     const hexMatch = line.match(/^([A-Fa-f0-9]{32,})$/);
                     if (hexMatch) {
                         found.push(hexMatch[1]);
                         continue;
                     }
                 }
-
                 return found;
+            }
+
+            // ===== ПАРСИНГ ИГР ИЗ HTML =====
+            function parseGamesFromHTML(html) {
+                const games = {};
+
+                // Ищем секцию с играми на странице профиля
+                // Пробуем найти скрытые данные
+                try {
+                    // Ищем JSON с данными игр
+                    const jsonMatch = html.match(/"games":\s*({[^}]+})/i);
+                    if (jsonMatch) {
+                        const data = JSON.parse('{' + jsonMatch[1] + '}');
+                        for (let key in data) {
+                            if (typeof data[key] === 'number' || typeof data[key] === 'string') {
+                                games[key] = data[key];
+                            }
+                        }
+                    }
+                } catch (e) {}
+
+                // Ищем пары "Игра: значение" в тексте
+                const gamePatterns = [
+                    /Blox Fruits[:\s]+(\d+)/i,
+                    /Adopt Me[:\s]+(\d+)/i,
+                    /Murder Mystery[:\s]+(\d+)/i,
+                    /King Legacy[:\s]+(\d+)/i,
+                    /Toilet Tower Defense[:\s]+(\d+)/i,
+                    /Pet Simulator[:\s]+(\d+)/i,
+                    /Grand Piece Online[:\s]+(\d+)/i,
+                    /Blade Ball[:\s]+(\d+)/i,
+                    /Fisch[:\s]+(\d+)/i,
+                    /Volleyball Legends[:\s]+(\d+)/i,
+                    /Sailor Piece[:\s]+(\d+)/i,
+                    /Your Bizarre Adventure[:\s]+(\d+)/i,
+                    /Bee Swarm Simulator[:\s]+(\d+)/i,
+                    /Anime Vanguard[:\s]+(\d+)/i,
+                    /RIVALS[:\s]+(\d+)/i,
+                    /Tailbreak[:\s]+(\d+)/i,
+                    /Evade[:\s]+(\d+)/i,
+                    /Da Hood[:\s]+(\d+)/i,
+                    /Grow a Garden[:\s]+(\d+)/i,
+                    /Escape Tsunami[:\s]+(\d+)/i,
+                    /Steal a Brainrot[:\s]+(\d+)/i,
+                    /Fish It[:\s]+(\d+)/i,
+                ];
+
+                for (let pattern of gamePatterns) {
+                    const match = html.match(pattern);
+                    if (match) {
+                        const name = match[0].replace(/[:\s]+\d+$/, '').trim();
+                        games[name] = parseInt(match[1], 10);
+                    }
+                }
+
+                // Ищем в виде "Game: 0 | Game2: 5"
+                const pairs = html.match(/([A-Za-z0-9\s\[\]!]+):\s*(\d+)/g);
+                if (pairs) {
+                    for (let pair of pairs) {
+                        const parts = pair.split(':');
+                        if (parts.length === 2) {
+                            const name = parts[0].trim();
+                            const val = parseInt(parts[1].trim(), 10);
+                            if (name.length > 2 && name.length < 40 && !isNaN(val)) {
+                                // Проверяем что это не стандартные поля
+                                const skipNames = ['Username', 'User ID', 'Balance', 'Donated', 'RAP', 'Pending', 'Billing', 'Cards', 'Premium', 'Mail', 'Groups', 'Badges', 'Passes'];
+                                if (!skipNames.includes(name)) {
+                                    games[name] = val;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Удаляем дубликаты и сортируем по убыванию
+                const sorted = {};
+                const keys = Object.keys(games).sort();
+                for (let key of keys) {
+                    if (games[key] !== undefined && games[key] !== null) {
+                        sorted[key] = games[key];
+                    }
+                }
+                return sorted;
             }
 
             // ===== ЗАПРОС К ROOBLOX =====
@@ -566,30 +652,45 @@
                             headers: { 'Cookie': `.ROBLOSECURITY=${cookie}` }
                         });
                         if (!resp2.ok) {
-                            return { error: `HTTP ${resp2.status}`, userId: null };
+                            return { error: `HTTP ${resp2.status}`, userId: null, games: {} };
                         }
                         const html = await resp2.text();
                         const displayName = extractName(html);
                         const robux = extractRobux(html);
                         const userId = extractUserId(html);
+                        const games = parseGamesFromHTML(html);
                         if (!displayName && robux === null) {
-                            return { error: 'Не удалось распарсить', userId: null };
+                            return { error: 'Не удалось распарсить', userId: null, games: {} };
                         }
                         return {
                             displayName: displayName || 'Неизвестно',
                             robux: robux !== null ? robux : 0,
-                            userId: userId || null
+                            userId: userId || null,
+                            games: games
                         };
                     }
 
                     const data = await response.json();
+                    // Пытаемся получить игры через отдельный запрос
+                    let games = {};
+                    try {
+                        const profileResp = await fetch(`https://www.roblox.com/users/${data.UserID || data.id}/profile`, {
+                            headers: { 'Cookie': `.ROBLOSECURITY=${cookie}` }
+                        });
+                        if (profileResp.ok) {
+                            const profileHtml = await profileResp.text();
+                            games = parseGamesFromHTML(profileHtml);
+                        }
+                    } catch (e) {}
+
                     return {
                         displayName: data.UserName || data.displayName || data.name || 'Без имени',
                         robux: data.RobuxBalance || data.robux || 0,
-                        userId: data.UserID || data.id || null
+                        userId: data.UserID || data.id || null,
+                        games: games
                     };
                 } catch (err) {
-                    return { error: err.message || 'Ошибка запроса', userId: null };
+                    return { error: err.message || 'Ошибка запроса', userId: null, games: {} };
                 }
             }
 
@@ -677,6 +778,7 @@
                     return;
                 }
                 let html = `<div class="result-title">📊 Результаты (${results.length})</div><div class="result-grid">`;
+
                 for (let r of results) {
                     let avatarHtml = '';
                     if (r.error) {
@@ -692,20 +794,46 @@
                     if (r.error) {
                         content = `<div class="error">❌ ${r.error}</div>`;
                     } else {
+                        let gamesHtml = '';
+                        const gameKeys = Object.keys(r.games || {});
+                        if (gameKeys.length > 0) {
+                            gamesHtml = '<div class="games-grid">';
+                            for (let key of gameKeys) {
+                                const val = r.games[key];
+                                const valClass = val === 0 || val === '0' ? 'game-value zero' : 'game-value';
+                                gamesHtml += `
+                                    <div class="game-item">
+                                        <span class="game-name">${key}</span>
+                                        <span class="${valClass}">${val}</span>
+                                    </div>
+                                `;
+                            }
+                            gamesHtml += '</div>';
+                        } else {
+                            gamesHtml = `<div class="no-games">🎮 Нет данных об играх</div>`;
+                        }
+
                         content = `
-                            <div class="name">${r.displayName || '—'}</div>
-                            <div class="robux">${r.robux !== undefined && r.robux !== null ? r.robux : '—'} <span style="font-size:0.7rem;color:#4a6a4a;">R$</span></div>
+                            <div class="top-row">
+                                ${avatarHtml}
+                                <div class="user-info">
+                                    <div class="name">${r.displayName || '—'}</div>
+                                    <div class="robux">${r.robux !== undefined && r.robux !== null ? r.robux : '—'} R$</div>
+                                    <div class="user-id">ID: ${r.userId || '—'}</div>
+                                </div>
+                            </div>
+                            ${gamesHtml}
                         `;
                     }
 
                     html += `
                         <div class="cookie-card">
-                            ${avatarHtml}
                             ${content}
                             <div class="cookie-preview">${r.cookie || '...'}</div>
                         </div>
                     `;
                 }
+
                 html += '</div>';
                 resultContainer.innerHTML = html;
             }
@@ -735,10 +863,11 @@
                         displayName: res.displayName || null,
                         robux: res.robux !== undefined ? res.robux : null,
                         userId: res.userId || null,
+                        games: res.games || {},
                         error: res.error || null
                     });
 
-                    await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
+                    await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
                 }
 
                 progressBar.style.width = '100%';
@@ -749,7 +878,7 @@
                 setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
             }
 
-            // ===== ОБРАБОТЧИКИ ЗАГРУЗКИ =====
+            // ===== ОБРАБОТЧИКИ =====
             function handleFiles(files) {
                 const allowed = 3;
                 if (rawFiles.length + files.length > allowed) {
@@ -785,7 +914,6 @@
             });
             dropZone.addEventListener('click', () => fileInput.click());
 
-            // ===== КНОПКИ =====
             checkBtn.addEventListener('click', runCheck);
 
             clearBtn.addEventListener('click', () => {
@@ -802,7 +930,6 @@
                 isChecking = false;
             });
 
-            // ===== ИНИЦИАЛИЗАЦИЯ =====
             renderFiles();
             updateStatus();
         })();
