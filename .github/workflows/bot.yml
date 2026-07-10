@@ -1,0 +1,30 @@
+name: Run Telegram Bot
+
+on:
+  schedule:
+    # Запуск каждые 5 минут (можно изменить интервал)
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Позволяет запустить вручную из вкладки Actions
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install aiogram
+          # Если зависимостей много, лучше создать requirements.txt
+
+      - name: Run bot
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }} # Токен из секретов репозитория
+        run: |
+          python bot.py
