@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wait | otklix</title>
     <style>
-        /* ========== ОСНОВНЫЕ СТИЛИ ========== */
+        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -23,143 +23,106 @@
             margin: 0;
             padding: 20px;
             text-align: center;
-            overflow: hidden;
         }
 
-        /* ========== ЧАСТИЦЫ НА ФОНЕ ========== */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* ===== КОНТЕЙНЕР ===== */
+        .container {
+            max-width: 600px;
             width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
         }
 
-        /* ========== КАРТОЧКА С GLASSMORPHISM ========== */
-        .card {
-            position: relative;
-            z-index: 1;
-            background: rgba(22, 27, 34, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 2.5rem 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            max-width: 550px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-            animation: cardAppear 1s ease forwards;
+        /* ===== АНИМАЦИЯ ПРИВЕТСТВИЯ ===== */
+        .hero {
+            margin-bottom: 3rem;
+        }
+
+        .welcome-text {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #58a6ff;
             opacity: 0;
-            transform: translateY(30px) scale(0.95);
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 0.2s;
         }
 
-        @keyframes cardAppear {
-            0% {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .card:hover {
-            border-color: rgba(88, 166, 255, 0.15);
-            transition: all 0.4s ease;
-        }
-
-        /* ========== ЗАГОЛОВОК С АНИМАЦИЕЙ ========== */
-        .title-wrapper {
-            margin-bottom: 0.5rem;
-            min-height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #animated-title {
-            font-size: 3.2rem;
+        .main-title {
+            font-size: 4rem;
             font-weight: 800;
             letter-spacing: 2px;
-            background: linear-gradient(135deg, #58a6ff, #f0883e, #58a6ff);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 4s ease-in-out infinite;
+            margin-top: 0.5rem;
             display: flex;
-            gap: 2px;
             flex-wrap: wrap;
             justify-content: center;
+            gap: 0.1rem;
         }
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        /* Каждая буква отдельно */
+        /* Каждая буква — отдельный элемент */
         .letter {
             display: inline-block;
             opacity: 0;
-            transform: scale(0.5) rotate(-10deg);
-            animation: letterPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transform: translateY(20px);
+            animation: letterAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            color: #ffffff;
         }
 
-        .letter.space {
-            width: 8px;
-            animation: none;
-            opacity: 1;
-            transform: none;
+        /* Буквы "wait" — с градиентом */
+        .letter.gradient {
+            background: linear-gradient(135deg, #58a6ff, #f0883e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        @keyframes letterPop {
+        /* Буквы "otklix" — белые */
+        .letter.white {
+            color: #ffffff;
+        }
+
+        /* Символ "|" — серый */
+        .letter.pipe {
+            color: #8b949e;
+            font-weight: 300;
+        }
+
+        @keyframes letterAppear {
             0% {
                 opacity: 0;
-                transform: scale(0.5) rotate(-10deg);
+                transform: translateY(20px) scale(0.8);
                 filter: blur(4px);
             }
             60% {
                 opacity: 1;
-                transform: scale(1.15) rotate(2deg);
+                transform: translateY(-5px) scale(1.05);
                 filter: blur(0);
-                text-shadow: 0 0 40px rgba(88, 166, 255, 0.3);
             }
             100% {
                 opacity: 1;
-                transform: scale(1) rotate(0deg);
+                transform: translateY(0) scale(1);
                 filter: blur(0);
-                text-shadow: none;
             }
         }
 
-        /* ========== ПОДЗАГОЛОВОК ========== */
-        .sub {
-            color: #8b949e;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #21262d;
-            padding-bottom: 1rem;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== КАРТОЧКА (появляется после анимации) ===== */
+        .card {
+            background: rgba(22, 27, 34, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
             opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 2.5s;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 2.8s; /* Ждём, пока появятся все буквы */
         }
 
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ========== СТАТУС БОТА ========== */
+        /* ===== СТАТУС ===== */
         .status {
             background: rgba(13, 17, 23, 0.7);
             border-radius: 12px;
@@ -170,9 +133,6 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 2.8s;
         }
 
         .status-dot {
@@ -194,17 +154,13 @@
             font-weight: 500;
         }
 
-        /* ========== ФИЧИ ========== */
+        /* ===== ФИЧИ ===== */
         .features {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
             margin: 1.2rem 0;
-            text-align: left;
             font-size: 0.9rem;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 3s;
         }
 
         .features span {
@@ -213,9 +169,6 @@
             border-radius: 8px;
             border: 1px solid #21262d;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .features span:hover {
@@ -224,15 +177,12 @@
             transform: translateX(3px);
         }
 
-        /* ========== КНОПКИ ========== */
+        /* ===== КНОПКИ ===== */
         .btn-group {
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin-top: 1.2rem;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 3.2s;
         }
 
         .btn {
@@ -273,175 +223,26 @@
             display: flex;
             gap: 10px;
         }
-
         .btn-row .btn {
             flex: 1;
             text-align: center;
         }
 
-        /* ========== ФУТЕР ========== */
         .footer {
             margin-top: 1.5rem;
             font-size: 0.75rem;
             color: #484f58;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 3.5s;
         }
 
-        /* ========== АДАПТИВНОСТЬ ========== */
+        /* ===== АДАПТИВНОСТЬ ===== */
         @media (max-width: 480px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
             .card {
                 padding: 1.5rem;
-            }
-            #animated-title {
-                font-size: 2.2rem;
             }
             .features {
                 grid-template-columns: 1fr;
             }
-            .btn-row {
-                flex-direction: column;
-            }
-            .title-wrapper {
-                min-height: 60px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- ===== ЧАСТИЦЫ НА ФОНЕ ===== -->
-    <canvas id="particles-canvas"></canvas>
-
-    <!-- ===== КАРТОЧКА ===== -->
-    <div class="card">
-
-        <!-- ===== ЗАГОЛОВОК С АНИМАЦИЕЙ БУКВ ===== -->
-        <div class="title-wrapper">
-            <div id="animated-title">
-                <span class="letter">w</span>
-                <span class="letter">a</span>
-                <span class="letter">i</span>
-                <span class="letter">t</span>
-                <span class="letter space"></span>
-                <span class="letter">|</span>
-                <span class="letter space"></span>
-                <span class="letter">o</span>
-                <span class="letter">t</span>
-                <span class="letter">k</span>
-                <span class="letter">l</span>
-                <span class="letter">i</span>
-                <span class="letter">x</span>
-            </div>
-        </div>
-
-        <!-- ===== ПОДЗАГОЛОВОК ===== -->
-        <div class="sub">✨ Проект в разработке</div>
-
-        <!-- ===== СТАТУС ===== -->
-        <div class="status">
-            <span class="status-dot"></span>
-            <span class="status-text">Бот активен</span>
-            <span style="color:#8b949e; font-size:0.75rem;">(GitHub Actions)</span>
-        </div>
-
-        <!-- ===== ФИЧИ ===== -->
-        <div class="features">
-            <span>🔍 Проверка ников</span>
-            <span>🚀 Создание каналов</span>
-            <span>👑 Передача прав</span>
-            <span>⚡ Fragment.com</span>
-        </div>
-
-        <!-- ===== КНОПКИ ===== -->
-        <div class="btn-group">
-            <a href="#" class="btn btn-primary" id="botLink">🤖 Открыть бота</a>
-            <div class="btn-row">
-                <a href="https://github.com/otklix/wait" target="_blank" class="btn btn-secondary">📦 GitHub</a>
-                <a href="https://github.com/otklix/wait/issues" target="_blank" class="btn btn-secondary">🐛 Баги</a>
-            </div>
-        </div>
-
-        <!-- ===== ФУТЕР ===== -->
-        <div class="footer">
-            otklix · 2026
-        </div>
-    </div>
-
-    <!-- ===== СКРИПТЫ ===== -->
-    <script>
-        // ===========================
-        // 1. ЧАСТИЦЫ НА ФОНЕ
-        // ===========================
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, particles;
-
-        function resizeCanvas() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 2.5 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.4;
-                this.speedY = (Math.random() - 0.5) * 0.4;
-                this.opacity = Math.random() * 0.4 + 0.1;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x > width) this.x = 0;
-                if (this.x < 0) this.x = width;
-                if (this.y > height) this.y = 0;
-                if (this.y < 0) this.y = height;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                ctx.fill();
-            }
-        }
-
-        particles = [];
-        for (let i = 0; i < 100; i++) {
-            particles.push(new Particle());
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        // ===========================
-        // 2. АНИМАЦИЯ БУКВ (ЗАДЕРЖКИ)
-        // ===========================
-        document.addEventListener('DOMContentLoaded', () => {
-            const letters = document.querySelectorAll('.letter:not(.space)');
-            letters.forEach((el, i) => {
-                el.style.animationDelay = `${i * 0.08}s`;
-            });
-        });
-
-        // ===========================
-        // 3. ССЫЛКА НА БОТА (ЗАМЕНИ НА СВОЮ)
-        // ===========================
-        document.getElementById('botLink').href = 'https://t.me/ваш_бот_username';
-    </script>
-
-</body>
-</html>
+            .btn-row
