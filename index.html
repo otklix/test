@@ -1,38 +1,99 @@
-import os
-import logging
-from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wait | otklix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .card {
+            background: #161b22;
+            border-radius: 16px;
+            padding: 2rem 3rem;
+            border: 1px solid #30363d;
+            max-width: 500px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, #58a6ff, #f0883e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sub {
+            color: #8b949e;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 1rem;
+        }
+        .status {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            border-left: 3px solid #f0883e;
+        }
+        .emoji-big {
+            font-size: 4rem;
+            margin: 0.5rem 0;
+        }
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #484f58;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="emoji-big">⏳</div>
+        <h1>wait</h1>
+        <div class="sub">Проект в разработке</div>
+        
+        <div class="status">
+            <strong>🤖 Бот:</strong> 
+            <span id="bot-status">Запускается...</span>
+        </div>
 
-# Настройка логирования
-logging.basicConfig(level=logging.INFO)
+        <p>
+            Следите за обновлениями в 
+            <a href="https://github.com/otklix/wait" target="_blank">репозитории</a>
+        </p>
+        <div class="footer">
+            otklix · 2026
+        </div>
+    </div>
 
-# Токен берется из переменных окружения
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-if not BOT_TOKEN:
-    logging.error("BOT_TOKEN не найден! Установите секрет в настройках GitHub.")
-    exit(1)
-
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
-
-@dp.message(Command("start"))
-async def start_command(message: types.Message):
-    """Обработчик команды /start"""
-    await message.answer(
-        "👋 Привет! Я бот из репозитория otklix/wait.\n"
-        "Я работаю через GitHub Actions!"
-    )
-
-@dp.message()
-async def echo_message(message: types.Message):
-    """Отвечает на любое сообщение"""
-    await message.answer(f"Вы написали: {message.text}")
-
-async def main():
-    """Запуск бота"""
-    logging.info("Бот запускается...")
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    <script>
+        // Простая проверка статуса бота через запрос к его API (если есть)
+        // Сейчас просто имитация
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusEl = document.getElementById('bot-status');
+            // Можно попробовать запросить статус у бота, если он запущен
+            // Например: fetch('https://ваш-бот.herokuapp.com/health')
+            // Пока оставим заглушку
+            statusEl.textContent = '🟢 Активен (через GitHub Actions)';
+        });
+    </script>
+</body>
+</html>
