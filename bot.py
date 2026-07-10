@@ -1,504 +1,512 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>wait | otklix</title>
-    <style>
-        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+import os
+import logging
+import asyncio
+import aiohttp
+from bs4 import BeautifulSoup
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.filters import Command
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+from datetime import datetime
+import io
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-            overflow: hidden;
-            position: relative;
-        }
+# ========== НАСТРОЙКИ ==========
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-        /* ============================================
-                   ЗАДНИЙ ПЛАН (как на Aqua-Cookies)
-                   ============================================ */
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+if not BOT_TOKEN:
+    logger.error("BOT_TOKEN не найден!")
+    exit(1)
 
-        /* 1. Основной фон с затемнением */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(ellipse at 20% 50%, rgba(88, 166, 255, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 50%, rgba(240, 136, 62, 0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(88, 166, 255, 0.04) 0%, transparent 50%);
-            z-index: 0;
-            pointer-events: none;
-        }
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
 
-        /* 2. Декоративные градиентные линии (как на Aqua-Cookies) */
-        .bg-lines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-            opacity: 0.4;
-        }
+# ========== ХРАНИЛИЩЕ ==========
+user_channels = {}
 
-        .bg-line {
-            position: absolute;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.3), rgba(240, 136, 62, 0.3), transparent);
-            border-radius: 50%;
-            animation: lineFloat 8s ease-in-out infinite alternate;
-        }
+# ========== КЛАВИАТУРЫ ==========
+def main_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="🔍 Проверить ники", callback_data="check"),
+        InlineKeyboardButton(text="🚀 Создать канал", callback_data="create")
+    )
+    builder.row(
+        InlineKeyboardButton(text="👑 Передать права", callback_data="transfer"),
+        InlineKeyboardButton(text="🖼️ Сменить аватарку", callback_data="change_avatar")
+    )
+    builder.row(
+        InlineKeyboardButton(text="⚙️ Настройки канала", callback_data="settings"),
+        InlineKeyboardButton(text="🌐 Открыть сайт", url="https://otklix.github.io/wait/")
+    )
+    builder.row(
+        InlineKeyboardButton(text="📊 Мои каналы", callback_data="my_channels")
+    )
+    return builder.as_markup()
 
-        .bg-line:nth-child(1) {
-            top: 10%;
-            left: -10%;
-            width: 40%;
-            animation-delay: 0s;
-        }
-        .bg-line:nth-child(2) {
-            top: 30%;
-            right: -10%;
-            width: 35%;
-            animation-delay: 2s;
-            background: linear-gradient(90deg, transparent, rgba(240, 136, 62, 0.2), rgba(88, 166, 255, 0.2), transparent);
-        }
-        .bg-line:nth-child(3) {
-            top: 55%;
-            left: -5%;
-            width: 30%;
-            animation-delay: 4s;
-        }
-        .bg-line:nth-child(4) {
-            top: 75%;
-            right: -5%;
-            width: 45%;
-            animation-delay: 1s;
-            background: linear-gradient(90deg, transparent, rgba(240, 136, 62, 0.15), rgba(88, 166, 255, 0.15), transparent);
-        }
-        .bg-line:nth-child(5) {
-            top: 90%;
-            left: 10%;
-            width: 25%;
-            animation-delay: 3s;
-        }
+def channels_keyboard(user_id):
+    builder = InlineKeyboardBuilder()
+    channels = user_channels.get(user_id, [])
+    if not channels:
+        builder.row(InlineKeyboardButton(text="❌ Нет каналов", callback_data="no_channels"))
+    else:
+        for ch in channels:
+            builder.row(InlineKeyboardButton(
+                text=f"📢 {ch['title']} (@{ch['username']})",
+                callback_data=f"channel_{ch['channel_id']}"
+            ))
+    builder.row(InlineKeyboardButton(text="↩️ Назад", callback_data="back"))
+    return builder.as_markup()
 
-        @keyframes lineFloat {
-            0% {
-                transform: translateX(0) scaleX(1);
-                opacity: 0.3;
-            }
-            50% {
-                transform: translateX(30px) scaleX(1.2);
-                opacity: 0.7;
-            }
-            100% {
-                transform: translateX(-20px) scaleX(0.8);
-                opacity: 0.3;
-            }
-        }
+def settings_keyboard(channel_id):
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="📝 Изменить название", callback_data=f"rename_{channel_id}"),
+        InlineKeyboardButton(text="📄 Изменить описание", callback_data=f"bio_{channel_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="🖼️ Сменить аватарку", callback_data=f"avatar_{channel_id}"),
+        InlineKeyboardButton(text="🔗 Изменить ссылку", callback_data=f"link_{channel_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="🔒 Приватность", callback_data=f"privacy_{channel_id}"),
+        InlineKeyboardButton(text="👑 Передать права", callback_data=f"transfer_owner_{channel_id}")
+    )
+    builder.row(
+        InlineKeyboardButton(text="🗑️ Удалить канал", callback_data=f"delete_{channel_id}")
+    )
+    builder.row(InlineKeyboardButton(text="↩️ Назад", callback_data="back"))
+    return builder.as_markup()
 
-        /* 3. Частицы (звёздочки) */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
+# ========== СОСТОЯНИЯ ==========
+class CheckStates(StatesGroup):
+    waiting_nicks = State()
 
-        /* ============================================
-                   КОНТЕНТ
-                   ============================================ */
+class CreateStates(StatesGroup):
+    waiting_username = State()
 
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 600px;
-            width: 100%;
-        }
+class TransferStates(StatesGroup):
+    waiting_channel = State()
+    waiting_new_owner = State()
 
-        /* ===== АНИМАЦИЯ ПРИВЕТСТВИЯ ===== */
-        .hero {
-            margin-bottom: 2rem;
-        }
+class AvatarStates(StatesGroup):
+    waiting_channel = State()
+    waiting_photo = State()
 
-        .welcome-text {
-            font-size: 1.2rem;
-            font-weight: 300;
-            letter-spacing: 4px;
-            color: #58a6ff;
-            opacity: 0;
-            animation: fadeIn 0.8s ease forwards;
-            animation-delay: 0.2s;
-        }
+class RenameStates(StatesGroup):
+    waiting_channel = State()
+    waiting_new_name = State()
 
-        .main-title {
-            font-size: 4rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin-top: 0.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.1rem;
-        }
+class BioStates(StatesGroup):
+    waiting_channel = State()
+    waiting_new_bio = State()
 
-        .letter {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: letterAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            color: #ffffff;
-        }
+# ========== ФУНКЦИЯ ПРОВЕРКИ НА FRAGMENT ==========
+async def check_nick_on_fragment(nick: str) -> str:
+    url = f"https://fragment.com/username/{nick}"
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=10) as response:
+                html = await response.text()
+                soup = BeautifulSoup(html, 'html.parser')
+                if soup.find('button', string=lambda t: t and 'Bid' in t):
+                    return "auction"
+                if soup.find(string=lambda t: t and 'not available' in t.lower()):
+                    return "taken"
+                return "free"
+    except:
+        return "taken"
 
-        .letter.gradient {
-            background: linear-gradient(135deg, #58a6ff, #f0883e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+async def check_nicks(nicks: list) -> dict:
+    result = {"free": [], "taken": [], "auction": []}
+    for i in range(0, len(nicks), 5):
+        batch = nicks[i:i+5]
+        tasks = [check_nick_on_fragment(nick) for nick in batch]
+        statuses = await asyncio.gather(*tasks)
+        for nick, status in zip(batch, statuses):
+            result[status].append(nick)
+    return result
 
-        .letter.white {
-            color: #ffffff;
-        }
+# ========== АНИМАЦИЯ ПЕЧАТИ ==========
+async def typing_animation(message: types.Message, text: str, delay: float = 0.06):
+    msg = await message.answer("⌨️ Печатаю...")
+    current_text = ""
+    for char in text:
+        current_text += char
+        try:
+            await msg.edit_text(current_text)
+        except:
+            pass
+        await asyncio.sleep(delay)
+    return msg
 
-        .letter.pipe {
-            color: #8b949e;
-            font-weight: 300;
-        }
+# ========== КОМАНДА /start ==========
+@dp.message(Command("start"))
+async def start_command(message: types.Message):
+    await typing_animation(
+        message,
+        "👋 Привет! Я бот Fint Username!\n\n"
+        "Что я умею:\n"
+        "🔍 Проверять ники на Fragment.com\n"
+        "🚀 Создавать каналы\n"
+        "👑 Передавать права\n"
+        "🖼️ Менять аватарку\n"
+        "⚙️ Настраивать каналы\n\n"
+        "👇 Выбери действие:",
+        delay=0.05
+    )
+    await message.answer("👇 Выбери действие:", reply_markup=main_keyboard())
 
-        @keyframes letterAppear {
-            0% {
-                opacity: 0;
-                transform: translateY(20px) scale(0.8);
-                filter: blur(4px);
-            }
-            60% {
-                opacity: 1;
-                transform: translateY(-5px) scale(1.05);
-                filter: blur(0);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0);
-            }
-        }
+# ========== ПРОВЕРКА НИКОВ ==========
+@dp.callback_query(F.data == "check")
+async def start_check(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        "📝 Отправь список ников для проверки.\n"
+        "Формат: @name1, @name2, @name3 ...\n"
+        "Максимум 100 ников за раз.",
+        reply_markup=None
+    )
+    await state.set_state(CheckStates.waiting_nicks)
+    await callback.answer()
 
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+@dp.message(CheckStates.waiting_nicks)
+async def process_check(message: types.Message, state: FSMContext):
+    raw = message.text
+    nicks = [n.strip().replace('@', '') for n in raw.replace(',', ' ').split() if n.strip()]
+    
+    if not nicks:
+        await message.answer("❌ Список пуст. Попробуй ещё раз.")
+        return
+    
+    if len(nicks) > 100:
+        await message.answer(f"❌ Слишком много! Максимум 100 ников. У тебя {len(nicks)}.")
+        return
+    
+    loading_msg = await message.answer("⏳ Проверяю ники на Fragment.com...")
+    result = await check_nicks(nicks)
+    await loading_msg.delete()
+    
+    free_list = "\n".join([f"@{n}" for n in result["free"][:10]])
+    more = f"... и ещё {len(result['free']) - 10}" if len(result['free']) > 10 else ""
+    
+    result_text = (
+        f"📊 <b>Результат проверки</b>\n\n"
+        f"✅ Свободных: <b>{len(result['free'])}</b>\n"
+        f"❌ Занятых: <b>{len(result['taken'])}</b>\n"
+        f"💰 На аукционе: <b>{len(result['auction'])}</b>\n\n"
+        f"📋 Свободные ники:\n{free_list} {more}"
+    )
+    
+    await typing_animation(message, result_text, delay=0.04)
+    await message.answer("✅ Готово!", reply_markup=main_keyboard())
+    await state.clear()
 
-        /* ===== КАРТОЧКА ===== */
-        .card {
-            background: rgba(22, 27, 34, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 2.5rem 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-            opacity: 0;
-            animation: fadeIn 1s ease forwards;
-            animation-delay: 2.8s;
-        }
+# ========== СОЗДАНИЕ КАНАЛА ==========
+@dp.callback_query(F.data == "create")
+async def start_create(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        "📝 Введи желаемый юзернейм для канала:\n"
+        "Пример: @my_new_channel",
+        reply_markup=None
+    )
+    await state.set_state(CreateStates.waiting_username)
+    await callback.answer()
 
-        /* ===== СТАТУС ===== */
-        .status {
-            background: rgba(13, 17, 23, 0.7);
-            border-radius: 12px;
-            padding: 0.8rem 1.2rem;
-            margin: 1rem 0;
-            border-left: 3px solid #3fb950;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
+@dp.message(CreateStates.waiting_username)
+async def process_create(message: types.Message, state: FSMContext):
+    username = message.text.strip().replace('@', '')
+    if not username:
+        await message.answer("❌ Введи корректный юзернейм.")
+        return
+    
+    loading_msg = await message.answer(f"⏳ Проверяю ник @{username}...")
+    try:
+        status = await check_nick_on_fragment(username)
+        if status != "free":
+            await loading_msg.delete()
+            await message.answer(
+                f"❌ Ник @{username} {'занят' if status == 'taken' else 'на аукционе'}.\n"
+                f"Попробуй другой.",
+                reply_markup=main_keyboard()
+            )
+            await state.clear()
+            return
+        
+        await loading_msg.edit_text(f"🚀 Создаю канал @{username}...")
+        channel = await message.bot.create_channel(
+            title=f"Канал @{username}",
+            username=username
+        )
+        
+        await message.bot.promote_chat_member(
+            chat_id=channel.id,
+            user_id=message.from_user.id,
+            can_manage_chat=True,
+            can_change_info=True,
+            can_post_messages=True,
+            can_edit_messages=True,
+            can_delete_messages=True,
+            can_manage_video_chats=True,
+            can_invite_users=True,
+            can_restrict_members=True,
+            can_pin_messages=True,
+            can_manage_topics=True
+        )
+        
+        user_id = message.from_user.id
+        if user_id not in user_channels:
+            user_channels[user_id] = []
+        user_channels[user_id].append({
+            "channel_id": channel.id,
+            "username": username,
+            "title": f"Канал @{username}",
+            "created_at": datetime.now().isoformat()
+        })
+        
+        await loading_msg.delete()
+        await typing_animation(
+            message,
+            f"✅ <b>Канал создан!</b>\n\n"
+            f"📢 Название: {channel.title}\n"
+            f"🔗 Ссылка: https://t.me/{username}\n"
+            f"👑 Ты владелец!\n\n"
+            f"Используй настройки для управления каналом.",
+            delay=0.05
+        )
+        await message.answer("🎉 Поздравляю!", reply_markup=main_keyboard())
+    except Exception as e:
+        await loading_msg.delete()
+        error_msg = str(e)
+        if "USERNAME_OCCUPIED" in error_msg:
+            await message.answer(f"❌ Ник @{username} уже занят. Попробуй другой.", reply_markup=main_keyboard())
+        else:
+            await message.answer(f"❌ Ошибка: {error_msg}", reply_markup=main_keyboard())
+    await state.clear()
 
-        .status-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background: #3fb950;
-            border-radius: 50%;
-            animation: pulse-dot 2s infinite;
-        }
+# ========== МОИ КАНАЛЫ ==========
+@dp.callback_query(F.data == "my_channels")
+async def show_channels(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    await callback.message.edit_text(
+        "📊 <b>Твои каналы</b>",
+        reply_markup=channels_keyboard(user_id)
+    )
+    await callback.answer()
 
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(0.8); }
-        }
+@dp.callback_query(F.data.startswith("channel_"))
+async def channel_detail(callback: types.CallbackQuery):
+    channel_id = int(callback.data.replace("channel_", ""))
+    user_id = callback.from_user.id
+    channels = user_channels.get(user_id, [])
+    channel = next((c for c in channels if c["channel_id"] == channel_id), None)
+    if not channel:
+        await callback.message.edit_text("❌ Канал не найден.", reply_markup=main_keyboard())
+        await callback.answer()
+        return
+    await callback.message.edit_text(
+        f"📢 <b>{channel['title']}</b>\n\n"
+        f"🔗 @{channel['username']}\n"
+        f"📅 Создан: {channel['created_at'][:10]}\n\n"
+        f"⚙️ Управление каналом:",
+        reply_markup=settings_keyboard(channel_id)
+    )
+    await callback.answer()
 
-        .status-text {
-            color: #7ee787;
-            font-weight: 500;
-        }
+# ========== НАСТРОЙКИ ==========
+@dp.callback_query(F.data == "settings")
+async def show_settings(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    channels = user_channels.get(user_id, [])
+    if not channels:
+        await callback.message.edit_text("❌ У тебя нет каналов. Создай канал через /start.", reply_markup=main_keyboard())
+        await callback.answer()
+        return
+    await callback.message.edit_text("📢 <b>Выбери канал для настройки:</b>", reply_markup=channels_keyboard(user_id))
+    await callback.answer()
 
-        /* ===== ФИЧИ ===== */
-        .features {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin: 1.2rem 0;
-            font-size: 0.9rem;
-        }
+# ========== ИЗМЕНЕНИЕ НАЗВАНИЯ ==========
+@dp.callback_query(F.data.startswith("rename_"))
+async def start_rename(callback: types.CallbackQuery, state: FSMContext):
+    channel_id = int(callback.data.replace("rename_", ""))
+    await state.update_data(channel_id=channel_id)
+    await callback.message.edit_text("📝 Введи новое название для канала:", reply_markup=None)
+    await state.set_state(RenameStates.waiting_new_name)
+    await callback.answer()
 
-        .features span {
-            background: rgba(13, 17, 23, 0.6);
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 1px solid #21262d;
-            transition: all 0.3s ease;
-        }
+@dp.message(RenameStates.waiting_new_name)
+async def process_rename(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    channel_id = data.get("channel_id")
+    new_name = message.text.strip()
+    try:
+        await message.bot.set_chat_title(chat_id=channel_id, title=new_name)
+        await message.answer(f"✅ Название канала изменено на: <b>{new_name}</b>", reply_markup=main_keyboard())
+    except Exception as e:
+        await message.answer(f"❌ Ошибка: {str(e)}", reply_markup=main_keyboard())
+    await state.clear()
 
-        .features span:hover {
-            border-color: #58a6ff;
-            background: rgba(88, 166, 255, 0.05);
-            transform: translateX(3px);
-        }
+# ========== ИЗМЕНЕНИЕ ОПИСАНИЯ ==========
+@dp.callback_query(F.data.startswith("bio_"))
+async def start_bio(callback: types.CallbackQuery, state: FSMContext):
+    channel_id = int(callback.data.replace("bio_", ""))
+    await state.update_data(channel_id=channel_id)
+    await callback.message.edit_text("📄 Введи новое описание для канала:", reply_markup=None)
+    await state.set_state(BioStates.waiting_new_bio)
+    await callback.answer()
 
-        /* ===== КНОПКИ ===== */
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 1.2rem;
-        }
+@dp.message(BioStates.waiting_new_bio)
+async def process_bio(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    channel_id = data.get("channel_id")
+    new_bio = message.text.strip()
+    try:
+        await message.bot.set_chat_description(chat_id=channel_id, description=new_bio)
+        await message.answer(f"✅ Описание канала обновлено!", reply_markup=main_keyboard())
+    except Exception as e:
+        await message.answer(f"❌ Ошибка: {str(e)}", reply_markup=main_keyboard())
+    await state.clear()
 
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
+# ========== СМЕНА АВАТАРКИ ==========
+@dp.callback_query(F.data == "change_avatar")
+async def start_change_avatar(callback: types.CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    channels = user_channels.get(user_id, [])
+    if not channels:
+        await callback.message.edit_text("❌ У тебя нет каналов. Создай канал через /start.", reply_markup=main_keyboard())
+        await callback.answer()
+        return
+    await callback.message.edit_text("📢 <b>Выбери канал для смены аватарки:</b>", reply_markup=channels_keyboard(user_id))
+    await state.set_state(AvatarStates.waiting_channel)
+    await callback.answer()
 
-        .btn-primary {
-            background: linear-gradient(135deg, #238636, #2ea043);
-            color: #fff;
-        }
+@dp.callback_query(F.data.startswith("avatar_"))
+async def start_avatar(callback: types.CallbackQuery, state: FSMContext):
+    channel_id = int(callback.data.replace("avatar_", ""))
+    await state.update_data(channel_id=channel_id)
+    await callback.message.edit_text("🖼️ Отправь мне новую аватарку для канала.\nФото должно быть квадратным.", reply_markup=None)
+    await state.set_state(AvatarStates.waiting_photo)
+    await callback.answer()
 
-        .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(35, 134, 54, 0.3);
-        }
+@dp.message(AvatarStates.waiting_photo, F.photo)
+async def process_avatar(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    channel_id = data.get("channel_id")
+    try:
+        photo = message.photo[-1]
+        file = await message.bot.get_file(photo.file_id)
+        file_data = await message.bot.download_file(file.file_path)
+        await message.bot.set_chat_photo(
+            chat_id=channel_id,
+            photo=FSInputFile(io.BytesIO(file_data.getvalue()))
+        )
+        await message.answer("✅ Аватарка канала обновлена!", reply_markup=main_keyboard())
+    except Exception as e:
+        await message.answer(f"❌ Ошибка: {str(e)}", reply_markup=main_keyboard())
+    await state.clear()
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: #8b949e;
-            border: 1px solid #30363d;
-        }
+# ========== ПЕРЕДАЧА ПРАВ ==========
+@dp.callback_query(F.data == "transfer")
+async def start_transfer(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        "📝 Введи @username канала, который хочешь передать:\n"
+        "Пример: @my_channel",
+        reply_markup=None
+    )
+    await state.set_state(TransferStates.waiting_channel)
+    await callback.answer()
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #58a6ff;
-            color: #c9d1d9;
-        }
+@dp.message(TransferStates.waiting_channel)
+async def process_transfer_channel(message: types.Message, state: FSMContext):
+    username = message.text.strip().replace('@', '')
+    await state.update_data(channel_username=username)
+    await message.answer("👤 Введи @username нового владельца:")
+    await state.set_state(TransferStates.waiting_new_owner)
 
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-        .btn-row .btn {
-            flex: 1;
-            text-align: center;
-        }
+@dp.message(TransferStates.waiting_new_owner)
+async def process_transfer_owner(message: types.Message, state: FSMContext):
+    new_owner = message.text.strip().replace('@', '')
+    data = await state.get_data()
+    channel_username = data.get('channel_username')
+    loading_msg = await message.answer(f"⏳ Передаю права на @{channel_username}...")
+    try:
+        chat = await message.bot.get_chat(f"@{channel_username}")
+        try:
+            new_owner_user = await message.bot.get_chat(f"@{new_owner}")
+            new_owner_id = new_owner_user.id
+        except:
+            await loading_msg.delete()
+            await message.answer(f"❌ Пользователь @{new_owner} не найден.", reply_markup=main_keyboard())
+            await state.clear()
+            return
+        await message.bot.promote_chat_member(
+            chat_id=chat.id,
+            user_id=message.from_user.id,
+            can_manage_chat=False,
+            can_change_info=False,
+            can_post_messages=False,
+            can_edit_messages=False,
+            can_delete_messages=False,
+            can_manage_video_chats=False,
+            can_invite_users=False,
+            can_restrict_members=False,
+            can_pin_messages=False,
+            can_manage_topics=False
+        )
+        await message.bot.promote_chat_member(
+            chat_id=chat.id,
+            user_id=new_owner_id,
+            can_manage_chat=True,
+            can_change_info=True,
+            can_post_messages=True,
+            can_edit_messages=True,
+            can_delete_messages=True,
+            can_manage_video_chats=True,
+            can_invite_users=True,
+            can_restrict_members=True,
+            can_pin_messages=True,
+            can_manage_topics=True
+        )
+        await loading_msg.delete()
+        await typing_animation(
+            message,
+            f"✅ <b>Права переданы!</b>\n\n"
+            f"📢 Канал: @{channel_username}\n"
+            f"👤 Новый владелец: @{new_owner}",
+            delay=0.05
+        )
+        await message.answer("🔑 Бот вышел из канала.", reply_markup=main_keyboard())
+        await message.bot.leave_chat(chat.id)
+    except Exception as e:
+        await loading_msg.delete()
+        await message.answer(
+            f"❌ Ошибка: {str(e)}\n"
+            f"Убедись, что канал @{channel_username} существует и бот является админом.",
+            reply_markup=main_keyboard()
+        )
+    await state.clear()
 
-        .footer {
-            margin-top: 1.5rem;
-            font-size: 0.75rem;
-            color: #484f58;
-        }
+# ========== КНОПКА НАЗАД ==========
+@dp.callback_query(F.data == "back")
+async def back_to_menu(callback: types.CallbackQuery):
+    await callback.message.edit_text("👋 Главное меню:", reply_markup=main_keyboard())
+    await callback.answer()
 
-        /* ===== АДАПТИВНОСТЬ ===== */
-        @media (max-width: 480px) {
-            .main-title {
-                font-size: 2.5rem;
-            }
-            .card {
-                padding: 1.5rem;
-            }
-            .features {
-                grid-template-columns: 1fr;
-            }
-            .btn-row {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
+# ========== НЕИЗВЕСТНЫЕ КОМАНДЫ ==========
+@dp.message()
+async def unknown_command(message: types.Message):
+    await message.answer(
+        "❓ Неизвестная команда.\n"
+        "Используй /start для главного меню."
+    )
 
-    <!-- ===== ЗАДНИЙ ПЛАН ===== -->
+# ========== ЗАПУСК ==========
+async def main():
+    logger.info("🤖 Бот запускается...")
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
 
-    <!-- Градиентные линии -->
-    <div class="bg-lines">
-        <div class="bg-line"></div>
-        <div class="bg-line"></div>
-        <div class="bg-line"></div>
-        <div class="bg-line"></div>
-        <div class="bg-line"></div>
-    </div>
-
-    <!-- Частицы -->
-    <canvas id="particles-canvas"></canvas>
-
-    <!-- ===== КОНТЕНТ ===== -->
-    <div class="container">
-
-        <!-- Приветствие -->
-        <div class="hero">
-            <div class="welcome-text">welcome</div>
-            <div class="main-title">
-                <span class="letter gradient">w</span>
-                <span class="letter gradient">a</span>
-                <span class="letter gradient">i</span>
-                <span class="letter gradient">t</span>
-                <span class="letter pipe" style="animation-delay: 0.6s;">&nbsp;|&nbsp;</span>
-                <span class="letter white" style="animation-delay: 0.7s;">o</span>
-                <span class="letter white" style="animation-delay: 0.8s;">t</span>
-                <span class="letter white" style="animation-delay: 0.9s;">k</span>
-                <span class="letter white" style="animation-delay: 1.0s;">l</span>
-                <span class="letter white" style="animation-delay: 1.1s;">i</span>
-                <span class="letter white" style="animation-delay: 1.2s;">x</span>
-            </div>
-        </div>
-
-        <!-- Карточка -->
-        <div class="card">
-            <div class="status">
-                <span class="status-dot"></span>
-                <span class="status-text">Бот активен</span>
-                <span style="color:#8b949e; font-size:0.75rem;">(GitHub Actions)</span>
-            </div>
-
-            <div class="features">
-                <span>🔍 Проверка ников</span>
-                <span>🚀 Создание каналов</span>
-                <span>👑 Передача прав</span>
-                <span>⚡ Fragment.com</span>
-            </div>
-
-            <div class="btn-group">
-                <a href="#" class="btn btn-primary" id="botLink">🤖 Открыть бота</a>
-                <div class="btn-row">
-                    <a href="https://github.com/otklix/wait" target="_blank" class="btn btn-secondary">📦 GitHub</a>
-                    <a href="https://github.com/otklix/wait/issues" target="_blank" class="btn btn-secondary">🐛 Баги</a>
-                </div>
-            </div>
-
-            <div class="footer">
-                otklix · 2026
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== СКРИПТЫ ===== -->
-    <script>
-        // ===========================
-        // 1. ЧАСТИЦЫ
-        // ===========================
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, particles;
-
-        function resizeCanvas() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 2.5 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.3;
-                this.speedY = (Math.random() - 0.5) * 0.3;
-                this.opacity = Math.random() * 0.3 + 0.1;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x > width) this.x = 0;
-                if (this.x < 0) this.x = width;
-                if (this.y > height) this.y = 0;
-                if (this.y < 0) this.y = height;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                ctx.fill();
-            }
-        }
-
-        particles = [];
-        for (let i = 0; i < 80; i++) {
-            particles.push(new Particle());
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        // ===========================
-        // 2. АНИМАЦИЯ БУКВ
-        // ===========================
-        document.addEventListener('DOMContentLoaded', () => {
-            const letters = document.querySelectorAll('.letter:not(.pipe)');
-            letters.forEach((el, i) => {
-                el.style.animationDelay = `${i * 0.12 + 0.5}s`;
-            });
-        });
-
-        // ===========================
-        // 3. ССЫЛКА НА БОТА
-        // ===========================
-        document.getElementById('botLink').href = 'https://t.me/Username1FinderBOT';
-    </script>
-
-</body>
-</html>
+if __name__ == "__main__":
+    asyncio.run(main())
