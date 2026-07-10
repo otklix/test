@@ -2,9 +2,8 @@ name: Run Telegram Bot
 
 on:
   schedule:
-    # Запуск каждые 5 минут (можно изменить интервал)
     - cron: '*/5 * * * *'
-  workflow_dispatch: # Позволяет запустить вручную из вкладки Actions
+  workflow_dispatch:
 
 jobs:
   run-bot:
@@ -20,11 +19,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install aiogram
-          # Если зависимостей много, лучше создать requirements.txt
+          pip install aiogram aiohttp beautifulsoup4 lxml
 
       - name: Run bot
         env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }} # Токен из секретов репозитория
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           python bot.py
