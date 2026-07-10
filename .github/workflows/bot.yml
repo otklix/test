@@ -2,8 +2,8 @@ name: Run Telegram Bot
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    - cron: '*/5 * * * *'   # Запуск каждые 5 минут
+  workflow_dispatch:        # Ручной запуск
 
 jobs:
   run-bot:
@@ -21,8 +21,11 @@ jobs:
         run: |
           pip install aiogram aiohttp beautifulsoup4 lxml
 
-      - name: Run bot
+      - name: Run bot (keep alive)
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-          python bot.py
+          # Запускаем бота в фоне
+          python bot.py &
+          # Держим воркфлоу живым
+          sleep infinity
