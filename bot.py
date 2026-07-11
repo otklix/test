@@ -3,31 +3,26 @@ import asyncio
 import random
 import string
 import aiohttp
-import json
-import base64
+import zipfile
+import io
 from datetime import datetime
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 from aiogram import Bot, Dispatcher, Router, F
-from aiogram.types import Message, CallbackQuery, FSInputFile, InlineKeyboardMarkup, InlineKeyboardButton, BufferedInputFile
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, BufferedInputFile, FSInputFile
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-import io
-import subprocess
 
 # ===== КОНФИГУРАЦИЯ =====
-BOT_TOKEN = os.environ.get("BOT_TOKEN") or "ВАШ_ТОКЕН_БОТА"
-
-# Для GitHub Pages
-GITHUB_REPO = os.environ.get("GITHUB_REPO", "ваш-username/ваш-репозиторий")
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # Токен для пуша в репозиторий
-GITHUB_PAGES_URL = os.environ.get("GITHUB_PAGES_URL", "https://ваш-username.github.io/ваш-репозиторий")
+BOT_TOKEN = "ВАШ_ТОКЕН_БОТА"
 
 REPORTS_DIR = "reports"
 IMAGES_DIR = "images"
+ZIP_DIR = "zips"
 os.makedirs(REPORTS_DIR, exist_ok=True)
 os.makedirs(IMAGES_DIR, exist_ok=True)
+os.makedirs(ZIP_DIR, exist_ok=True)
 
 MAX_ATTEMPTS = 50
 TIMEOUT = 0.3
@@ -41,65 +36,95 @@ dp.include_router(router)
 class SearchStates(StatesGroup):
     waiting_for_username = State()
 
-# ===== СОЗДАНИЕ ПРОГРЕСС-БАРА (GIF/PNG) =====
+# Хранилище найденных юзернеймов
+found_usernames = []
+stats = {
+    "total": 0,
+    "valid": 0,
+    "invalid": 0,
+    "banned": 0
+}
+
+# ===== СОЗДАНИЕ ПРОГРЕСС-БАРА (как на IMG_8461) =====
 def create_progress_image(progress: int, total: int, username: str = "", status: str = "Поиск") -> bytes:
-    """Создаёт стильный прогресс-бар с плавным дизайном"""
-    width, height = 800, 300
+    """Создаёт стильный прогресс-бар как в Aqua Checker"""
+    width, height = 800, 400
     percent = (progress / total) * 100 if total > 0 else 0
     
-    img = Image.new('RGB', (width, height), color=(15, 15, 35))
+    img = Image.new('RGB', (width, height), color=(10, 10, 30))
     draw = ImageDraw.Draw(img)
     
     # Градиентный фон
     for i in range(height):
-        r = 15 + int(i * 0.05)
-        g = 15 + int(i * 0.03)
-        b = 35 + int(i * 0.1)
+        r = 10 + int(i * 0.03)
+        g = 10 + int(i * 0.02)
+        b = 30 + int(i * 0.08)
         draw.line([(0, i), (width, i)], fill=(r, g, b))
     
     try:
-        font_title = ImageFont.truetype("arial.ttf", 32)
-        font_progress = ImageFont.truetype("arial.ttf", 24)
-        font_username = ImageFont.truetype("arial.ttf", 20)
-        font_status = ImageFont.truetype("arial.ttf", 18)
+        font_title = ImageFont.truetype("arial.ttf", 36)
+        font_progress = ImageFont.truetype("arial.ttf", 28)
+        font_username = ImageFont.truetype("arial.ttf", 22)
+        font_status = ImageFont.truetype("arial.ttf", 20)
+        font_sub = ImageFont.truetype("arial.ttf", 16)
     except:
         font_title = ImageFont.load_default()
         font_progress = ImageFont.load_default()
         font_username = ImageFont.load_default()
         font_status = ImageFont.load_default()
+        font_sub = ImageFont.load_default()
     
-    # Заголовок
-    draw.text((width//2 - 100, 20), "🔍 ПОИСК ЮЗЕРНЕЙМА", fill=(255, 255, 255), font=font_title)
+    # Логотип "AQUA CHECKER" стиль
+    draw.text((width//2 - 150, 20), "🔍 AQUA CHECKER", fill=(0, 200, 255), font=font_title)
+    draw.text((width//2 - 80, 65), "БОТ", fill=(100, 200, 255), font=font_sub)
+    
+    # Заголовок статуса
+    status_text = "ПОИСК ЮЗЕРНЕЙМОВ" if status == "Поиск" else "ЗАВЕРШЕНО"
+    draw.text((width//2 - 120, 110), status_text, fill=(255, 255, 255), font=font_progress)
     
     # Рамка прогресс-бара
-    bar_x, bar_y, bar_w, bar_h = 50, 90, width - 100, 50
+    bar_x, bar_y, bar_w, bar_h = 50, 160, width - 100, 40
     draw.rectangle([bar_x, bar_y, bar_x + bar_w, bar_y + bar_h], 
-                   outline=(100, 100, 200), width=2, fill=(30, 30, 70))
+                   outline=(0, 200, 255), width=2, fill=(20, 20, 50))
     
     # Заливка прогресса (градиент)
     fill_width = int((bar_w - 4) * (percent / 100))
     if fill_width > 0:
         for i in range(fill_width):
             ratio = i / fill_width
-            r = int(0 + ratio * 100)
-            g = int(100 + ratio * 100)
+            r = int(0 + ratio * 0)
+            g = int(150 + ratio * 50)
             b = int(200 + ratio * 55)
             draw.line([(bar_x + 2 + i, bar_y + 2), (bar_x + 2 + i, bar_y + bar_h - 2)], 
                      fill=(r, g, b), width=1)
     
-    # Текст прогресса
-    progress_text = f"{progress} / {total}  |  {percent:.1f}%"
-    draw.text((width//2 - 80, 155), progress_text, fill=(200, 220, 255), font=font_progress)
+    # Проценты
+    percent_text = f"{percent:.1f}%"
+    draw.text((width//2 - 40, 215), percent_text, fill=(0, 200, 255), font=font_progress)
+    
+    # Прогресс текст
+    progress_text = f"{progress} / {total}"
+    draw.text((width//2 - 50, 260), progress_text, fill=(150, 200, 255), font=font_username)
     
     # Имя юзернейма
     if username:
-        draw.text((50, 205), f"🎯 Юзернейм: @{username}", fill=(100, 255, 150), font=font_username)
+        draw.text((50, 310), f"🎯 ТЕКУЩИЙ: @{username}", fill=(100, 255, 150), font=font_username)
     
     # Статус
-    status_colors = {"Поиск": (100, 200, 255), "Найден": (100, 255, 150), "Занят": (255, 150, 150), "Ошибка": (255, 100, 100)}
+    status_colors = {
+        "Поиск": (0, 200, 255),
+        "Найден": (0, 255, 100),
+        "Занят": (255, 150, 50),
+        "Ошибка": (255, 50, 50)
+    }
     color = status_colors.get(status, (200, 200, 200))
-    draw.text((width - 200, 205), f"📌 {status}", fill=color, font=font_status)
+    draw.text((width - 250, 310), f"СТАТУС: {status.upper()}", fill=color, font=font_status)
     
+    # Декоративная линия внизу
+    draw.line([(50, 370), (width - 50, 370)], fill=(0, 200, 255), width=1)
+    draw.text((width//2 - 100, 380), "AQUA CHECKER • v1.0", fill=(50, 100, 150), font=font_sub)
+    
+    # Сохраняем в байты
     img_path = os.path.join(IMAGES_DIR, f"progress_{progress}_{datetime.now().timestamp()}.png")
     img.save(img_path)
     
@@ -109,22 +134,35 @@ def create_progress_image(progress: int, total: int, username: str = "", status:
     os.remove(img_path)
     return image_data
 
-# ===== СОЗДАНИЕ HTML-ОТЧЁТА ДЛЯ GITHUB PAGES =====
-def create_report_html(username: str, status: str = "Свободен") -> str:
-    """Создаёт красивый HTML-отчёт для GitHub Pages"""
+# ===== СОЗДАНИЕ HTML-ОТЧЁТА (как на IMG_8462-8464) =====
+def create_report_html(username: str, stats_data: dict = None) -> str:
+    """Создаёт детальный HTML-отчёт как в Aqua Checker"""
     now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
     telegram_link = f"https://t.me/{username}"
-    report_id = f"{username}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
-    html = f'''<!DOCTYPE html>
+    if stats_data is None:
+        stats_data = {
+            "valid": True,
+            "donate": random.randint(1000, 100000),
+            "balance": random.randint(0, 1000),
+            "rap": random.randint(100, 5000),
+            "groups": random.randint(0, 10),
+            "followers": random.randint(0, 500),
+            "badges": random.randint(0, 50),
+            "premium": random.choice([True, False]),
+            "two_fa": random.choice([True, False]),
+            "email": random.choice([True, False])
+        }
+    
+    status_color = "#4CAF50" if stats_data.get("valid", True) else "#f44336"
+    status_text = "VALID" if stats_data.get("valid", True) else "INVALID"
+    
+    return f'''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@{username} — найден!</title>
-    <meta property="og:title" content="@{username} — свободный юзернейм!">
-    <meta property="og:description" content="Найден свободный юзернейм @{username} в Telegram">
-    <meta property="og:image" content="https://img.icons8.com/fluency/96/telegram-app.png">
+    <title>@{username} — отчёт</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         
@@ -132,325 +170,21 @@ def create_report_html(username: str, status: str = "Свободен") -> str:
             0% {{ background-position: 0% 50%; }}
             50% {{ background-position: 100% 50%; }}
             100% {{ background-position: 0% 50%; }}
-        }}
-        
-        @keyframes float {{
-            0%, 100% {{ transform: translateY(0px) rotate(0deg); }}
-            50% {{ transform: translateY(-10px) rotate(5deg); }}
-        }}
-        
-        @keyframes pulse {{
-            0%, 100% {{ transform: scale(1); opacity: 1; }}
-            50% {{ transform: scale(1.05); opacity: 0.8; }}
         }}
         
         @keyframes slideIn {{
-            from {{ opacity: 0; transform: translateY(50px) scale(0.9); }}
-            to {{ opacity: 1; transform: translateY(0) scale(1); }}
-        }}
-        
-        @keyframes shine {{
-            0% {{ left: -100%; }}
-            100% {{ left: 200%; }}
-        }}
-        
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            animation: gradient 15s ease infinite;
-            background-size: 400% 400%;
-        }}
-        
-        .card {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 50px 40px;
-            max-width: 550px;
-            width: 100%;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-            animation: slideIn 0.8s ease-out;
-            position: relative;
-            overflow: hidden;
-        }}
-        
-        .card::before {{
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shine 3s infinite;
-            pointer-events: none;
-        }}
-        
-        .card::after {{
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(102, 126, 234, 0.05), transparent, rgba(118, 75, 162, 0.05), transparent);
-            animation: spin 20s linear infinite;
-            pointer-events: none;
-        }}
-        
-        @keyframes spin {{
-            100% {{ transform: rotate(360deg); }}
-        }}
-        
-        .emoji-big {{
-            font-size: 80px;
-            animation: float 2s ease-in-out infinite;
-            position: relative;
-            z-index: 1;
-            display: block;
-            text-align: center;
-        }}
-        
-        .title {{
-            font-size: 26px;
-            font-weight: 800;
-            color: #333;
-            margin: 15px 0 5px;
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }}
-        
-        .username-display {{
-            font-size: 48px;
-            font-weight: 900;
-            color: #667eea;
-            margin: 15px 0;
-            word-break: break-all;
-            position: relative;
-            z-index: 1;
-            animation: pulse 2s ease-in-out infinite;
-            text-align: center;
-        }}
-        
-        .username-display a {{
-            color: #667eea;
-            text-decoration: none;
-            transition: all 0.3s;
-        }}
-        
-        .username-display a:hover {{
-            color: #764ba2;
-            text-decoration: underline;
-        }}
-        
-        .badge {{
-            display: inline-block;
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            padding: 8px 28px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-            text-align: center;
-            margin: 0 auto;
-            display: table;
-        }}
-        
-        .badge::after {{
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(135deg, #4CAF50, #45a049, #4CAF50);
-            border-radius: 50px;
-            z-index: -1;
-            filter: blur(8px);
-            opacity: 0.6;
-        }}
-        
-        .info-grid {{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 25px 0;
-            position: relative;
-            z-index: 1;
-        }}
-        
-        .info-item {{
-            background: rgba(102, 126, 234, 0.08);
-            padding: 12px 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }}
-        
-        .info-item .label {{
-            font-size: 11px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }}
-        
-        .info-item .value {{
-            font-size: 16px;
-            color: #333;
-            font-weight: 600;
-            margin-top: 3px;
-            word-break: break-all;
-        }}
-        
-        .btn {{
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 16px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 18px;
-            margin: 15px 0 5px;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            width: 100%;
-            text-align: center;
-        }}
-        
-        .btn:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
-        }}
-        
-        .footer {{
-            margin-top: 20px;
-            color: #999;
-            font-size: 12px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }}
-        
-        .footer a {{
-            color: #667eea;
-            text-decoration: none;
-        }}
-        
-        .report-id {{
-            font-size: 11px;
-            color: #bbb;
-            margin-top: 5px;
-        }}
-        
-        @media (max-width: 480px) {{
-            .card {{ padding: 30px 20px; }}
-            .username-display {{ font-size: 36px; }}
-            .title {{ font-size: 22px; }}
-            .info-grid {{ grid-template-columns: 1fr; }}
-            .btn {{ font-size: 16px; padding: 14px 30px; }}
-        }}
-    </style>
-</head>
-<body>
-    <div class="card">
-        <span class="emoji-big">🎉</span>
-        <h1 class="title">Юзернейм найден!</h1>
-        
-        <div class="username-display">
-            <a href="{telegram_link}" target="_blank">@{username}</a>
-        </div>
-        
-        <div class="badge">✅ {status}</div>
-        
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="label">📅 Дата</div>
-                <div class="value">{now}</div>
-            </div>
-            <div class="info-item">
-                <div class="label">🔗 Ссылка</div>
-                <div class="value"><a href="{telegram_link}" target="_blank" style="color:#667eea;text-decoration:none;">t.me/{username}</a></div>
-            </div>
-            <div class="info-item">
-                <div class="label">📊 Статус</div>
-                <div class="value" style="color:#4CAF50;">Доступен</div>
-            </div>
-            <div class="info-item">
-                <div class="label">🆔 ID отчёта</div>
-                <div class="value" style="font-size:12px;">{report_id}</div>
-            </div>
-        </div>
-        
-        <a href="{telegram_link}" target="_blank" class="btn">🚀 Перейти в Telegram</a>
-        
-        <div class="footer">
-            <div>Отчёт сгенерирован автоматически</div>
-            <div class="report-id">ID: {report_id}</div>
-            <div style="margin-top:5px;">
-                <a href="{GITHUB_PAGES_URL}">🏠 На главную</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>'''
-    
-    return html
-
-# ===== СОЗДАНИЕ index.html ДЛЯ GITHUB PAGES =====
-def create_index_html():
-    """Создаёт красивую главную страницу для GitHub Pages"""
-    html = f'''<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Юзернейм Бот — Найди свой идеальный ник!</title>
-    <meta property="og:title" content="Юзернейм Бот — Найди свободный ник в Telegram">
-    <meta property="og:description" content="Поиск 5-символьных юзернеймов в Telegram с красивыми отчётами">
-    <meta property="og:image" content="https://img.icons8.com/fluency/96/telegram-app.png">
-    <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        
-        @keyframes gradient {{
-            0% {{ background-position: 0% 50%; }}
-            50% {{ background-position: 100% 50%; }}
-            100% {{ background-position: 0% 50%; }}
-        }}
-        
-        @keyframes float {{
-            0%, 100% {{ transform: translateY(0px); }}
-            50% {{ transform: translateY(-20px); }}
-        }}
-        
-        @keyframes pulse {{
-            0%, 100% {{ transform: scale(1); opacity: 1; }}
-            50% {{ transform: scale(1.1); opacity: 0.8; }}
-        }}
-        
-        @keyframes slideUp {{
-            from {{ opacity: 0; transform: translateY(50px); }}
+            from {{ opacity: 0; transform: translateY(30px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
         
+        @keyframes pulse {{
+            0%, 100% {{ transform: scale(1); }}
+            50% {{ transform: scale(1.02); }}
+        }}
+        
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -461,261 +195,520 @@ def create_index_html():
         }}
         
         .container {{
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(20, 20, 50, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 50px;
+            border-radius: 20px;
+            padding: 40px;
             max-width: 600px;
             width: 100%;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-            animation: slideUp 0.8s ease-out;
+            box-shadow: 0 30px 80px rgba(0, 200, 255, 0.1);
+            animation: slideIn 0.8s ease-out;
+            border: 1px solid rgba(0, 200, 255, 0.1);
+        }}
+        
+        .header {{
             text-align: center;
+            border-bottom: 1px solid rgba(0, 200, 255, 0.1);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
         }}
         
         .logo {{
-            font-size: 80px;
-            animation: float 3s ease-in-out infinite;
-        }}
-        
-        h1 {{
-            font-size: 36px;
+            color: #00ccff;
+            font-size: 24px;
             font-weight: 800;
-            color: #333;
-            margin: 20px 0 10px;
+            letter-spacing: 2px;
         }}
         
-        .subtitle {{
-            color: #666;
-            font-size: 18px;
-            margin-bottom: 30px;
+        .logo span {{
+            color: #ffffff;
         }}
         
-        .features {{
+        .username {{
+            font-size: 36px;
+            font-weight: 900;
+            color: #00ccff;
+            margin: 10px 0;
+        }}
+        
+        .username a {{
+            color: #00ccff;
+            text-decoration: none;
+        }}
+        
+        .status {{
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            background: {status_color};
+            color: white;
+            margin: 10px 0;
+        }}
+        
+        .stats-grid {{
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 30px 0;
+            gap: 12px;
+            margin: 20px 0;
         }}
         
-        .feature {{
-            background: rgba(102, 126, 234, 0.08);
+        .stat-card {{
+            background: rgba(0, 200, 255, 0.05);
             padding: 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 200, 255, 0.08);
             transition: all 0.3s;
         }}
         
-        .feature:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        .stat-card:hover {{
+            transform: scale(1.02);
+            background: rgba(0, 200, 255, 0.1);
         }}
         
-        .feature .icon {{ font-size: 30px; }}
-        .feature .label {{ font-weight: 600; color: #333; margin-top: 5px; }}
-        .feature .desc {{ font-size: 12px; color: #888; margin-top: 3px; }}
+        .stat-card .label {{
+            font-size: 11px;
+            color: #6688aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }}
+        
+        .stat-card .value {{
+            font-size: 20px;
+            font-weight: 700;
+            color: #00ccff;
+            margin-top: 5px;
+        }}
+        
+        .stat-card .value.green {{ color: #4CAF50; }}
+        .stat-card .value.gold {{ color: #FFD700; }}
+        .stat-card .value.purple {{ color: #9B59B6; }}
+        
+        .progress-bar {{
+            background: rgba(0, 200, 255, 0.1);
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+            border: 1px solid rgba(0, 200, 255, 0.1);
+        }}
+        
+        .progress-fill {{
+            height: 100%;
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+            border-radius: 10px;
+            transition: width 1s;
+            width: {random.randint(30, 100)}%;
+        }}
         
         .btn {{
             display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #00ccff, #0066ff);
             color: white;
-            padding: 16px 40px;
+            padding: 14px 30px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            width: 100%;
+            text-align: center;
+            margin-top: 15px;
         }}
         
         .btn:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 200, 255, 0.3);
         }}
         
-        .stats {{
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: space-around;
-        }}
-        
-        .stat-item .number {{
-            font-size: 24px;
-            font-weight: 800;
-            color: #667eea;
-        }}
-        .stat-item .label {{
-            font-size: 12px;
-            color: #888;
-        }}
-        
-        .recent {{
+        .footer {{
+            text-align: center;
+            color: #446688;
+            font-size: 11px;
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid rgba(0, 200, 255, 0.05);
         }}
         
-        .recent a {{
-            color: #667eea;
-            text-decoration: none;
+        .badge {{
             display: inline-block;
-            margin: 5px 10px;
-            padding: 5px 15px;
-            background: rgba(102, 126, 234, 0.08);
-            border-radius: 20px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }}
-        
-        .recent a:hover {{
-            background: rgba(102, 126, 234, 0.2);
-            transform: scale(1.05);
+            background: rgba(0, 200, 255, 0.1);
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #00ccff;
+            margin: 2px;
         }}
         
         @media (max-width: 480px) {{
-            .container {{ padding: 30px 20px; }}
-            .features {{ grid-template-columns: 1fr; }}
-            h1 {{ font-size: 28px; }}
+            .container {{ padding: 20px; }}
+            .stats-grid {{ grid-template-columns: 1fr; }}
+            .username {{ font-size: 28px; }}
         }}
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">🤖</div>
-        <h1>Юзернейм Бот</h1>
-        <div class="subtitle">Находи свободные 5-символьные юзернеймы в Telegram</div>
+        <div class="header">
+            <div class="logo">AQUA <span>CHECKER</span></div>
+            <div class="username">
+                <a href="{telegram_link}" target="_blank">@{username}</a>
+            </div>
+            <div class="status">{status_text}</div>
+        </div>
         
-        <div class="features">
-            <div class="feature">
-                <div class="icon">🔍</div>
-                <div class="label">Быстрый поиск</div>
-                <div class="desc">Проверка через API</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">💰 ДОНАТ</div>
+                <div class="value">{stats_data.get('donate', 0):,} R$</div>
             </div>
-            <div class="feature">
-                <div class="icon">📊</div>
-                <div class="label">Прогресс-бар</div>
-                <div class="desc">Визуальный процесс</div>
+            <div class="stat-card">
+                <div class="label">💳 БАЛАНС</div>
+                <div class="value gold">{stats_data.get('balance', 0)} R$</div>
             </div>
-            <div class="feature">
-                <div class="icon">📄</div>
-                <div class="label">Индивидуальные отчёты</div>
-                <div class="desc">Каждый юзернейм уникален</div>
+            <div class="stat-card">
+                <div class="label">📊 RAP</div>
+                <div class="value purple">{stats_data.get('rap', 0):,}</div>
             </div>
-            <div class="feature">
-                <div class="icon">✨</div>
-                <div class="label">Красивый дизайн</div>
-                <div class="desc">Анимации и градиенты</div>
+            <div class="stat-card">
+                <div class="label">👥 ГРУППЫ</div>
+                <div class="value">{stats_data.get('groups', 0)}</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">👤 ПОДПИСЧИКИ</div>
+                <div class="value">{stats_data.get('followers', 0)}</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">🏅 БЕЙДЖИ</div>
+                <div class="value">{stats_data.get('badges', 0)}</div>
             </div>
         </div>
         
-        <a href="https://t.me/ваш_бот" target="_blank" class="btn">🚀 Запустить бота</a>
-        
-        <div class="stats">
-            <div class="stat-item">
-                <div class="number">⚡</div>
-                <div class="label">Мгновенный</div>
-            </div>
-            <div class="stat-item">
-                <div class="number">🔒</div>
-                <div class="label">Безопасный</div>
-            </div>
-            <div class="stat-item">
-                <div class="number">📱</div>
-                <div class="label">Доступный</div>
-            </div>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
         </div>
         
-        <div class="recent">
-            <div style="font-weight:600;color:#333;margin-bottom:10px;">📋 Последние найденные:</div>
-            <div id="recent-list">
-                <!-- Обновляется автоматически через GitHub Pages -->
-                <span style="color:#888;">Загрузка...</span>
-            </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:10px 0;">
+            <span class="badge">{'⭐ PREMIUM' if stats_data.get('premium', False) else ''}</span>
+            <span class="badge">{'🔐 2FA' if stats_data.get('two_fa', False) else ''}</span>
+            <span class="badge">{'📧 С ПОЧТОЙ' if stats_data.get('email', False) else ''}</span>
+        </div>
+        
+        <a href="{telegram_link}" target="_blank" class="btn">🚀 ПЕРЕЙТИ В TELEGRAM</a>
+        
+        <div class="footer">
+            AQUA CHECKER • Отчёт сгенерирован {now}
         </div>
     </div>
 </body>
 </html>'''
+
+# ===== СОЗДАНИЕ ГЛАВНОЙ СТРАНИЦЫ СО СТАТИСТИКОЙ =====
+def create_index_html():
+    """Создаёт главную страницу со статистикой как на IMG_8462"""
+    total = len(found_usernames)
+    valid = sum(1 for u in found_usernames if u.get("valid", True))
+    invalid = total - valid
     
+    reports_list = ""
+    for u in found_usernames[-20:]:
+        username = u.get("username", "unknown")
+        reports_list += f'<a href="reports/{username}.html">@{username}</a>\n'
+    
+    html = f'''<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQUA CHECKER — Статистика</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        
+        @keyframes gradient {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+        
+        @keyframes slideUp {{
+            from {{ opacity: 0; transform: translateY(30px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        
+        @keyframes pulse {{
+            0%, 100% {{ transform: scale(1); opacity: 1; }}
+            50% {{ transform: scale(1.05); opacity: 0.8; }}
+        }}
+        
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: gradient 15s ease infinite;
+            background-size: 400% 400%;
+        }}
+        
+        .container {{
+            background: rgba(20, 20, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 200, 255, 0.1);
+            animation: slideUp 0.8s ease-out;
+            border: 1px solid rgba(0, 200, 255, 0.1);
+        }}
+        
+        .header {{
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 200, 255, 0.1);
+            padding-bottom: 20px;
+        }}
+        
+        .logo {{
+            color: #00ccff;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 3px;
+        }}
+        
+        .logo span {{ color: #ffffff; }}
+        
+        .subtitle {{
+            color: #6688aa;
+            font-size: 14px;
+            margin-top: 5px;
+        }}
+        
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }}
+        
+        .stat-box {{
+            background: rgba(0, 200, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(0, 200, 255, 0.08);
+            transition: all 0.3s;
+        }}
+        
+        .stat-box:hover {{ transform: scale(1.05); }}
+        
+        .stat-box .number {{
+            font-size: 28px;
+            font-weight: 800;
+            color: #00ccff;
+        }}
+        
+        .stat-box .number.green {{ color: #4CAF50; }}
+        .stat-box .number.red {{ color: #f44336; }}
+        .stat-box .number.gold {{ color: #FFD700; }}
+        
+        .stat-box .label {{
+            font-size: 11px;
+            color: #6688aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }}
+        
+        .progress-section {{
+            margin: 20px 0;
+        }}
+        
+        .progress-bar {{
+            background: rgba(0, 200, 255, 0.05);
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 200, 255, 0.1);
+            margin: 5px 0;
+        }}
+        
+        .progress-fill {{
+            height: 100%;
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+            border-radius: 10px;
+            transition: width 1s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }}
+        
+        .progress-fill.green {{ background: linear-gradient(90deg, #4CAF50, #45a049); }}
+        .progress-fill.gold {{ background: linear-gradient(90deg, #FFD700, #f57c00); }}
+        .progress-fill.purple {{ background: linear-gradient(90deg, #9B59B6, #8e44ad); }}
+        
+        .recent {{
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 200, 255, 0.05);
+        }}
+        
+        .recent a {{
+            color: #00ccff;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 6px;
+            padding: 4px 12px;
+            background: rgba(0, 200, 255, 0.05);
+            border-radius: 15px;
+            font-size: 13px;
+            transition: all 0.3s;
+            border: 1px solid rgba(0, 200, 255, 0.05);
+        }}
+        
+        .recent a:hover {{
+            background: rgba(0, 200, 255, 0.15);
+            transform: scale(1.05);
+        }}
+        
+        .btn {{
+            display: inline-block;
+            background: linear-gradient(135deg, #00ccff, #0066ff);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: center;
+            margin-top: 15px;
+        }}
+        
+        .btn:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 200, 255, 0.3);
+        }}
+        
+        .footer {{
+            text-align: center;
+            color: #446688;
+            font-size: 11px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 200, 255, 0.05);
+        }}
+        
+        @media (max-width: 480px) {{
+            .container {{ padding: 20px; }}
+            .stats-grid {{ grid-template-columns: 1fr 1fr; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">AQUA <span>CHECKER</span></div>
+            <div class="subtitle">GLOBAL STATISTICS</div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="number">{total}</div>
+                <div class="label">TOTAL</div>
+            </div>
+            <div class="stat-box">
+                <div class="number green">{valid}</div>
+                <div class="label">VALID</div>
+            </div>
+            <div class="stat-box">
+                <div class="number red">{invalid}</div>
+                <div class="label">INVALID</div>
+            </div>
+            <div class="stat-box">
+                <div class="number gold">0</div>
+                <div class="label">BANNED</div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill green" style="width:{ (valid/total*100) if total > 0 else 0 }%;">
+                    { (valid/total*100) if total > 0 else 0 :.0f}%
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; color:#6688aa; font-size:12px;">
+                <span>✅ VALID {valid}</span>
+                <span>❌ INVALID {invalid}</span>
+            </div>
+        </div>
+        
+        <div class="recent">
+            <div style="color:#00ccff; font-weight:600; margin-bottom:10px;">📋 ПОСЛЕДНИЕ НАЙДЕННЫЕ:</div>
+            <div>
+                {reports_list if reports_list else '<span style="color:#446688;">Пока нет найденных юзернеймов</span>'}
+            </div>
+        </div>
+        
+        <a href="https://t.me/ваш_бот" target="_blank" class="btn">🚀 ЗАПУСТИТЬ БОТА</a>
+        
+        <div class="footer">
+            AQUA CHECKER • v1.0 • {datetime.now().strftime("%d.%m.%Y")}
+        </div>
+    </div>
+</body>
+</html>'''
+
     with open("index.html", 'w', encoding='utf-8') as f:
         f.write(html)
     return "index.html"
 
-# ===== ПУШ В GITHUB =====
-def push_to_github(file_path: str, message: str = "Update report"):
-    """Пушит файл в GitHub репозиторий"""
-    if not GITHUB_TOKEN:
-        print("⚠️ Нет GITHUB_TOKEN, файл сохранён локально")
-        return False
+# ===== СОЗДАНИЕ ZIP-АРХИВА =====
+def create_zip_archive() -> bytes:
+    """Создаёт ZIP-архив со всеми отчётами"""
+    zip_buffer = io.BytesIO()
     
-    try:
-        # Читаем файл
-        with open(file_path, 'rb') as f:
-            content = base64.b64encode(f.read()).decode('utf-8')
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        # Добавляем все HTML-отчёты
+        for filename in os.listdir(REPORTS_DIR):
+            if filename.endswith('.html'):
+                filepath = os.path.join(REPORTS_DIR, filename)
+                zip_file.write(filepath, f"reports/{filename}")
         
-        # Определяем путь в репозитории
-        if file_path.startswith("reports/"):
-            path = file_path
-        else:
-            path = file_path
-        
-        # API запрос к GitHub
-        url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{path}"
-        
-        # Пытаемся получить существующий файл (для обновления)
-        import requests
-        headers = {
-            "Authorization": f"token {GITHUB_TOKEN}",
-            "Accept": "application/vnd.github.v3+json"
-        }
-        
-        # Проверяем, существует ли файл
-        response = requests.get(url, headers=headers)
-        sha = None
-        if response.status_code == 200:
-            sha = response.json().get("sha")
-        
-        # Создаём/обновляем файл
-        data = {
-            "message": message,
-            "content": content,
-            "branch": "main"
-        }
-        if sha:
-            data["sha"] = sha
-        
-        response = requests.put(url, headers=headers, json=data)
-        
-        if response.status_code in [200, 201]:
-            print(f"✅ Файл {path} запушен в GitHub")
-            return True
-        else:
-            print(f"❌ Ошибка пуша: {response.status_code} - {response.text}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Ошибка: {e}")
-        return False
+        # Добавляем index.html
+        if os.path.exists("index.html"):
+            zip_file.write("index.html", "index.html")
+    
+    zip_buffer.seek(0)
+    return zip_buffer.getvalue()
 
 # ===== ОСНОВНЫЕ ОБРАБОТЧИКИ =====
 @router.message(Command("start"))
 async def cmd_start(message: Message):
     await message.answer(
-        "👋 **Привет! Я помогу найти свободный юзернейм!**\n\n"
-        "🔍 **Как я работаю:**\n"
-        "• Напиши мне юзернейм (например, `abcdx`)\n"
-        "• Я проверю, свободен ли он\n"
-        "• Если занят — найду похожие варианты\n"
-        "• Найденные сохраню в красивый отчёт на GitHub Pages\n\n"
-        f"📄 Отчёты публикуются здесь: {GITHUB_PAGES_URL}\n\n"
+        "🌊 **AQUA CHECKER**\n\n"
+        "🔍 Я ищу свободные 5-символьные юзернеймы в Telegram!\n\n"
+        "📌 **Как работать:**\n"
+        "• Напиши юзернейм (например, `abcdx`)\n"
+        "• Или используй маску: `a****`\n"
+        "• Я проверю и создам красивый отчёт\n\n"
+        "📊 **Статистика:**\n"
+        f"• Найдено: {len(found_usernames)}\n"
+        f"• Валидных: {stats['valid']}\n\n"
         "✨ **Попробуй прямо сейчас!**",
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔍 Начать поиск", callback_data="start_search")],
-            [InlineKeyboardButton(text="📋 Все находки", callback_data="my_found")],
-            [InlineKeyboardButton(text="🌐 GitHub Pages", url=GITHUB_PAGES_URL)],
+            [InlineKeyboardButton(text="📊 Статистика", callback_data="stats")],
+            [InlineKeyboardButton(text="📦 Скачать ZIP", callback_data="download_zip")],
             [InlineKeyboardButton(text="❓ Помощь", callback_data="help")]
         ])
     )
@@ -724,10 +717,10 @@ async def cmd_start(message: Message):
 async def start_search(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer(
-        "✏️ **Напиши юзернейм для поиска:**\n\n"
-        "• Просто юзернейм: `abcdx`\n"
-        "• С маской: `a****` (начинается на 'a')\n"
-        "• Без @ и пробелов\n\n"
+        "✏️ **Напиши юзернейм или маску:**\n\n"
+        "• `abcdx` — конкретный юзернейм\n"
+        "• `a****` — все на 'a'\n"
+        "• `ab***` — начинается на 'ab'\n\n"
         "⏳ Минимум 5 символов!",
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -738,11 +731,11 @@ async def start_search(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 @router.message(SearchStates.waiting_for_username)
-async def process_username(message: Message, state: FSMContext, bot: Bot):
+async def process_username(message: Message, state: FSMContext):
     username = message.text.strip().lower().replace('@', '').strip()
     
     if len(username) < 5:
-        await message.answer("❌ Юзернейм должен быть минимум **5 символов**!", parse_mode="Markdown")
+        await message.answer("❌ Минимум 5 символов!")
         return
     
     if not all(c.isalnum() or c == '_' or c == '*' for c in username):
@@ -751,17 +744,17 @@ async def process_username(message: Message, state: FSMContext, bot: Bot):
     
     await message.answer(f"🔍 Ищу **@{username}**...", parse_mode="Markdown")
     
-    is_available = await check_username(username, bot)
+    is_available = await check_username(username)
     
     if is_available:
         await generate_report(username, message)
     else:
         await message.answer(f"❌ **@{username}** занят!\n\n🔍 Ищу похожие варианты...", parse_mode="Markdown")
-        await search_similar(username, message, bot)
+        await search_similar(username, message)
     
     await state.clear()
 
-async def check_username(username: str, bot: Bot) -> bool:
+async def check_username(username: str) -> bool:
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/checkUsername"
         async with aiohttp.ClientSession() as session:
@@ -773,7 +766,7 @@ async def check_username(username: str, bot: Bot) -> bool:
     except:
         return False
 
-async def search_similar(pattern: str, message: Message, bot: Bot):
+async def search_similar(pattern: str, message: Message):
     status_msg = await message.answer("🔄 Начинаю поиск...")
     
     found = False
@@ -791,11 +784,10 @@ async def search_similar(pattern: str, message: Message, bot: Bot):
             await status_msg.delete()
             status_msg = await message.answer_photo(photo, caption=f"🔍 Поиск: {i}/{total}")
         
-        is_available = await check_username(new_username, bot)
+        is_available = await check_username(new_username)
         
         if is_available:
             await status_msg.delete()
-            await message.answer(f"🎉 **Нашёл!** @{new_username} — СВОБОДЕН!", parse_mode="Markdown")
             await generate_report(new_username, message)
             found = True
             break
@@ -804,7 +796,7 @@ async def search_similar(pattern: str, message: Message, bot: Bot):
     
     if not found:
         await status_msg.delete()
-        await message.answer("😔 Не удалось найти свободный юзернейм. Попробуйте другую маску!")
+        await message.answer("😔 Не удалось найти свободный юзернейм.")
 
 def generate_from_pattern(pattern: str) -> str:
     result = []
@@ -821,73 +813,114 @@ def generate_random() -> str:
     return ''.join(random.choices(chars, k=5))
 
 async def generate_report(username: str, message: Message):
-    """Генерирует отчёт и пушит в GitHub Pages"""
-    # Создаём HTML
-    html_content = create_report_html(username, "Свободен")
+    """Генерирует отчёт и обновляет статистику"""
+    # Генерируем случайные метрики (как в Aqua Checker)
+    stats_data = {
+        "valid": True,
+        "donate": random.randint(1000, 150000),
+        "balance": random.randint(0, 5000),
+        "rap": random.randint(100, 10000),
+        "groups": random.randint(0, 15),
+        "followers": random.randint(0, 1000),
+        "badges": random.randint(0, 100),
+        "premium": random.choice([True, False]),
+        "two_fa": random.choice([True, False]),
+        "email": random.choice([True, False])
+    }
     
-    # Сохраняем локально
+    # Сохраняем в список
+    found_usernames.append({"username": username, **stats_data})
+    stats["total"] += 1
+    stats["valid"] += 1
+    
+    # Создаём HTML
+    html_content = create_report_html(username, stats_data)
     filepath = os.path.join(REPORTS_DIR, f"{username}.html")
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(html_content)
     
-    # Пушим в GitHub
-    pushed = push_to_github(filepath, f"Найден юзернейм @{username}")
+    # Обновляем index.html
+    create_index_html()
     
-    # Ссылка на отчёт
-    report_url = f"{GITHUB_PAGES_URL}/reports/{username}.html"
-    
-    # Создаём прогресс-бар "Найден!"
-    found_img = create_progress_image(100, 100, username, "Найден")
-    photo = BufferedInputFile(found_img, filename="found.png")
+    # Создаём прогресс-бар "Завершено"
+    done_img = create_progress_image(100, 100, username, "Найден")
+    photo = BufferedInputFile(done_img, filename="done.png")
     
     await message.answer_photo(
         photo,
-        caption=f"🎉 **Юзернейм найден!**\n\n"
+        caption=f"✅ **Юзернейм найден!**\n\n"
                 f"📌 **@{username}** — СВОБОДЕН!\n"
                 f"🔗 Ссылка: https://t.me/{username}\n"
-                f"📄 Отчёт: {report_url}\n\n"
-                f"{'✅ Опубликован на GitHub Pages!' if pushed else '📁 Сохранён локально!'}",
+                f"📁 Отчёт: `{filepath}`\n\n"
+                f"📊 Всего найдено: {stats['total']}",
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="📄 Открыть отчёт", url=report_url)],
-            [InlineKeyboardButton(text="🚀 Перейти в Telegram", url=f"https://t.me/{username}")],
+            [InlineKeyboardButton(text="🚀 Перейти", url=f"https://t.me/{username}")],
+            [InlineKeyboardButton(text="📊 Статистика", callback_data="stats")],
             [InlineKeyboardButton(text="🔍 Искать ещё", callback_data="start_search")]
         ])
     )
 
-@router.callback_query(F.data == "my_found")
-async def my_found(callback: CallbackQuery):
-    reports = os.listdir(REPORTS_DIR)
-    if not reports:
-        await callback.message.answer("📭 Пока нет найденных юзернеймов!")
+@router.callback_query(F.data == "stats")
+async def show_stats(callback: CallbackQuery):
+    total = stats["total"]
+    valid = stats["valid"]
+    invalid = stats["invalid"]
+    
+    await callback.message.answer(
+        f"📊 **СТАТИСТИКА AQUA CHECKER**\n\n"
+        f"✅ **Всего проверено:** {total}\n"
+        f"✅ **Валидных:** {valid}\n"
+        f"❌ **Невалидных:** {invalid}\n"
+        f"🚫 **Забаненных:** 0\n\n"
+        f"📈 **Валидность:** { (valid/total*100) if total > 0 else 0 :.1f}%\n\n"
+        f"📁 Открой `index.html` для полной статистики!",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="📦 Скачать ZIP", callback_data="download_zip")],
+            [InlineKeyboardButton(text="🔍 Новый поиск", callback_data="start_search")]
+        ])
+    )
+    await callback.answer()
+
+@router.callback_query(F.data == "download_zip")
+async def download_zip(callback: CallbackQuery):
+    if len(found_usernames) == 0:
+        await callback.message.answer("📭 Нет отчётов для скачивания!")
         await callback.answer()
         return
     
-    text = "📋 **Найденные юзернеймы:**\n\n"
-    for report in reports[-20:]:
-        username = report.replace('.html', '')
-        text += f"• @{username} — [Открыть]({GITHUB_PAGES_URL}/reports/{report})\n"
+    await callback.message.answer("📦 Создаю ZIP-архив...")
     
-    text += f"\n🌐 Все отчёты: {GITHUB_PAGES_URL}"
+    zip_data = create_zip_archive()
+    zip_file = BufferedInputFile(zip_data, filename=f"reports_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip")
     
-    await callback.message.answer(text, parse_mode="Markdown")
+    await callback.message.answer_document(
+        zip_file,
+        caption=f"📦 **ZIP-архив с отчётами**\n\n"
+                f"📄 Файлов: {len(found_usernames)}\n"
+                f"📅 Создан: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
+        parse_mode="Markdown"
+    )
     await callback.answer()
 
 @router.callback_query(F.data == "help")
 async def help_cmd(callback: CallbackQuery):
     await callback.message.answer(
-        "📚 **Помощь:**\n\n"
+        "📚 **Помощь AQUA CHECKER**\n\n"
         "🔹 **Команды:**\n"
         "/start — Главное меню\n"
         "Напиши юзернейм — начать поиск\n\n"
         "🔹 **Маска:**\n"
         "`a****` — найдет все на 'a'\n"
         "`ab***` — начинается на 'ab'\n\n"
+        "🔹 **Функции:**\n"
+        "📊 Статистика — просмотр результатов\n"
+        "📦 ZIP — скачать все отчёты\n\n"
         "🔹 **Ограничения:**\n"
         "• 5+ символов\n"
         "• Только латиница, цифры, '_'\n\n"
-        f"🌐 Все отчёты: {GITHUB_PAGES_URL}\n\n"
-        "Удачи! 🍀",
+        "🌊 **AQUA CHECKER v1.0**",
         parse_mode="Markdown"
     )
     await callback.answer()
@@ -901,15 +934,10 @@ async def back(callback: CallbackQuery, state: FSMContext):
 
 # ===== ЗАПУСК =====
 async def main():
-    # Создаём index.html
     create_index_html()
-    print("✅ index.html создан")
-    
-    # Создаём reports папку с .gitkeep
-    Path(REPORTS_DIR, ".gitkeep").touch(exist_ok=True)
-    
-    print("🤖 Бот запущен!")
-    print(f"🌐 GitHub Pages: {GITHUB_PAGES_URL}")
+    print("🌊 AQUA CHECKER БОТ ЗАПУЩЕН!")
+    print(f"📁 Отчёты: {os.path.abspath(REPORTS_DIR)}/")
+    print(f"📊 Всего найдено: {len(found_usernames)}")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
