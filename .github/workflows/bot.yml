@@ -1,35 +1,33 @@
-name: Generate Reports
+name: Bot Webhook Responder
 
 on:
-  schedule:
-    - cron: '*/10 * * * *'  # Каждые 10 минут
+  push:
+    branches: [ main ]
   workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'  # Проверка каждые 15 минут
 
 permissions:
   contents: write
 
 jobs:
-  generate:
+  check_requests:
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-    
-    - name: Generate reports
+
+    - name: Install
       run: |
-        python generator.py
-    
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        publish_branch: gh-pages
-        keep_files: true
-        exclude_assets: '.github,generator.py,requirements.txt,.gitignore'
+        pip install aiogram aiohttp
+
+    - name: Run bot responder
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      run: |
+        python responder.py
