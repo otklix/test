@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@cy9fk — найден!</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @keyframes wave {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a, #1a1a3e, #0a0a1a);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .container {
+            background: rgba(20, 20, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 550px;
+            width: 100%;
+            border: 1px solid rgba(0, 200, 255, 0.1);
+            box-shadow: 0 30px 80px rgba(0, 200, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.08), transparent);
+            animation: wave 3s infinite;
+        }
+        
+        .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 900;
+            color: #00ccff;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo span { color: #ffffff; }
+        
+        .username {
+            font-size: 48px;
+            font-weight: 900;
+            color: #00ccff;
+            text-align: center;
+            margin: 15px 0;
+            animation: pulse 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .username a {
+            color: #00ccff;
+            text-decoration: none;
+        }
+        
+        .status {
+            display: table;
+            margin: 0 auto;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .info {
+            color: #6688aa;
+            text-align: center;
+            margin: 15px 0;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn {
+            display: block;
+            background: linear-gradient(135deg, #00ccff, #0066ff);
+            color: white;
+            padding: 16px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 20px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.3);
+        }
+        
+        .footer {
+            text-align: center;
+            color: #446688;
+            font-size: 11px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 200, 255, 0.05);
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">AQUA <span>CHECKER</span></div>
+        <div class="username">
+            <a href="https://t.me/cy9fk" target="_blank">@cy9fk</a>
+        </div>
+        <div class="status">✅ СВОБОДЕН</div>
+        <div class="info">📅 Найден: 11.07.2026 13:22:15</div>
+        <a href="https://t.me/cy9fk" target="_blank" class="btn">🚀 Перейти в Telegram</a>
+        <div class="footer">AQUA CHECKER • 11.07.2026 13:22:15</div>
+    </div>
+</body>
+</html>
