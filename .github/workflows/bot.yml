@@ -1,27 +1,32 @@
-name: Aqua Checker Bot (Auto-Restart)
+name: Aqua Checker Bot
 
 on:
   push:
     branches: [ main ]
-  schedule:
-    - cron: '*/5 * * * *'  # Перезапуск каждые 5 минут
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  run-bot:
+  deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
     
-    - name: Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     
     - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pillow aiohttp aiogram
     
@@ -29,28 +34,40 @@ jobs:
       run: |
         mkdir -p reports images zips
     
-    - name: Run Aqua Checker Bot
+    - name: Generate reports
       env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       run: |
         python bot.py &
-        echo "Бот запущен!"
-        sleep 5
+        sleep 15
+        pkill -f "python bot.py" || true
     
-    - name: Upload reports
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: reports-${{ github.run_id }}
-        path: reports/
-        retention-days: 7
-    
-    - name: Deploy to GitHub Pages
-      if: always()
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        publish_branch: gh-pages
-        keep_files: true
-        exclude_assets: '.github,bot.py,requirements.txt,.gitignore,.env'
+    - name: Deploy to gh-pages
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Переключаемся на gh-pages
+        if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+          git fetch origin gh-pages
+          git checkout gh-pages
+        else
+          git checkout --orphan gh-pages
+        fi
+        
+        # Копируем отчёты и index.html
+        mkdir -p reports
+        cp -r reports/ ./reports/ 2>/dev/null || true
+        cp index.html ./ 2>/dev/null || true
+        cp -r images/ ./images/ 2>/dev/null || true
+        
+        # Удаляем ненужное
+        rm -rf .github bot.py requirements.txt .gitignore __pycache__ *.pyc
+        
+        # Добавляем .nojekyll для GitHub Pages
+        touch .nojekyll
+        
+        # Коммитим и пушим
+        git add .
+        git commit -m "Deploy: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+        git push --force origin gh-pages
