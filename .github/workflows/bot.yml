@@ -1,31 +1,56 @@
-name: Run Telegram Bot
+name: Aqua Checker Bot (Auto-Restart)
 
 on:
+  push:
+    branches: [ main ]
   schedule:
-    - cron: '*/5 * * * *'   # Запуск каждые 5 минут
-  workflow_dispatch:        # Ручной запуск
+    - cron: '*/5 * * * *'  # Перезапуск каждые 5 минут
+  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          pip install aiogram aiohttp beautifulsoup4 lxml
-
-      - name: Run bot (keep alive)
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: |
-          # Запускаем бота в фоне
-          python bot.py &
-          # Держим воркфлоу живым
-          sleep infinity
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pillow aiohttp aiogram
+    
+    - name: Create directories
+      run: |
+        mkdir -p reports images zips
+    
+    - name: Run Aqua Checker Bot
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      run: |
+        python bot.py &
+        echo "Бот запущен!"
+        sleep 5
+    
+    - name: Upload reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: reports-${{ github.run_id }}
+        path: reports/
+        retention-days: 7
+    
+    - name: Deploy to GitHub Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+        publish_branch: gh-pages
+        keep_files: true
+        exclude_assets: '.github,bot.py,requirements.txt,.gitignore,.env'
