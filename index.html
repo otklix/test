@@ -3,130 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQUA CHECKER — Поиск юзернеймов</title>
+    <title>AQUA CHECKER</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         /* ===== АНИМАЦИИ ===== */
-        @keyframes waveIn {
-            0% { transform: translateX(-100%) scaleY(0.3); opacity: 0; }
-            50% { transform: translateX(0%) scaleY(1); opacity: 1; }
-            100% { transform: translateX(100%) scaleY(0.3); opacity: 0; }
+        @keyframes waveMove {
+            0% { transform: translateX(-100%) scaleY(0.2); opacity: 0; }
+            30% { transform: translateX(0%) scaleY(1); opacity: 1; }
+            70% { transform: translateX(0%) scaleY(1); opacity: 1; }
+            100% { transform: translateX(100%) scaleY(0.2); opacity: 0; }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            50% { transform: scale(1.03); }
         }
 
         @keyframes letterAppear {
-            0% { opacity: 0; transform: translateY(-20px) scale(0.8); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0% { opacity: 0; transform: translateY(-30px) scale(0.5) rotate(-10deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
         }
 
         body {
-            background: linear-gradient(135deg, #070720, #0d1b4e, #070720);
+            background: linear-gradient(135deg, #05051a, #0a1a4a, #05051a);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             padding: 20px;
-            animation: fadeIn 0.8s ease-out;
-            overflow-x: hidden;
-        }
-
-        .container {
-            background: rgba(10, 20, 50, 0.92);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 40px;
-            max-width: 750px;
-            width: 100%;
-            border: 1px solid rgba(0, 200, 255, 0.1);
-            box-shadow: 0 30px 80px rgba(0, 100, 255, 0.15);
-            position: relative;
             overflow: hidden;
         }
 
-        /* ===== ВОЛНА НА ФОНЕ ===== */
+        /* ===== ВОЛНА НА ВСЁМ ЭКРАНЕ ===== */
         .wave-bg {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            overflow: hidden;
             z-index: 0;
+            overflow: hidden;
         }
 
-        .wave-bg .wave-layer {
+        .wave-bg .wave {
             position: absolute;
-            bottom: -5%;
-            left: -10%;
-            width: 120%;
-            height: 120%;
-            background: radial-gradient(ellipse at 30% 80%, rgba(0, 150, 255, 0.04), transparent 70%);
-            animation: waveIn 4s ease-in-out infinite;
-        }
-
-        .wave-bg .wave-layer:nth-child(2) {
             bottom: -10%;
-            background: radial-gradient(ellipse at 70% 90%, rgba(0, 200, 255, 0.03), transparent 60%);
-            animation-delay: 2s;
+            left: -50%;
+            width: 200%;
+            height: 150%;
+            background: radial-gradient(ellipse at 30% 80%, rgba(0, 150, 255, 0.06), transparent 70%);
+            animation: waveMove 6s ease-in-out infinite;
+            border-radius: 50%;
         }
 
-        /* ===== ЗАГОЛОВОК С АНИМАЦИЕЙ БУКВ ===== */
-        .header {
-            text-align: center;
+        .wave-bg .wave:nth-child(2) {
+            animation-delay: 3s;
+            background: radial-gradient(ellipse at 70% 90%, rgba(0, 200, 255, 0.04), transparent 60%);
+        }
+
+        .wave-bg .wave:nth-child(3) {
+            animation-delay: 1.5s;
+            background: radial-gradient(ellipse at 50% 100%, rgba(0, 100, 255, 0.03), transparent 50%);
+        }
+
+        /* ===== КОНТЕЙНЕР ===== */
+        .container {
+            background: rgba(5, 10, 30, 0.88);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            border: 1px solid rgba(0, 200, 255, 0.08);
+            box-shadow: 0 30px 80px rgba(0, 100, 255, 0.1);
             position: relative;
             z-index: 1;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* ===== ЗАГОЛОВОК С БУКВАМИ ===== */
+        .header {
+            text-align: center;
             margin-bottom: 25px;
         }
 
-        .header .title {
+        .title {
             font-size: 48px;
             font-weight: 900;
-            color: #00ccff;
             letter-spacing: 4px;
-            text-shadow: 0 0 40px rgba(0, 200, 255, 0.2);
+            color: #00ccff;
+            text-shadow: 0 0 40px rgba(0, 200, 255, 0.15);
         }
 
-        .header .title .letter {
+        .title .letter {
             display: inline-block;
             animation: letterAppear 0.6s ease-out forwards;
             opacity: 0;
         }
 
-        .header .title .letter:nth-child(1) { animation-delay: 0.1s; }
-        .header .title .letter:nth-child(2) { animation-delay: 0.2s; }
-        .header .title .letter:nth-child(3) { animation-delay: 0.3s; }
-        .header .title .letter:nth-child(4) { animation-delay: 0.4s; }
-        .header .title .letter:nth-child(5) { animation-delay: 0.5s; }
-        .header .title .letter:nth-child(6) { animation-delay: 0.6s; }
-        .header .title .letter:nth-child(7) { animation-delay: 0.7s; }
-        .header .title .letter:nth-child(8) { animation-delay: 0.8s; }
-        .header .title .letter:nth-child(9) { animation-delay: 0.9s; }
-        .header .title .letter:nth-child(10) { animation-delay: 1.0s; }
-        .header .title .letter:nth-child(11) { animation-delay: 1.1s; }
-        .header .title .letter:nth-child(12) { animation-delay: 1.2s; }
+        .title .letter:nth-child(1) { animation-delay: 0.05s; }
+        .title .letter:nth-child(2) { animation-delay: 0.10s; }
+        .title .letter:nth-child(3) { animation-delay: 0.15s; }
+        .title .letter:nth-child(4) { animation-delay: 0.20s; }
+        .title .letter:nth-child(5) { animation-delay: 0.25s; }
+        .title .letter:nth-child(6) { animation-delay: 0.30s; }
+        .title .letter:nth-child(7) { animation-delay: 0.35s; }
+        .title .letter:nth-child(8) { animation-delay: 0.40s; }
+        .title .letter:nth-child(9) { animation-delay: 0.45s; }
+        .title .letter:nth-child(10) { animation-delay: 0.50s; }
+        .title .letter:nth-child(11) { animation-delay: 0.55s; }
+        .title .letter:nth-child(12) { animation-delay: 0.60s; }
 
-        .header .title .letter.white {
-            color: #ffffff;
-        }
+        .title .letter.white { color: #ffffff; }
 
-        .header .sub {
+        .subtitle {
             color: #6688aa;
             font-size: 14px;
             margin-top: 5px;
             letter-spacing: 2px;
-            animation: fadeIn 1.5s ease-out;
+            animation: fadeIn 1.2s ease-out;
         }
 
         /* ===== ФИЛЬТРЫ ===== */
@@ -134,8 +137,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            position: relative;
-            z-index: 1;
             margin: 15px 0;
         }
 
@@ -160,35 +161,96 @@
             margin-bottom: 4px;
         }
 
-        .filter-group input, .filter-group select {
+        .filter-group input,
+        .filter-group select {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(0, 200, 255, 0.1);
             border-radius: 8px;
             padding: 8px 12px;
-            color: #ffffff;
+            color: #fff;
             font-size: 14px;
             outline: none;
             transition: 0.3s;
         }
 
-        .filter-group input:focus, .filter-group select:focus {
+        .filter-group input:focus,
+        .filter-group select:focus {
             border-color: #00ccff;
-            box-shadow: 0 0 15px rgba(0, 200, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 200, 255, 0.08);
         }
 
         .filter-group input::placeholder {
             color: #446688;
         }
-
         .filter-group select option {
             background: #0a0a2a;
         }
 
-        /* ===== ПРОГРЕСС-БАР ===== */
-        .progress-wrap {
+        /* ===== КНОПКИ ===== */
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
             position: relative;
             z-index: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ccff, #0066ff);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.25);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #2e7d32);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.25);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #00ccff;
+            border: 2px solid rgba(0, 200, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 200, 255, 0.05);
+            border-color: #00ccff;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* ===== ПРОГРЕСС-БАР ===== */
+        .progress-wrap {
             margin: 15px 0 10px;
             display: none;
         }
@@ -196,7 +258,7 @@
         .progress-bar {
             width: 100%;
             height: 6px;
-            background: rgba(0, 200, 255, 0.1);
+            background: rgba(0, 200, 255, 0.08);
             border-radius: 10px;
             overflow: hidden;
         }
@@ -216,69 +278,8 @@
             margin-top: 6px;
         }
 
-        /* ===== КНОПКИ ===== */
-        .btn {
-            display: inline-block;
-            padding: 14px 30px;
-            border-radius: 50px;
-            border: none;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            z-index: 1;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #00ccff, #0066ff);
-            color: white;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.3);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4CAF50, #2e7d32);
-            color: white;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.3);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #00ccff;
-            border: 2px solid rgba(0, 200, 255, 0.3);
-            padding: 10px 20px;
-            font-size: 14px;
-        }
-
-        .btn-outline:hover {
-            background: rgba(0, 200, 255, 0.1);
-            border-color: #00ccff;
-        }
-
         /* ===== РЕЗУЛЬТАТЫ ===== */
         .result-area {
-            position: relative;
-            z-index: 1;
             margin-top: 15px;
             display: none;
         }
@@ -287,7 +288,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .stat-card {
@@ -304,6 +305,9 @@
             color: #00ccff;
         }
 
+        .stat-card .number.green { color: #4CAF50; }
+        .stat-card .number.red { color: #f44336; }
+
         .stat-card .label {
             font-size: 10px;
             color: #6688aa;
@@ -314,7 +318,7 @@
         .username-list {
             max-height: 200px;
             overflow-y: auto;
-            margin: 10px 0;
+            margin: 8px 0;
             padding-right: 5px;
         }
 
@@ -337,25 +341,14 @@
             margin: 4px 0;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             font-size: 14px;
         }
 
-        .username-item .name {
-            color: #00ccff;
-            font-weight: 600;
-        }
+        .username-item .name { color: #00ccff; font-weight: 600; }
+        .username-item .status { color: #4CAF50; font-size: 12px; }
+        .username-item .status.taken { color: #f44336; }
 
-        .username-item .status {
-            color: #4CAF50;
-            font-size: 12px;
-        }
-
-        .username-item .status.taken {
-            color: #f44336;
-        }
-
-        .report-link-box {
+        .report-box {
             background: rgba(0, 200, 255, 0.03);
             padding: 15px;
             border-radius: 12px;
@@ -364,7 +357,7 @@
             text-align: center;
         }
 
-        .report-link-box .link {
+        .report-box .link {
             color: #00ccff;
             word-break: break-all;
             font-size: 14px;
@@ -374,47 +367,21 @@
             margin: 8px 0;
         }
 
-        .report-link-box .copy-btn {
-            background: rgba(0, 200, 255, 0.1);
+        .report-box .copy-btn {
+            background: rgba(0, 200, 255, 0.08);
             color: #00ccff;
-            border: 1px solid rgba(0, 200, 255, 0.2);
-            padding: 6px 16px;
+            border: 1px solid rgba(0, 200, 255, 0.15);
+            padding: 5px 16px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 12px;
             transition: 0.3s;
         }
 
-        .report-link-box .copy-btn:hover {
-            background: rgba(0, 200, 255, 0.2);
+        .report-box .copy-btn:hover {
+            background: rgba(0, 200, 255, 0.15);
         }
 
-        .btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(10, 20, 50, 0.95);
-            color: #00ccff;
-            padding: 12px 24px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 200, 255, 0.2);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            display: none;
-            z-index: 999;
-            font-size: 14px;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        /* ===== ФУТЕР ===== */
         .footer {
             text-align: center;
             color: #446688;
@@ -422,28 +389,43 @@
             margin-top: 20px;
             padding-top: 15px;
             border-top: 1px solid rgba(0, 200, 255, 0.05);
-            position: relative;
-            z-index: 1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(5, 10, 30, 0.95);
+            color: #00ccff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 200, 255, 0.15);
+            display: none;
+            z-index: 999;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease-out;
         }
 
         @media (max-width: 480px) {
             .container { padding: 25px 20px; }
             .filters { grid-template-columns: 1fr; }
-            .result-stats { grid-template-columns: 1fr 1fr 1fr; }
             .btn-group { grid-template-columns: 1fr; }
-            .header .title { font-size: 32px; }
+            .result-stats { grid-template-columns: 1fr 1fr 1fr; }
+            .title { font-size: 32px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- ФОН С ВОЛНАМИ -->
-        <div class="wave-bg">
-            <div class="wave-layer"></div>
-            <div class="wave-layer"></div>
-        </div>
+    <!-- ВОЛНА НА ФОНЕ -->
+    <div class="wave-bg">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
 
+    <div class="container">
         <!-- ЗАГОЛОВОК -->
         <div class="header">
             <div class="title">
@@ -460,7 +442,7 @@
                 <span class="letter">E</span>
                 <span class="letter">R</span>
             </div>
-            <div class="sub">🔍 Поиск свободных юзернеймов в Telegram</div>
+            <div class="subtitle">🔍 Поиск свободных юзернеймов в Telegram</div>
         </div>
 
         <!-- ФИЛЬТРЫ -->
@@ -494,40 +476,28 @@
             </div>
         </div>
 
-        <!-- КНОПКА ПОИСКА -->
-        <button class="btn btn-primary" id="searchBtn">🚀 Начать поиск</button>
+        <button class="btn btn-primary" id="searchBtn">🚀 Найти юзернеймы</button>
 
-        <!-- ПРОГРЕСС-БАР -->
+        <!-- ПРОГРЕСС -->
         <div class="progress-wrap" id="progressWrap">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             <div class="progress-text" id="progressText">⏳ Поиск...</div>
         </div>
 
         <!-- РЕЗУЛЬТАТЫ -->
         <div class="result-area" id="resultArea">
             <div class="result-stats">
-                <div class="stat-card">
-                    <div class="number" id="totalCount">0</div>
-                    <div class="label">Всего</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number" style="color:#4CAF50;" id="validCount">0</div>
-                    <div class="label">Свободных</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number" style="color:#f44336;" id="takenCount">0</div>
-                    <div class="label">Занятых</div>
-                </div>
+                <div class="stat-card"><div class="number" id="totalCount">0</div><div class="label">Всего</div></div>
+                <div class="stat-card"><div class="number green" id="validCount">0</div><div class="label">Свободных</div></div>
+                <div class="stat-card"><div class="number red" id="takenCount">0</div><div class="label">Занятых</div></div>
             </div>
 
             <div class="username-list" id="usernameList"></div>
 
-            <div class="report-link-box" id="reportBox">
-                <div style="color:#6688aa;font-size:12px;margin-bottom:6px;">📄 Одноразовая ссылка на отчёт:</div>
+            <div class="report-box" id="reportBox">
+                <div style="color:#6688aa;font-size:12px;margin-bottom:6px;">📄 Ваша уникальная ссылка на отчёт:</div>
                 <div class="link" id="reportLink">⏳ Сгенерируйте отчёт...</div>
-                <button class="copy-btn" onclick="copyLink()">📋 Копировать</button>
+                <button class="copy-btn" onclick="copyLink()">📋 Копировать ссылку</button>
 
                 <div class="btn-group">
                     <a href="#" class="btn btn-success" id="openBotBtn" target="_blank">📲 Получить ZIP в Telegram</a>
@@ -536,14 +506,14 @@
             </div>
         </div>
 
-        <div class="footer">AQUA CHECKER • GitHub Pages</div>
+        <div class="footer">GitHub Pages + Actions</div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
         const BOT_USERNAME = 'Username1FinderBOT';
-        const BOT_TOKEN = '8011946729:AAE9t-n-Ur16Kxg0gH-9uUF6SAP6H2Qa-Oo'; // Токен бота
+        const BOT_TOKEN = '8011946729:AAE9t-n-Ur16Kxg0gH-9uUF6SAP6H2Qa-Oo';
 
         let foundUsernames = [];
         let checkedUsernames = [];
@@ -650,7 +620,6 @@
             progressText.textContent = `✅ Готово! Найдено ${found} юзернеймов`;
             progressFill.style.width = '100%';
 
-            // Показываем результаты
             resultArea.style.display = 'block';
             document.getElementById('totalCount').textContent = foundUsernames.length;
             document.getElementById('validCount').textContent = foundUsernames.length;
@@ -673,13 +642,13 @@
                 list.appendChild(div);
             }
 
-            // Генерируем ссылку
+            // Генерируем УНИКАЛЬНУЮ ссылку для этого пользователя
             currentReportId = generateReportId();
             const botLink = `https://t.me/${BOT_USERNAME}?start=report_${currentReportId}`;
             document.getElementById('reportLink').textContent = botLink;
             document.getElementById('openBotBtn').href = botLink;
 
-            // Сохраняем данные
+            // Сохраняем данные в localStorage для этого отчёта
             localStorage.setItem('report_' + currentReportId, JSON.stringify({
                 usernames: foundUsernames,
                 checked: checkedUsernames,
@@ -687,11 +656,11 @@
                 created: Date.now()
             }));
 
-            showToast(`✅ Найдено ${foundUsernames.length} юзернеймов!`);
+            showToast(`✅ Найдено ${foundUsernames.length} юзернеймов! Ссылка создана.`);
 
             isSearching = false;
             this.disabled = false;
-            this.textContent = '🚀 Начать поиск';
+            this.textContent = '🚀 Найти юзернеймы';
         });
 
         function generateFullReport() {
@@ -699,39 +668,43 @@
                 showToast('❌ Сначала найдите юзернеймы!');
                 return;
             }
-            // Создаём HTML-отчёт
+
             const reportId = currentReportId || generateReportId();
+
+            // Формируем HTML-отчёт
             const html = `
         <!DOCTYPE html>
         <html>
         <head><title>AQUA CHECKER — Отчёт</title>
         <style>
-            body { background: #0a0a2a; color: #00ccff; font-family: Arial; padding: 40px; }
-            .container { max-width: 700px; margin: 0 auto; background: rgba(10,20,50,0.9); border-radius: 20px; padding: 30px; }
-            h1 { color: #00ccff; text-align: center; }
+            * { margin:0; padding:0; box-sizing:border-box; }
+            body { background: #05051a; color: #00ccff; font-family: Arial; padding: 30px; }
+            .container { max-width: 700px; margin: 0 auto; background: rgba(5,10,30,0.9); border-radius: 20px; padding: 30px; border: 1px solid rgba(0,200,255,0.08); }
+            h1 { color: #00ccff; text-align: center; font-size: 32px; }
+            .sub { text-align:center; color:#6688aa; margin-bottom:20px; }
             .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 20px 0; }
-            .stat { background: rgba(0,200,255,0.05); padding: 15px; border-radius: 12px; text-align: center; }
+            .stat { background: rgba(0,200,255,0.03); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,200,255,0.06); }
             .stat .num { font-size: 28px; font-weight: 800; }
-            .stat .label { color: #6688aa; font-size: 11px; }
-            .list { max-height: 400px; overflow-y: auto; }
-            .item { padding: 6px 10px; background: rgba(0,200,255,0.03); border-radius: 8px; margin: 3px 0; }
-            .free { color: #4CAF50; float: right; }
-            .taken { color: #f44336; float: right; }
-            .footer { text-align: center; color: #446688; font-size: 12px; margin-top: 20px; border-top: 1px solid rgba(0,200,255,0.05); padding-top: 15px; }
+            .stat .label { color: #6688aa; font-size: 11px; text-transform: uppercase; }
+            .list { max-height: 400px; overflow-y: auto; margin: 15px 0; }
+            .item { padding: 8px 12px; background: rgba(0,200,255,0.03); border-radius: 8px; margin: 4px 0; border-left: 2px solid #4CAF50; display: flex; justify-content: space-between; }
+            .free { color: #4CAF50; }
+            .taken { color: #f44336; }
+            .footer { text-align: center; color: #446688; font-size: 11px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,200,255,0.05); }
         </style>
         </head>
         <body>
         <div class="container">
             <h1>🌊 AQUA CHECKER</h1>
-            <p style="text-align:center;color:#6688aa;">📊 Полный отчёт</p>
+            <div class="sub">📊 Полный отчёт</div>
             <div class="stats">
                 <div class="stat"><div class="num">${foundUsernames.length}</div><div class="label">Всего</div></div>
                 <div class="stat"><div class="num" style="color:#4CAF50;">${foundUsernames.length}</div><div class="label">Свободных</div></div>
                 <div class="stat"><div class="num" style="color:#f44336;">${checkedUsernames.length - foundUsernames.length}</div><div class="label">Занятых</div></div>
             </div>
             <div class="list">
-                ${foundUsernames.map(u => `<div class="item">@${u} <span class="free">✅ Свободен</span></div>`).join('')}
-                ${checkedUsernames.filter(u => !u.isAvailable).slice(0, 10).map(u => `<div class="item">@${u.username} <span class="taken">❌ Занят</span></div>`).join('')}
+                ${foundUsernames.map(u => `<div class="item"><span>@${u}</span><span class="free">✅ Свободен</span></div>`).join('')}
+                ${checkedUsernames.filter(u => !u.isAvailable).slice(0, 10).map(u => `<div class="item"><span>@${u.username}</span><span class="taken">❌ Занят</span></div>`).join('')}
             </div>
             <div class="footer">Сгенерировано: ${new Date().toLocaleString()}</div>
         </div>
@@ -739,7 +712,7 @@
         </html>
         `;
 
-            // Скачиваем как HTML
+            // Скачиваем как HTML-файл
             const blob = new Blob([html], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -751,6 +724,28 @@
             URL.revokeObjectURL(url);
             showToast('✅ Отчёт скачан!');
         }
+
+        // Автозагрузка отчёта, если есть параметр в URL
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const reportId = params.get('report');
+            if (reportId) {
+                const data = localStorage.getItem('report_' + reportId);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    foundUsernames = parsed.usernames || [];
+                    checkedUsernames = parsed.checked || [];
+                    currentReportId = reportId;
+                    document.getElementById('reportLink').textContent = `https://t.me/${BOT_USERNAME}?start=report_${reportId}`;
+                    document.getElementById('openBotBtn').href = `https://t.me/${BOT_USERNAME}?start=report_${reportId}`;
+                    document.getElementById('resultArea').style.display = 'block';
+                    document.getElementById('totalCount').textContent = foundUsernames.length;
+                    document.getElementById('validCount').textContent = foundUsernames.length;
+                    document.getElementById('takenCount').textContent = (checkedUsernames.length || 0) - foundUsernames.length;
+                    showToast(`📄 Загружен отчёт с ${foundUsernames.length} юзернеймами`);
+                }
+            }
+        };
     </script>
 </body>
 </html>
