@@ -1,33 +1,22 @@
-name: Bot Webhook Responder
+name: Bot
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-  schedule:
-    - cron: '*/15 * * * *'  # Проверка каждые 15 минут
 
 permissions:
   contents: write
 
 jobs:
-  check_requests:
+  run:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-
-    - name: Install
-      run: |
-        pip install aiogram aiohttp
-
-    - name: Run bot responder
-      env:
+    - run: pip install -r requirements.txt
+    - env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      run: |
-        python responder.py
+      run: python bot.py
