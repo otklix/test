@@ -3,20 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQUA CHECKER</title>
+    <title>AQUA CHECKER — 1000+ функций</title>
     <style>
+        /* ===== ОБЩИЕ СТИЛИ ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         @keyframes waveMove {
             0% { transform: translateX(-100%) scaleY(0.2); opacity: 0; }
             30% { transform: translateX(0%) scaleY(1); opacity: 1; }
             70% { transform: translateX(0%) scaleY(1); opacity: 1; }
             100% { transform: translateX(100%) scaleY(0.2); opacity: 0; }
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @keyframes letterAppear {
             0% { opacity: 0; transform: translateY(-30px) scale(0.5) rotate(-10deg); }
             100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
         }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 200, 255, 0.1); }
+            50% { box-shadow: 0 0 40px rgba(0, 200, 255, 0.3); }
+        }
+
         body {
             background: linear-gradient(135deg, #05051a, #0a1a4a, #05051a);
             min-height: 100vh;
@@ -25,25 +43,75 @@
             align-items: center;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             padding: 20px;
-            overflow: hidden;
+            overflow-x: hidden;
             margin: 0;
         }
-        .wave-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+
+        /* ===== ВОЛНА НА ФОНЕ ===== */
+        .wave-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
         .wave-bg .wave {
-            position: absolute; bottom: -10%; left: -50%; width: 200%; height: 150%;
+            position: absolute;
+            bottom: -10%;
+            left: -50%;
+            width: 200%;
+            height: 150%;
             background: radial-gradient(ellipse at 30% 80%, rgba(0, 150, 255, 0.06), transparent 70%);
-            animation: waveMove 6s ease-in-out infinite; border-radius: 50%;
+            animation: waveMove 6s ease-in-out infinite;
+            border-radius: 50%;
         }
-        .wave-bg .wave:nth-child(2) { animation-delay: 3s; background: radial-gradient(ellipse at 70% 90%, rgba(0, 200, 255, 0.04), transparent 60%); }
-        .wave-bg .wave:nth-child(3) { animation-delay: 1.5s; background: radial-gradient(ellipse at 50% 100%, rgba(0, 100, 255, 0.03), transparent 50%); }
+
+        .wave-bg .wave:nth-child(2) {
+            animation-delay: 3s;
+            background: radial-gradient(ellipse at 70% 90%, rgba(0, 200, 255, 0.04), transparent 60%);
+        }
+
+        .wave-bg .wave:nth-child(3) {
+            animation-delay: 1.5s;
+            background: radial-gradient(ellipse at 50% 100%, rgba(0, 100, 255, 0.03), transparent 50%);
+        }
+
+        /* ===== КОНТЕЙНЕР ===== */
         .container {
-            background: rgba(5, 10, 30, 0.88); backdrop-filter: blur(30px); border-radius: 30px; padding: 40px;
-            max-width: 700px; width: 100%; border: 1px solid rgba(0, 200, 255, 0.08);
-            box-shadow: 0 30px 80px rgba(0, 100, 255, 0.1); position: relative; z-index: 1; animation: fadeIn 0.8s ease-out;
+            background: rgba(5, 10, 30, 0.88);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 850px;
+            width: 100%;
+            border: 1px solid rgba(0, 200, 255, 0.08);
+            box-shadow: 0 30px 80px rgba(0, 100, 255, 0.1);
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.8s ease-out;
         }
+
+        /* ===== ЗАГОЛОВОК ===== */
         .header { text-align: center; margin-bottom: 25px; }
-        .title { font-size: 48px; font-weight: 900; letter-spacing: 4px; color: #00ccff; text-shadow: 0 0 40px rgba(0, 200, 255, 0.15); }
-        .title .letter { display: inline-block; animation: letterAppear 0.6s ease-out forwards; opacity: 0; }
+
+        .title {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #00ccff;
+            text-shadow: 0 0 40px rgba(0, 200, 255, 0.15);
+        }
+
+        .title .letter {
+            display: inline-block;
+            animation: letterAppear 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
         .title .letter:nth-child(1) { animation-delay: 0.05s; }
         .title .letter:nth-child(2) { animation-delay: 0.10s; }
         .title .letter:nth-child(3) { animation-delay: 0.15s; }
@@ -56,112 +124,551 @@
         .title .letter:nth-child(10) { animation-delay: 0.50s; }
         .title .letter:nth-child(11) { animation-delay: 0.55s; }
         .title .letter:nth-child(12) { animation-delay: 0.60s; }
+
         .title .letter.white { color: #ffffff; }
-        .subtitle { color: #6688aa; font-size: 14px; margin-top: 5px; letter-spacing: 2px; animation: fadeIn 1.2s ease-out; }
-        .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-        .filter-group { background: rgba(0, 200, 255, 0.03); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(0, 200, 255, 0.06); transition: 0.3s; }
-        .filter-group:hover { border-color: rgba(0, 200, 255, 0.15); }
-        .filter-group label { display: block; color: #6688aa; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .filter-group input, .filter-group select {
-            width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(0, 200, 255, 0.1);
-            border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 14px; outline: none; transition: 0.3s;
+
+        .subtitle {
+            color: #6688aa;
+            font-size: 14px;
+            margin-top: 5px;
+            letter-spacing: 2px;
+            animation: fadeIn 1.2s ease-out;
         }
-        .filter-group input:focus, .filter-group select:focus { border-color: #00ccff; box-shadow: 0 0 15px rgba(0, 200, 255, 0.08); }
+
+        /* ===== ФИЛЬТРЫ ===== */
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .filter-group {
+            background: rgba(0, 200, 255, 0.03);
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 200, 255, 0.06);
+            transition: 0.3s;
+        }
+
+        .filter-group:hover { border-color: rgba(0, 200, 255, 0.15); }
+
+        .filter-group label {
+            display: block;
+            color: #6688aa;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 200, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: #00ccff;
+            box-shadow: 0 0 15px rgba(0, 200, 255, 0.08);
+        }
+
         .filter-group input::placeholder { color: #446688; }
         .filter-group select option { background: #0a0a2a; }
-        .btn {
-            display: inline-block; padding: 14px 30px; border-radius: 50px; border: none; font-size: 16px;
-            font-weight: 700; cursor: pointer; transition: all 0.3s; text-decoration: none; text-align: center; position: relative; z-index: 1;
+
+        /* ===== ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ ===== */
+        .settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
         }
-        .btn-primary { background: linear-gradient(135deg, #00ccff, #0066ff); color: white; width: 100%; margin-top: 10px; }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0, 200, 255, 0.25); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-success { background: linear-gradient(135deg, #4CAF50, #2e7d32); color: white; }
-        .btn-success:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(76, 175, 80, 0.25); }
-        .btn-outline { background: transparent; color: #00ccff; border: 2px solid rgba(0, 200, 255, 0.2); }
-        .btn-outline:hover { background: rgba(0, 200, 255, 0.05); border-color: #00ccff; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .progress-wrap { margin: 15px 0 10px; display: none; }
-        .progress-bar { width: 100%; height: 6px; background: rgba(0, 200, 255, 0.08); border-radius: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00ccff, #0066ff); border-radius: 10px; transition: width 0.3s ease; }
-        .progress-text { color: #6688aa; font-size: 12px; text-align: center; margin-top: 6px; }
-        .result-area { margin-top: 15px; display: none; }
-        .result-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .stat-card { background: rgba(0, 200, 255, 0.03); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(0, 200, 255, 0.06); }
-        .stat-card .number { font-size: 24px; font-weight: 800; color: #00ccff; }
+
+        .settings .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6688aa;
+            font-size: 13px;
+        }
+
+        .settings .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #00ccff;
+            cursor: pointer;
+        }
+
+        /* ===== КНОПКИ ===== */
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ccff, #0066ff);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            animation: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #2e7d32);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.25);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #00ccff;
+            border: 2px solid rgba(0, 200, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 200, 255, 0.05);
+            border-color: #00ccff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #c62828);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(244, 67, 54, 0.25);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-group-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* ===== ПРОГРЕСС-БАР ===== */
+        .progress-wrap {
+            margin: 15px 0 10px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 200, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #6688aa;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        /* ===== РЕЗУЛЬТАТЫ ===== */
+        .result-area {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: rgba(0, 200, 255, 0.03);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(0, 200, 255, 0.06);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover { transform: scale(1.02); }
+
+        .stat-card .number {
+            font-size: 22px;
+            font-weight: 800;
+            color: #00ccff;
+        }
+
         .stat-card .number.green { color: #4CAF50; }
         .stat-card .number.red { color: #f44336; }
-        .stat-card .label { font-size: 10px; color: #6688aa; text-transform: uppercase; letter-spacing: 1px; }
-        .username-list { max-height: 200px; overflow-y: auto; margin: 8px 0; padding-right: 5px; }
-        .username-list::-webkit-scrollbar { width: 4px; }
-        .username-list::-webkit-scrollbar-track { background: rgba(0, 200, 255, 0.05); border-radius: 10px; }
-        .username-list::-webkit-scrollbar-thumb { background: #00ccff; border-radius: 10px; }
-        .username-item { padding: 6px 12px; background: rgba(0, 200, 255, 0.03); border-radius: 8px; margin: 4px 0; display: flex; justify-content: space-between; font-size: 14px; }
+        .stat-card .number.gold { color: #FFD700; }
+        .stat-card .number.purple { color: #9B59B6; }
+
+        .stat-card .label {
+            font-size: 9px;
+            color: #6688aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .username-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 8px 0;
+            padding-right: 5px;
+        }
+
+        .username-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .username-list::-webkit-scrollbar-track {
+            background: rgba(0, 200, 255, 0.05);
+            border-radius: 10px;
+        }
+        .username-list::-webkit-scrollbar-thumb {
+            background: #00ccff;
+            border-radius: 10px;
+        }
+
+        .username-item {
+            padding: 6px 12px;
+            background: rgba(0, 200, 255, 0.03);
+            border-radius: 8px;
+            margin: 4px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .username-item:hover { background: rgba(0, 200, 255, 0.06); }
+
         .username-item .name { color: #00ccff; font-weight: 600; }
         .username-item .status { color: #4CAF50; font-size: 12px; }
         .username-item .status.taken { color: #f44336; }
-        .report-box { background: rgba(0, 200, 255, 0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(0, 200, 255, 0.06); margin-top: 15px; text-align: center; }
-        .report-box .link { color: #00ccff; word-break: break-all; font-size: 13px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; margin: 8px 0; font-family: monospace; }
-        .report-box .copy-btn { background: rgba(0, 200, 255, 0.08); color: #00ccff; border: 1px solid rgba(0, 200, 255, 0.15); padding: 5px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: 0.3s; }
-        .report-box .copy-btn:hover { background: rgba(0, 200, 255, 0.15); }
-        .footer { text-align: center; color: #446688; font-size: 11px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0, 200, 255, 0.05); }
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(5, 10, 30, 0.95); color: #00ccff; padding: 12px 24px; border-radius: 12px; border: 1px solid rgba(0, 200, 255, 0.15); display: none; z-index: 999; font-size: 14px; animation: fadeIn 0.3s ease-out; }
-        @media (max-width: 480px) { .container { padding: 25px 20px; } .filters { grid-template-columns: 1fr; } .btn-group { grid-template-columns: 1fr; } .result-stats { grid-template-columns: 1fr 1fr 1fr; } .title { font-size: 32px; } }
+
+        /* ===== БЛОК ССЫЛКИ ===== */
+        .report-box {
+            background: rgba(0, 200, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 200, 255, 0.06);
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .report-box .link {
+            color: #00ccff;
+            word-break: break-all;
+            font-size: 13px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin: 8px 0;
+            font-family: monospace;
+        }
+
+        .report-box .copy-btn {
+            background: rgba(0, 200, 255, 0.08);
+            color: #00ccff;
+            border: 1px solid rgba(0, 200, 255, 0.15);
+            padding: 5px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .report-box .copy-btn:hover {
+            background: rgba(0, 200, 255, 0.15);
+        }
+
+        .footer {
+            text-align: center;
+            color: #446688;
+            font-size: 11px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 200, 255, 0.05);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(5, 10, 30, 0.95);
+            color: #00ccff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 200, 255, 0.15);
+            display: none;
+            z-index: 999;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .search-filter input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 200, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-filter input:focus {
+            border-color: #00ccff;
+            box-shadow: 0 0 15px rgba(0, 200, 255, 0.08);
+        }
+
+        .search-filter input::placeholder { color: #446688; }
+
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .export-buttons .btn-small {
+            padding: 6px 16px;
+            font-size: 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 200, 255, 0.15);
+            background: rgba(0, 200, 255, 0.05);
+            color: #00ccff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .export-buttons .btn-small:hover {
+            background: rgba(0, 200, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 25px 15px; }
+            .filters { grid-template-columns: 1fr; }
+            .settings { grid-template-columns: 1fr; }
+            .btn-group { grid-template-columns: 1fr; }
+            .btn-group-2 { grid-template-columns: 1fr; }
+            .result-stats { grid-template-columns: 1fr 1fr; }
+            .title { font-size: 32px; }
+        }
     </style>
 </head>
 <body>
-    <div class="wave-bg"><div class="wave"></div><div class="wave"></div><div class="wave"></div></div>
+
+    <!-- ===== ВОЛНА ===== -->
+    <div class="wave-bg">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <!-- ===== КОНТЕЙНЕР ===== -->
     <div class="container">
+        <!-- ЗАГОЛОВОК -->
         <div class="header">
             <div class="title">
                 <span class="letter">A</span><span class="letter">Q</span><span class="letter">U</span><span class="letter">A</span>
                 <span class="letter white"> </span>
                 <span class="letter">C</span><span class="letter">H</span><span class="letter">E</span><span class="letter">C</span><span class="letter">K</span><span class="letter">E</span><span class="letter">R</span>
             </div>
-            <div class="subtitle">🔍 Поиск свободных юзернеймов в Telegram</div>
+            <div class="subtitle">🔍 1000+ функций для поиска юзернеймов в Telegram</div>
         </div>
 
+        <!-- ФИЛЬТРЫ -->
         <div class="filters">
-            <div class="filter-group"><label>📏 Длина</label><select id="length"><option value="5">5 символов</option><option value="6">6 символов</option><option value="7">7 символов</option><option value="any">Любая</option></select></div>
-            <div class="filter-group"><label>🔤 Префикс</label><input type="text" id="prefix" placeholder="Начинается с..." maxlength="5"></div>
-            <div class="filter-group"><label>🔤 Суффикс</label><input type="text" id="suffix" placeholder="Заканчивается на..." maxlength="5"></div>
-            <div class="filter-group"><label>📊 Количество</label><select id="count"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="1000">1000</option><option value="2000" selected>2000</option></select></div>
+            <div class="filter-group">
+                <label>📏 Длина</label>
+                <select id="length">
+                    <option value="5">5 символов</option>
+                    <option value="6">6 символов</option>
+                    <option value="7">7 символов</option>
+                    <option value="8">8 символов</option>
+                    <option value="9">9 символов</option>
+                    <option value="10">10 символов</option>
+                    <option value="any">Любая</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🔤 Префикс</label>
+                <input type="text" id="prefix" placeholder="Начинается с..." maxlength="10">
+            </div>
+            <div class="filter-group">
+                <label>🔤 Суффикс</label>
+                <input type="text" id="suffix" placeholder="Заканчивается на..." maxlength="10">
+            </div>
+            <div class="filter-group">
+                <label>📊 Содержит</label>
+                <input type="text" id="contains" placeholder="Содержит текст...">
+            </div>
+            <div class="filter-group">
+                <label>📊 Количество</label>
+                <select id="count">
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value="2000">2000</option>
+                    <option value="5000" selected>5000</option>
+                    <option value="10000">10000</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>⚡ Скорость</label>
+                <select id="speed">
+                    <option value="10">Медленная</option>
+                    <option value="50" selected>Средняя</option>
+                    <option value="100">Быстрая</option>
+                    <option value="200">Максимальная</option>
+                </select>
+            </div>
         </div>
 
-        <button class="btn btn-primary" id="searchBtn">🚀 Найти юзернеймы</button>
+        <!-- ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ -->
+        <div class="settings">
+            <div class="checkbox-group">
+                <input type="checkbox" id="unique" checked>
+                <label for="unique">🔒 Только уникальные</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="onlyLetters">
+                <label for="onlyLetters">🔤 Только буквы</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="onlyNumbers">
+                <label for="onlyNumbers">🔢 Только цифры</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="mixed" checked>
+                <label for="mixed">🔀 Буквы + цифры</label>
+            </div>
+        </div>
 
+        <!-- КНОПКА ПОИСКА -->
+        <button class="btn btn-primary" id="searchBtn">🚀 Начать поиск (до 10 000 юзернеймов)</button>
+
+        <!-- ПРОГРЕСС -->
         <div class="progress-wrap" id="progressWrap">
             <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             <div class="progress-text" id="progressText">⏳ Поиск...</div>
         </div>
 
+        <!-- РЕЗУЛЬТАТЫ -->
         <div class="result-area" id="resultArea">
             <div class="result-stats">
                 <div class="stat-card"><div class="number" id="totalCount">0</div><div class="label">Всего</div></div>
                 <div class="stat-card"><div class="number green" id="validCount">0</div><div class="label">Свободных</div></div>
                 <div class="stat-card"><div class="number red" id="takenCount">0</div><div class="label">Занятых</div></div>
+                <div class="stat-card"><div class="number gold" id="checkCount">0</div><div class="label">Проверено</div></div>
+                <div class="stat-card"><div class="number purple" id="timeCount">0</div><div class="label">Время</div></div>
             </div>
+
+            <div class="search-filter">
+                <input type="text" id="listFilter" placeholder="🔍 Фильтр по списку..." oninput="filterList()">
+            </div>
+
+            <div class="export-buttons">
+                <button class="btn-small" onclick="exportCSV()">📊 CSV</button>
+                <button class="btn-small" onclick="exportTXT()">📄 TXT</button>
+                <button class="btn-small" onclick="exportJSON()">📦 JSON</button>
+                <button class="btn-small" onclick="exportHTML()">🌐 HTML</button>
+                <button class="btn-small" onclick="clearResults()">🗑️ Очистить</button>
+            </div>
+
             <div class="username-list" id="usernameList"></div>
+
             <div class="report-box" id="reportBox">
-                <div style="color:#6688aa;font-size:12px;margin-bottom:6px;">📄 Ваша ссылка на отчёт:</div>
+                <div style="color:#6688aa;font-size:12px;margin-bottom:6px;">📄 Ваша уникальная ссылка на отчёт:</div>
                 <div class="link" id="reportLink">⏳ Сгенерируйте отчёт...</div>
                 <button class="copy-btn" onclick="copyLink()">📋 Копировать ссылку</button>
-                <div class="btn-group">
+
+                <div class="btn-group-2">
                     <a href="#" class="btn btn-success" id="openBotBtn" target="_blank">📲 Получить в Telegram</a>
                     <button class="btn btn-outline" id="fullReportBtn" onclick="generateFullReport()">📄 Скачать отчёт</button>
                 </div>
+                <button class="btn btn-outline" style="margin-top:8px;width:100%;" onclick="generateZipReport()">📦 Скачать ZIP-архив</button>
             </div>
         </div>
-        <div class="footer">GitHub Pages + Telegram Bot</div>
+
+        <div class="footer">AQUA CHECKER • 1000+ функций • GitHub Pages + Telegram Bot</div>
     </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
+        // ===== КОНФИГУРАЦИЯ =====
         const BOT_USERNAME = 'Username1FinderBOT';
         const BOT_TOKEN = '8011946729:AAE9t-n-Ur16Kxg0gH-9uUF6SAP6H2Qa-Oo';
         const BASE_URL = window.location.origin + '/progress/';
 
-        let foundUsernames = [], checkedUsernames = [], isSearching = false, currentReportId = null;
+        let foundUsernames = [];
+        let checkedUsernames = [];
+        let isSearching = false;
+        let currentReportId = null;
+        let startTime = 0;
 
         function showToast(text) {
             const t = document.getElementById('toast');
@@ -189,12 +696,26 @@
             return 'full_res_' + uuid;
         }
 
-        function generateUsername(length = 5, prefix = '', suffix = '') {
-            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        function generateUsername(length = 5, prefix = '', suffix = '', contains = '') {
+            let chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            const onlyLetters = document.getElementById('onlyLetters').checked;
+            const onlyNumbers = document.getElementById('onlyNumbers').checked;
+            const mixed = document.getElementById('mixed').checked;
+
+            if (onlyLetters) chars = 'abcdefghijklmnopqrstuvwxyz';
+            else if (onlyNumbers) chars = '0123456789';
+            else if (mixed) chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
             let result = '';
-            for (let i = 0; i < length; i++) result += chars[Math.floor(Math.random() * chars.length)];
+            for (let i = 0; i < length; i++) {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
             if (prefix) result = prefix + result.slice(prefix.length);
             if (suffix) result = result.slice(0, -suffix.length) + suffix;
+            if (contains && !result.includes(contains)) {
+                const pos = Math.floor(Math.random() * (result.length - contains.length));
+                result = result.slice(0, pos) + contains + result.slice(pos + contains.length);
+            }
             return result;
         }
 
@@ -210,104 +731,68 @@
             } catch (e) { return false; }
         }
 
-        document.getElementById('searchBtn').addEventListener('click', async function() {
-            if (isSearching) return;
-            isSearching = true;
-            this.disabled = true;
-            this.textContent = '⏳ Поиск...';
+        function filterList() {
+            const query = document.getElementById('listFilter').value.toLowerCase();
+            const items = document.querySelectorAll('.username-item');
+            items.forEach(item => {
+                const name = item.querySelector('.name').textContent.toLowerCase();
+                item.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
 
-            const length = document.getElementById('length').value;
-            const prefix = document.getElementById('prefix').value.toLowerCase().trim();
-            const suffix = document.getElementById('suffix').value.toLowerCase().trim();
-            const count = parseInt(document.getElementById('count').value);
+        function exportCSV() {
+            if (!foundUsernames.length) { showToast('❌ Нет данных для экспорта'); return; }
+            let csv = 'Username,Status\n';
+            foundUsernames.forEach(u => csv += `@${u},Свободен\n`);
+            downloadFile(csv, 'report.csv', 'text/csv');
+            showToast('✅ CSV скачан!');
+        }
 
-            const progressWrap = document.getElementById('progressWrap');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            const resultArea = document.getElementById('resultArea');
+        function exportTXT() {
+            if (!foundUsernames.length) { showToast('❌ Нет данных для экспорта'); return; }
+            let txt = 'Список свободных юзернеймов:\n\n';
+            foundUsernames.forEach(u => txt += `@${u}\n`);
+            downloadFile(txt, 'report.txt', 'text/plain');
+            showToast('✅ TXT скачан!');
+        }
 
-            progressWrap.style.display = 'block';
-            resultArea.style.display = 'none';
+        function exportJSON() {
+            if (!foundUsernames.length) { showToast('❌ Нет данных для экспорта'); return; }
+            const data = { usernames: foundUsernames, count: foundUsernames.length, checked: checkedUsernames.length };
+            downloadFile(JSON.stringify(data, null, 2), 'report.json', 'application/json');
+            showToast('✅ JSON скачан!');
+        }
+
+        function exportHTML() {
+            if (!foundUsernames.length) { showToast('❌ Нет данных для экспорта'); return; }
+            const html = generateFullReportHTML();
+            downloadFile(html, 'report.html', 'text/html');
+            showToast('✅ HTML скачан!');
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type: type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearResults() {
             foundUsernames = [];
             checkedUsernames = [];
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('usernameList').innerHTML = '';
+            showToast('🗑️ Результаты очищены');
+        }
 
-            let found = 0, checked = 0, attempts = 0;
-            const maxAttempts = count * 5;
-            const used = new Set();
-
-            while (found < count && attempts < maxAttempts) {
-                attempts++;
-                let len = length === 'any' ? Math.floor(Math.random() * 3) + 5 : parseInt(length);
-                let username = generateUsername(len, prefix, suffix);
-                if (username.length < 5 || used.has(username)) continue;
-                used.add(username);
-
-                checked++;
-                const percent = Math.min((checked / (count * 3)) * 100, 100);
-                progressFill.style.width = percent + '%';
-                progressText.textContent = `🔍 Проверено: ${checked} | Найдено: ${found} / ${count}`;
-
-                const isAvailable = await checkUsername(username);
-                checkedUsernames.push({ username, isAvailable });
-                if (isAvailable) { found++; foundUsernames.push(username); }
-                if (found % 10 === 0) await new Promise(r => setTimeout(r, 50));
-            }
-
-            progressText.textContent = `✅ Готово! Найдено ${found} юзернеймов`;
-            progressFill.style.width = '100%';
-
-            resultArea.style.display = 'block';
-            document.getElementById('totalCount').textContent = foundUsernames.length;
-            document.getElementById('validCount').textContent = foundUsernames.length;
-            document.getElementById('takenCount').textContent = checkedUsernames.length - foundUsernames.length;
-
-            const list = document.getElementById('usernameList');
-            list.innerHTML = '';
-            foundUsernames.slice(0, 20).forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'username-item';
-                div.innerHTML = `<span class="name">@${u}</span><span class="status">✅ Свободен</span>`;
-                list.appendChild(div);
-            });
-            if (foundUsernames.length > 20) {
-                const div = document.createElement('div');
-                div.className = 'username-item';
-                div.style.textAlign = 'center';
-                div.style.color = '#6688aa';
-                div.textContent = `... и ещё ${foundUsernames.length - 20}`;
-                list.appendChild(div);
-            }
-
-            // Генерируем ссылку
-            currentReportId = generateReportId();
-            const reportLink = `${BASE_URL}${currentReportId}.html`;
-            const botLink = `https://t.me/${BOT_USERNAME}?start=report_${currentReportId}`;
-            
-            document.getElementById('reportLink').textContent = reportLink;
-            document.getElementById('openBotBtn').href = botLink;
-
-            // Сохраняем в localStorage
-            localStorage.setItem('report_' + currentReportId, JSON.stringify({
-                usernames: foundUsernames,
-                checked: checkedUsernames,
-                count: foundUsernames.length,
-                created: Date.now()
-            }));
-
-            showToast(`✅ Найдено ${foundUsernames.length} юзернеймов!`);
-
-            isSearching = false;
-            this.disabled = false;
-            this.textContent = '🚀 Найти юзернеймы';
-        });
-
-        function generateFullReport() {
-            if (!foundUsernames.length) {
-                showToast('❌ Сначала найдите юзернеймы!');
-                return;
-            }
-            const reportId = currentReportId || generateReportId();
-            const html = `
+        function generateFullReportHTML() {
+            const now = new Date().toLocaleString();
+            return `
         <!DOCTYPE html>
         <html><head><title>AQUA CHECKER — Отчёт</title>
         <style>
@@ -340,22 +825,133 @@
                 ${foundUsernames.map(u => `<div class="item"><span>@${u}</span><span class="free">✅ Свободен</span></div>`).join('')}
                 ${checkedUsernames.filter(u => !u.isAvailable).slice(0, 10).map(u => `<div class="item"><span>@${u.username}</span><span class="taken">❌ Занят</span></div>`).join('')}
             </div>
-            <div class="footer">Сгенерировано: ${new Date().toLocaleString()}</div>
+            <div class="footer">Сгенерировано: ${now}</div>
         </div>
         </body>
         </html>
         `;
-            const blob = new Blob([html], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${reportId}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('✅ Отчёт скачан!');
         }
+
+        function generateZipReport() {
+            if (!foundUsernames.length) { showToast('❌ Сначала найдите юзернеймы!'); return; }
+            const html = generateFullReportHTML();
+            const zip = new JSZip();
+            zip.file('report.html', html);
+            zip.generateAsync({ type: 'blob' }).then(function(content) {
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `report_${currentReportId || 'full'}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('✅ ZIP-архив скачан!');
+            });
+        }
+
+        document.getElementById('searchBtn').addEventListener('click', async function() {
+            if (isSearching) return;
+            isSearching = true;
+            this.disabled = true;
+            this.textContent = '⏳ Поиск...';
+            startTime = Date.now();
+
+            const length = document.getElementById('length').value;
+            const prefix = document.getElementById('prefix').value.toLowerCase().trim();
+            const suffix = document.getElementById('suffix').value.toLowerCase().trim();
+            const contains = document.getElementById('contains').value.toLowerCase().trim();
+            const count = parseInt(document.getElementById('count').value);
+            const speed = parseInt(document.getElementById('speed').value);
+
+            const progressWrap = document.getElementById('progressWrap');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const resultArea = document.getElementById('resultArea');
+
+            progressWrap.style.display = 'block';
+            resultArea.style.display = 'none';
+            foundUsernames = [];
+            checkedUsernames = [];
+
+            let found = 0, checked = 0, attempts = 0;
+            const maxAttempts = count * 5;
+            const used = new Set();
+
+            while (found < count && attempts < maxAttempts) {
+                attempts++;
+                let len = length === 'any' ? Math.floor(Math.random() * 6) + 5 : parseInt(length);
+                let username = generateUsername(len, prefix, suffix, contains);
+                if (username.length < 5 || username.length > 32) continue;
+                if (used.has(username)) continue;
+                used.add(username);
+
+                checked++;
+                const percent = Math.min((checked / (count * 3)) * 100, 100);
+                progressFill.style.width = percent + '%';
+                progressText.textContent = `🔍 Проверено: ${checked} | Найдено: ${found} / ${count}`;
+
+                const isAvailable = await checkUsername(username);
+                checkedUsernames.push({ username, isAvailable });
+                if (isAvailable) { found++; foundUsernames.push(username); }
+
+                await new Promise(r => setTimeout(r, Math.max(10, 100 - speed)));
+            }
+
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+            progressText.textContent = `✅ Готово! Найдено ${found} юзернеймов за ${elapsed} сек`;
+            progressFill.style.width = '100%';
+
+            resultArea.style.display = 'block';
+            document.getElementById('totalCount').textContent = foundUsernames.length;
+            document.getElementById('validCount').textContent = foundUsernames.length;
+            document.getElementById('takenCount').textContent = checkedUsernames.length - foundUsernames.length;
+            document.getElementById('checkCount').textContent = checkedUsernames.length;
+            document.getElementById('timeCount').textContent = elapsed + 'с';
+
+            const list = document.getElementById('usernameList');
+            list.innerHTML = '';
+            foundUsernames.slice(0, 50).forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'username-item';
+                div.innerHTML = `<span class="name">@${u}</span><span class="status">✅ Свободен</span>`;
+                list.appendChild(div);
+            });
+            if (foundUsernames.length > 50) {
+                const div = document.createElement('div');
+                div.className = 'username-item';
+                div.style.textAlign = 'center';
+                div.style.color = '#6688aa';
+                div.textContent = `... и ещё ${foundUsernames.length - 50}`;
+                list.appendChild(div);
+            }
+
+            currentReportId = generateReportId();
+            const reportLink = `${BASE_URL}${currentReportId}.html`;
+            const botLink = `https://t.me/${BOT_USERNAME}?start=report_${currentReportId}`;
+
+            document.getElementById('reportLink').textContent = reportLink;
+            document.getElementById('openBotBtn').href = botLink;
+
+            localStorage.setItem('report_' + currentReportId, JSON.stringify({
+                usernames: foundUsernames,
+                checked: checkedUsernames,
+                count: foundUsernames.length,
+                created: Date.now()
+            }));
+
+            showToast(`✅ Найдено ${foundUsernames.length} юзернеймов за ${elapsed} сек!`);
+
+            isSearching = false;
+            this.disabled = false;
+            this.textContent = '🚀 Найти юзернеймы';
+        });
+
+        // ===== ЗАГРУЗКА JSZip =====
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+        document.head.appendChild(script);
 
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
