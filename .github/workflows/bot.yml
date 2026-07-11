@@ -21,13 +21,7 @@ jobs:
       with:
         python-version: '3.10'
     
-    - name: Install
-      run: |
-        pip install pillow aiohttp aiogram
-    
     - name: Generate reports
-      env:
-        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       run: |
         python generator.py
     
@@ -38,4 +32,4 @@ jobs:
         publish_dir: ./
         publish_branch: gh-pages
         keep_files: true
-        exclude_assets: '.github,bot.py,generator.py,requirements.txt,.gitignore'
+        exclude_assets: '.github,generator.py,requirements.txt,.gitignore'
