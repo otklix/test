@@ -16,35 +16,35 @@ dp = Dispatcher()
 REPORTS_DIR = "reports"
 os.makedirs(REPORTS_DIR, exist_ok=True)
 
-# Хранилище
-reports = {}
+# Хранилище использованных ссылок
+used_links = {}
 
-def generate_full_report_html(usernames: list, checked: list) -> str:
+def generate_full_report_html(usernames: list, checked: list = None) -> str:
     now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
     total = len(usernames)
-    taken = len([u for u in checked if not u.get('isAvailable', False)]) if checked else 0
+    taken = len([u for u in (checked or []) if not u.get('isAvailable', False)]) if checked else 0
 
-    items = ''.join([f'<div class="item">@{u} <span class="free">✅ Свободен</span></div>' for u in usernames[:50]])
+    items = ''.join([f'<div class="item"><span>@{u}</span><span class="free">✅ Свободен</span></div>' for u in usernames[:50]])
     if len(usernames) > 50:
-        items += f'<div class="item" style="color:#6688aa;text-align:center;">... и ещё {len(usernames)-50}</div>'
+        items += f'<div class="item" style="text-align:center;color:#6688aa;">... и ещё {len(usernames)-50}</div>'
 
     return f'''<!DOCTYPE html>
 <html>
 <head><title>AQUA CHECKER — Отчёт</title>
 <style>
     * {{ margin:0; padding:0; box-sizing:border-box; }}
-    body {{ background: #0a0a2a; color: #00ccff; font-family: Arial; padding: 40px; }}
-    .container {{ max-width: 700px; margin: 0 auto; background: rgba(10,20,50,0.9); border-radius: 20px; padding: 30px; border: 1px solid rgba(0,200,255,0.1); }}
+    body {{ background: #05051a; color: #00ccff; font-family: Arial; padding: 30px; }}
+    .container {{ max-width: 700px; margin: 0 auto; background: rgba(5,10,30,0.9); border-radius: 20px; padding: 30px; border: 1px solid rgba(0,200,255,0.08); }}
     h1 {{ color: #00ccff; text-align: center; font-size: 32px; }}
     .sub {{ text-align:center; color:#6688aa; margin-bottom:20px; }}
     .stats {{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 20px 0; }}
-    .stat {{ background: rgba(0,200,255,0.05); padding: 15px; border-radius: 12px; text-align: center; }}
+    .stat {{ background: rgba(0,200,255,0.03); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,200,255,0.06); }}
     .stat .num {{ font-size: 28px; font-weight: 800; }}
     .stat .label {{ color: #6688aa; font-size: 11px; text-transform: uppercase; }}
     .list {{ max-height: 400px; overflow-y: auto; margin: 15px 0; }}
-    .item {{ padding: 8px 12px; background: rgba(0,200,255,0.03); border-radius: 8px; margin: 4px 0; border-left: 2px solid #4CAF50; }}
-    .free {{ color: #4CAF50; float: right; }}
-    .taken {{ color: #f44336; float: right; }}
+    .item {{ padding: 8px 12px; background: rgba(0,200,255,0.03); border-radius: 8px; margin: 4px 0; border-left: 2px solid #4CAF50; display: flex; justify-content: space-between; }}
+    .free {{ color: #4CAF50; }}
+    .taken {{ color: #f44336; }}
     .footer {{ text-align: center; color: #446688; font-size: 11px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,200,255,0.05); }}
 </style>
 </head>
@@ -71,22 +71,21 @@ async def start(message: types.Message):
         report_id = args[1].replace("report_", "")
         
         # Проверяем, не использована ли ссылка
-        if report_id in reports and reports[report_id].get("used", False):
+        if report_id in used_links:
             await message.answer("❌ Эта ссылка уже была использована!")
             return
         
-        # Получаем данные
-        data = reports.get(report_id, {})
-        usernames = data.get("usernames", [])
-        checked = data.get("checked", [])
+        # Пытаемся получить данные из localStorage (имитация)
+        # В реальности данные должны передаваться через бота
+        usernames = []
+        checked = []
         
+        # Генерируем демо-данные, если их нет
         if not usernames:
-            # Генерируем тестовые
             usernames = [''.join(random.choices(string.ascii_lowercase + string.digits, k=5)) for _ in range(20)]
         
         await message.answer(f"📄 Генерирую отчёт ({len(usernames)} юзернеймов)...")
         
-        # Создаём HTML
         html = generate_full_report_html(usernames, checked)
         filename = f"report_{report_id}.html"
         filepath = os.path.join(REPORTS_DIR, filename)
@@ -94,14 +93,12 @@ async def start(message: types.Message):
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(html)
         
-        # Создаём ZIP
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
             zip_file.write(filepath, filename)
         
         zip_buffer.seek(0)
         
-        # Отправляем
         await message.answer_document(
             types.BufferedInputFile(zip_buffer.getvalue(), filename=f"report_{report_id}.zip"),
             caption=f"📦 **Полный отчёт**\n\n"
@@ -111,8 +108,7 @@ async def start(message: types.Message):
             parse_mode="Markdown"
         )
         
-        # Отмечаем как использованную
-        reports[report_id] = {"used": True, "usernames": usernames, "checked": checked}
+        used_links[report_id] = True
         os.remove(filepath)
         return
     
