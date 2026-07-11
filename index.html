@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQUA CHECKER — Поиск юзернеймов</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @keyframes wave {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a1a, #1a1a3e, #0a0a1a);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .container {
+            background: rgba(20, 20, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 650px;
+            width: 100%;
+            border: 1px solid rgba(0, 200, 255, 0.1);
+            box-shadow: 0 30px 80px rgba(0, 200, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.05), transparent);
+            animation: wave 4s infinite;
+        }
+        
+        .logo {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 900;
+            color: #00ccff;
+            letter-spacing: 3px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo span { color: #ffffff; }
+        
+        .subtitle {
+            text-align: center;
+            color: #6688aa;
+            font-size: 14px;
+            margin: 10px 0 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .filter-group {
+            background: rgba(0, 200, 255, 0.03);
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 200, 255, 0.05);
+        }
+        
+        .filter-group label {
+            display: block;
+            color: #6688aa;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .filter-group input, .filter-group select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 200, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        
+        .filter-group input:focus, .filter-group select:focus {
+            border-color: #00ccff;
+            box-shadow: 0 0 15px rgba(0, 200, 255, 0.1);
+        }
+        
+        .filter-group input::placeholder {
+            color: #446688;
+        }
+        
+        .filter-group select option {
+            background: #1a1a3e;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #00ccff, #0066ff);
+            color: white;
+            padding: 16px;
+            border-radius: 50px;
+            border: none;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress {
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 200, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            color: #6688aa;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 200, 255, 0.05);
+            position: relative;
+            z-index: 1;
+            display: none;
+        }
+        
+        .result-item {
+            background: rgba(0, 200, 255, 0.03);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px 0;
+            color: #00ccff;
+            font-size: 14px;
+        }
+        
+        .result-item .username {
+            font-weight: 700;
+        }
+        
+        .result-item .status {
+            float: right;
+            color: #4CAF50;
+        }
+        
+        .result-item .status.taken {
+            color: #f44336;
+        }
+        
+        .report-link {
+            display: block;
+            background: rgba(0, 200, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid rgba(0, 200, 255, 0.1);
+            text-decoration: none;
+            color: #00ccff;
+            font-weight: 600;
+            transition: 0.3s;
+            text-align: center;
+        }
+        
+        .report-link:hover {
+            background: rgba(0, 200, 255, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .footer {
+            text-align: center;
+            color: #446688;
+            font-size: 11px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 200, 255, 0.05);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #00ccff;
+        }
+        
+        .checkbox-group label {
+            color: #6688aa;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 480px) {
+            .container { padding: 25px 20px; }
+            .filters { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">AQUA <span>CHECKER</span></div>
+        <div class="subtitle">🔍 Поиск свободных юзернеймов в Telegram</div>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label>📏 Длина</label>
+                <select id="length">
+                    <option value="5">5 символов</option>
+                    <option value="6">6 символов</option>
+                    <option value="7">7 символов</option>
+                    <option value="any">Любая</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🔤 Префикс</label>
+                <input type="text" id="prefix" placeholder="Начинается с..." maxlength="5">
+            </div>
+            <div class="filter-group">
+                <label>🔤 Суффикс</label>
+                <input type="text" id="suffix" placeholder="Заканчивается на..." maxlength="5">
+            </div>
+            <div class="filter-group">
+                <label>📊 Количество</label>
+                <select id="count">
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value="2000" selected>2000</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="checkbox-group">
+            <input type="checkbox" id="unique">
+            <label for="unique">🔒 Только уникальные (без повторений)</label>
+        </div>
+        
+        <button class="btn" id="searchBtn">🚀 Начать поиск</button>
+        
+        <div class="progress" id="progress">
+            <div class="progress-text" id="progressText">Поиск: 0 / 2000</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="result" id="result">
+            <div id="resultList"></div>
+            <a href="#" class="report-link" id="reportLink">📄 Получить полный отчёт →</a>
+        </div>
+        
+        <div class="footer">AQUA CHECKER • Работает через Telegram API</div>
+    </div>
+    
+    <script>
+        const searchBtn = document.getElementById('searchBtn');
+        const progress = document.getElementById('progress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const result = document.getElementById('result');
+        const resultList = document.getElementById('resultList');
+        const reportLink = document.getElementById('reportLink');
+        
+        let foundUsernames = [];
+        let isSearching = false;
+        
+        // Генерация случайного юзернейма
+        function generateUsername(length = 5) {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return result;
+        }
+        
+        // Проверка юзернейма через API
+        async function checkUsername(username) {
+            try {
+                // Используем бота как прокси
+                const response = await fetch('https://api.telegram.org/bot' + 'ВАШ_ТОКЕН_БОТА' + '/checkUsername', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username })
+                });
+                const data = await response.json();
+                return data.result || false;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // Основной поиск
+        searchBtn.addEventListener('click', async () => {
+            if (isSearching) return;
+            isSearching = true;
+            searchBtn.disabled = true;
+            searchBtn.textContent = '⏳ Поиск...';
+            
+            const length = document.getElementById('length').value;
+            const prefix = document.getElementById('prefix').value.toLowerCase();
+            const suffix = document.getElementById('suffix').value.toLowerCase();
+            const count = parseInt(document.getElementById('count').value);
+            const unique = document.getElementById('unique').checked;
+            
+            // Показываем прогресс
+            progress.style.display = 'block';
+            result.style.display = 'none';
+            foundUsernames = [];
+            
+            let found = 0;
+            let checked = 0;
+            let attempts = 0;
+            const maxAttempts = count * 3;
+            
+            const used = new Set();
+            
+            while (found < count && attempts < maxAttempts) {
+                attempts++;
+                
+                // Генерация юзернейма
+                let username;
+                let len = length === 'any' ? Math.floor(Math.random() * 3) + 5 : parseInt(length);
+                username = generateUsername(len);
+                
+                // Применяем префикс и суффикс
+                if (prefix) username = prefix + username.slice(prefix.length);
+                if (suffix) username = username.slice(0, -suffix.length) + suffix;
+                if (username.length < 5) continue;
+                
+                // Проверка на уникальность
+                if (unique && used.has(username)) continue;
+                used.add(username);
+                
+                checked++;
+                
+                // Обновляем прогресс
+                const percent = Math.min((checked / (count * 2)) * 100, 100);
+                progressFill.style.width = percent + '%';
+                progressText.textContent = `🔍 Проверено: ${checked} | Найдено: ${found} / ${count}`;
+                
+                // Проверяем юзернейм
+                const isAvailable = await checkUsername(username);
+                
+                if (isAvailable) {
+                    found++;
+                    foundUsernames.push(username);
+                }
+                
+                // Задержка для API
+                await new Promise(r => setTimeout(r, 50));
+            }
+            
+            // Показываем результаты
+            progressText.textContent = `✅ Готово! Найдено ${found} юзернеймов`;
+            progressFill.style.width = '100%';
+            
+            // Отображаем список
+            result.style.display = 'block';
+            resultList.innerHTML = '';
+            
+            foundUsernames.slice(0, 20).forEach(username => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <span class="username">@${username}</span>
+                    <span class="status">✅ Свободен</span>
+                `;
+                resultList.appendChild(div);
+            });
+            
+            if (foundUsernames.length > 20) {
+                const more = document.createElement('div');
+                more.className = 'result-item';
+                more.style.textAlign = 'center';
+                more.style.color = '#6688aa';
+                more.textContent = `... и ещё ${foundUsernames.length - 20}`;
+                resultList.appendChild(more);
+            }
+            
+            // Ссылка на отчёт
+            const reportId = Date.now().toString(36);
+            reportLink.href = `https://t.me/Username1FinderBOT?start=report_${reportId}`;
+            reportLink.textContent = `📄 Получить полный отчёт (${foundUsernames.length} юзернеймов) →`;
+            
+            isSearching = false;
+            searchBtn.disabled = false;
+            searchBtn.textContent = '🚀 Начать поиск';
+        });
+    </script>
+</body>
+</html>
