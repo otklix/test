@@ -1,5 +1,6 @@
 import os
 import json
+import asyncio
 import random
 import string
 import zipfile
@@ -14,55 +15,16 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 REPORTS_DIR = "reports"
+PROGRESS_DIR = "progress"
 os.makedirs(REPORTS_DIR, exist_ok=True)
+os.makedirs(PROGRESS_DIR, exist_ok=True)
 
-# Хранилище использованных ссылок
+# ===== БАЗОВЫЙ URL (ваш сайт) =====
+BASE_URL = "https://otklix.github.io/test/"
+
 used_links = {}
 
-def generate_full_report_html(usernames: list, checked: list = None) -> str:
-    now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-    total = len(usernames)
-    taken = len([u for u in (checked or []) if not u.get('isAvailable', False)]) if checked else 0
-
-    items = ''.join([f'<div class="item"><span>@{u}</span><span class="free">✅ Свободен</span></div>' for u in usernames[:50]])
-    if len(usernames) > 50:
-        items += f'<div class="item" style="text-align:center;color:#6688aa;">... и ещё {len(usernames)-50}</div>'
-
-    return f'''<!DOCTYPE html>
-<html>
-<head><title>AQUA CHECKER — Отчёт</title>
-<style>
-    * {{ margin:0; padding:0; box-sizing:border-box; }}
-    body {{ background: #05051a; color: #00ccff; font-family: Arial; padding: 30px; }}
-    .container {{ max-width: 700px; margin: 0 auto; background: rgba(5,10,30,0.9); border-radius: 20px; padding: 30px; border: 1px solid rgba(0,200,255,0.08); }}
-    h1 {{ color: #00ccff; text-align: center; font-size: 32px; }}
-    .sub {{ text-align:center; color:#6688aa; margin-bottom:20px; }}
-    .stats {{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 20px 0; }}
-    .stat {{ background: rgba(0,200,255,0.03); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,200,255,0.06); }}
-    .stat .num {{ font-size: 28px; font-weight: 800; }}
-    .stat .label {{ color: #6688aa; font-size: 11px; text-transform: uppercase; }}
-    .list {{ max-height: 400px; overflow-y: auto; margin: 15px 0; }}
-    .item {{ padding: 8px 12px; background: rgba(0,200,255,0.03); border-radius: 8px; margin: 4px 0; border-left: 2px solid #4CAF50; display: flex; justify-content: space-between; }}
-    .free {{ color: #4CAF50; }}
-    .taken {{ color: #f44336; }}
-    .footer {{ text-align: center; color: #446688; font-size: 11px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,200,255,0.05); }}
-</style>
-</head>
-<body>
-<div class="container">
-    <h1>🌊 AQUA CHECKER</h1>
-    <div class="sub">📊 Полный отчёт</div>
-    <div class="stats">
-        <div class="stat"><div class="num">{total}</div><div class="label">Всего</div></div>
-        <div class="stat"><div class="num" style="color:#4CAF50;">{total}</div><div class="label">Свободных</div></div>
-        <div class="stat"><div class="num" style="color:#f44336;">{taken}</div><div class="label">Занятых</div></div>
-    </div>
-    <div class="list">{items}</div>
-    <div class="footer">Сгенерировано: {now}</div>
-</div>
-</body>
-</html>'''
-
+# ===== ОТПРАВКА ССЫЛКИ В ОТВЕТ =====
 @dp.message(Command("start"))
 async def start(message: types.Message):
     args = message.text.split()
@@ -70,46 +32,28 @@ async def start(message: types.Message):
     if len(args) > 1 and args[1].startswith("report_"):
         report_id = args[1].replace("report_", "")
         
-        # Проверяем, не использована ли ссылка
         if report_id in used_links:
             await message.answer("❌ Эта ссылка уже была использована!")
             return
         
-        # Пытаемся получить данные из localStorage (имитация)
-        # В реальности данные должны передаваться через бота
-        usernames = []
-        checked = []
+        # Формируем ссылку на отчёт
+        report_link = f"{BASE_URL}progress/{report_id}.html"
         
-        # Генерируем демо-данные, если их нет
-        if not usernames:
-            usernames = [''.join(random.choices(string.ascii_lowercase + string.digits, k=5)) for _ in range(20)]
-        
-        await message.answer(f"📄 Генерирую отчёт ({len(usernames)} юзернеймов)...")
-        
-        html = generate_full_report_html(usernames, checked)
-        filename = f"report_{report_id}.html"
-        filepath = os.path.join(REPORTS_DIR, filename)
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(html)
-        
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
-            zip_file.write(filepath, filename)
-        
-        zip_buffer.seek(0)
-        
-        await message.answer_document(
-            types.BufferedInputFile(zip_buffer.getvalue(), filename=f"report_{report_id}.zip"),
-            caption=f"📦 **Полный отчёт**\n\n"
-                    f"✅ Найдено: {len(usernames)} юзернеймов\n"
-                    f"📅 {datetime.now().strftime('%d.%m.%Y %H:%M')}\n\n"
-                    f"🔗 Ссылка одноразовая — использована!",
-            parse_mode="Markdown"
+        # Отправляем ответ со ссылкой
+        await message.answer(
+            f"📄 **Ваш отчёт готов!**\n\n"
+            f"🔗 Ссылка: {report_link}\n\n"
+            f"📊 Найдено юзернеймов: 20+\n"
+            f"📅 {datetime.now().strftime('%d.%m.%Y %H:%M')}\n\n"
+            f"🔒 Ссылка одноразовая!",
+            parse_mode="Markdown",
+            reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[
+                [types.InlineKeyboardButton(text="🌐 Открыть отчёт", url=report_link)],
+                [types.InlineKeyboardButton(text="📲 Открыть в Telegram", url=f"https://t.me/{BOT_TOKEN.split(':')[0]}")]
+            ])
         )
         
         used_links[report_id] = True
-        os.remove(filepath)
         return
     
     await message.answer(
@@ -136,15 +80,23 @@ async def check(message: types.Message):
             is_available = data.get("result", False)
     
     if is_available:
-        await message.answer(f"✅ @{username} — **СВОБОДЕН!**\n🔗 https://t.me/{username}",
-                           parse_mode="Markdown")
+        await message.answer(
+            f"✅ @{username} — **СВОБОДЕН!**\n"
+            f"🔗 https://t.me/{username}\n\n"
+            f"📄 Хотите полный отчёт? Используйте сайт: https://otklix.github.io/test/",
+            parse_mode="Markdown"
+        )
     else:
-        await message.answer(f"❌ @{username} — **ЗАНЯТ!**", parse_mode="Markdown")
+        await message.answer(
+            f"❌ @{username} — **ЗАНЯТ!**\n\n"
+            f"🔍 Попробуйте другой юзернейм или используйте сайт для массового поиска: https://otklix.github.io/test/",
+            parse_mode="Markdown"
+        )
 
 async def main():
     print("🌊 AQUA CHECKER БОТ ЗАПУЩЕН!")
+    print(f"🌐 Сайт: {BASE_URL}")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main())
