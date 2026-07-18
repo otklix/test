@@ -1,22 +1,343 @@
-# 🌵 Кактус РБикс
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌵 Кактус РБикс</title>
+    <meta name="theme-color" content="#00d26a" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
 
-Простой и быстрый способ купить Robux.
+        body {
+            background: #08080e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-## 🔗 Ссылка
-[Открыть магазин](https://твой-логин.github.io/kaktus-rbiks/)
+        .card {
+            max-width: 400px;
+            width: 100%;
+            background: #12141c;
+            border-radius: 36px;
+            padding: 30px 24px 24px;
+            border: 1px solid #262a33;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
 
-## 📦 Пакеты
-- 160 Robux — $1.98
-- 260 Robux — $3.49
-- 500 Robux — $5.99
-- 1000 Robux — $10.99
-- 2500 Robux — $24.99
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        .logo span {
+            color: #00d26a;
+        }
+        .logo-sub {
+            font-size: 14px;
+            color: #8f94a3;
+            margin-top: 4px;
+        }
 
-## 🛠 Технологии
-- HTML + CSS + JavaScript
-- GitHub Pages
+        .order-table {
+            margin-top: 24px;
+            background: #0c0e14;
+            border-radius: 20px;
+            padding: 6px 16px;
+            border: 1px solid #22262f;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #1b1e26;
+        }
+        .row:last-child {
+            border-bottom: none;
+        }
+        .label {
+            color: #8f94a3;
+            font-size: 15px;
+        }
+        .value {
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .value.robux {
+            color: #79f8b0;
+        }
+        .value.price {
+            color: #00d26a;
+        }
 
-## 📱 Как использовать
-1. Выбери количество Robux
-2. Нажми «Продолжить»
-3. Скопируй ссылку или перейди в Telegram
+        .badge-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+        .badge {
+            background: #1b2a1f;
+            border: 1px solid #1f3d2a;
+            color: #5dfc8a;
+            font-size: 13px;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+        .badge i {
+            font-style: normal;
+            margin-right: 6px;
+        }
+        .badge-user {
+            color: #5a606e;
+            font-size: 13px;
+        }
+
+        .btn {
+            margin-top: 20px;
+            width: 100%;
+            background: #00d26a;
+            color: #0c1a12;
+            border: none;
+            border-radius: 60px;
+            padding: 16px 0;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #00e676;
+            transform: scale(1.01);
+            box-shadow: 0 8px 28px rgba(0, 210, 106, 0.25);
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .secure {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #5a606e;
+        }
+        .secure .lock {
+            font-size: 14px;
+        }
+
+        .robux-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 16px;
+            background: #0c0e14;
+            border: 1px solid #22262f;
+            color: #fff;
+            font-size: 15px;
+            margin-top: 14px;
+            text-align: center;
+        }
+        .robux-input:focus {
+            outline: none;
+            border-color: #00d26a;
+        }
+
+        .link-box {
+            margin-top: 14px;
+            padding: 12px;
+            background: #0a0c12;
+            border-radius: 16px;
+            border: 1px dashed #262a33;
+            font-size: 13px;
+            color: #8f94a3;
+            word-break: break-all;
+            display: none;
+        }
+        .link-box a {
+            color: #00d26a;
+            text-decoration: none;
+        }
+        .link-box a:hover {
+            text-decoration: underline;
+        }
+
+        .copy-btn {
+            background: #1b1e26;
+            border: none;
+            color: #8f94a3;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .copy-btn:hover {
+            background: #262a33;
+            color: #fff;
+        }
+
+        .telegram-link {
+            margin-top: 10px;
+            display: block;
+            text-align: center;
+            color: #00d26a;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .telegram-link:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+
+        <div class="logo">
+            🌵 <span>Кактус</span> РБикс
+        </div>
+        <div class="logo-sub">Персональный заказ Robux</div>
+
+        <input type="number" class="robux-input" id="robuxInput" value="500" min="1" placeholder="Введите количество Robux" />
+
+        <div class="order-table">
+            <div class="row">
+                <span class="label">Ордер</span>
+                <span class="value" id="orderId">#845217</span>
+            </div>
+            <div class="row">
+                <span class="label">Robux</span>
+                <span class="value robux" id="robuxDisplay">500</span>
+            </div>
+            <div class="row">
+                <span class="label">Цена</span>
+                <span class="value price" id="priceDisplay">$5.99</span>
+            </div>
+        </div>
+
+        <div class="badge-row">
+            <span class="badge"><i>●</i> Активен</span>
+            <span class="badge-user">Amirys_bombo</span>
+        </div>
+
+        <div class="link-box" id="linkBox">
+            <span>🔗 Ссылка на заказ:</span><br />
+            <a href="#" id="linkUrl" target="_blank">https://...</a>
+            <br />
+            <button class="copy-btn" id="copyBtn">📋 Копировать</button>
+            <a href="#" class="telegram-link hidden" id="telegramLink">
+                📩 Перейти в Telegram
+            </a>
+        </div>
+
+        <button class="btn" id="continueBtn">Продолжить</button>
+
+        <div class="secure">
+            <span class="lock">🔒</span> Защищённое соединение
+        </div>
+
+    </div>
+
+    <script>
+        const robuxInput = document.getElementById('robuxInput');
+        const robuxDisplay = document.getElementById('robuxDisplay');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const orderDisplay = document.getElementById('orderId');
+        const continueBtn = document.getElementById('continueBtn');
+        const linkBox = document.getElementById('linkBox');
+        const linkUrl = document.getElementById('linkUrl');
+        const copyBtn = document.getElementById('copyBtn');
+        const telegramLink = document.getElementById('telegramLink');
+
+        const PRICE_PER_ROBUX = 0.011;
+        const TELEGRAM_BOT = "твой_бот"; // замени на username
+
+        function generateOrder() {
+            const num = String(Math.floor(100000 + Math.random() * 900000));
+            orderDisplay.textContent = '#' + num;
+        }
+
+        function updateOrder() {
+            let robux = parseInt(robuxInput.value) || 100;
+            if (robux < 1) robux = 1;
+            robuxDisplay.textContent = robux;
+            const price = (robux * PRICE_PER_ROBUX).toFixed(2);
+            priceDisplay.textContent = '$' + price;
+        }
+
+        robuxInput.addEventListener('input', function() {
+            updateOrder();
+            generateOrder();
+        });
+
+        continueBtn.addEventListener('click', function() {
+            const robux = parseInt(robuxInput.value) || 500;
+            const orderId = orderDisplay.textContent;
+            const baseUrl = window.location.href.split('?')[0];
+            const link = baseUrl + '?robux=' + robux + '&order=' + orderId.replace('#', '');
+            
+            linkUrl.href = link;
+            linkUrl.textContent = link;
+            
+            telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + orderId.replace('#', '');
+            telegramLink.classList.remove('hidden');
+            
+            linkBox.style.display = 'block';
+        });
+
+        copyBtn.addEventListener('click', function() {
+            const link = linkUrl.href;
+            if (link) {
+                navigator.clipboard.writeText(link).then(() => {
+                    alert('✅ Ссылка скопирована!');
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = link;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('✅ Ссылка скопирована!');
+                });
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('robux')) {
+            const robux = urlParams.get('robux');
+            robuxInput.value = robux;
+            updateOrder();
+            
+            const baseUrl = window.location.href.split('?')[0];
+            const link = baseUrl + '?robux=' + robux + '&order=' + orderDisplay.textContent.replace('#', '');
+            linkUrl.href = link;
+            linkUrl.textContent = link;
+            telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + orderDisplay.textContent.replace('#', '');
+            telegramLink.classList.remove('hidden');
+            linkBox.style.display = 'block';
+        }
+
+        updateOrder();
+        generateOrder();
+    </script>
+
+</body>
+</html>
