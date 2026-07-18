@@ -1,141 +1,22 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQUA CHECKER</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: linear-gradient(135deg, #0a0a2a, #1a1a4e);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            padding: 20px;
-        }
-        .container {
-            background: rgba(20, 30, 60, 0.9);
-            border-radius: 30px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            border: 1px solid rgba(0, 200, 255, 0.2);
-            box-shadow: 0 20px 60px rgba(0, 100, 255, 0.2);
-            text-align: center;
-        }
-        h1 {
-            color: #00ccff;
-            font-size: 42px;
-            letter-spacing: 2px;
-        }
-        .sub {
-            color: #88aacc;
-            margin: 10px 0 30px;
-        }
-        .btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #00ccff, #0066ff);
-            color: white;
-            padding: 16px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 0.3s;
-            margin: 5px;
-            border: none;
-            cursor: pointer;
-        }
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.3);
-        }
-        .btn-green {
-            background: linear-gradient(135deg, #4CAF50, #2e7d32);
-        }
-        .btn-green:hover {
-            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.3);
-        }
-        .link-box {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            word-break: break-all;
-            color: #00ccff;
-        }
-        .status {
-            color: #88aacc;
-            font-size: 14px;
-            margin: 10px 0;
-        }
-        .footer {
-            color: #446688;
-            font-size: 12px;
-            margin-top: 20px;
-            border-top: 1px solid rgba(0,200,255,0.1);
-            padding-top: 15px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>🌊 AQUA CHECKER</h1>
-    <div class="sub">Поиск свободных юзернеймов</div>
+# 🌵 Кактус РБикс
 
-    <button class="btn" id="searchBtn">🔍 Найти юзернеймы</button>
-    <div id="resultArea" style="margin-top:20px; color:#88aacc;"></div>
+Простой и быстрый способ купить Robux.
 
-    <div id="reportArea" style="display:none; margin-top:20px;">
-        <div class="link-box" id="reportLink">⏳ Генерация...</div>
-        <a href="#" id="openBotBtn" class="btn btn-green" target="_blank">📲 Получить отчёт в Telegram</a>
-        <div class="status">🔒 Ссылка одноразовая</div>
-    </div>
+## 🔗 Ссылка
+[Открыть магазин](https://твой-логин.github.io/kaktus-rbiks/)
 
-    <div class="footer">GitHub Pages + Actions</div>
-</div>
+## 📦 Пакеты
+- 160 Robux — $1.98
+- 260 Robux — $3.49
+- 500 Robux — $5.99
+- 1000 Robux — $10.99
+- 2500 Robux — $24.99
 
-<script>
-    const BOT_USERNAME = 'Username1FinderBOT';
-    let foundUsernames = [];
+## 🛠 Технологии
+- HTML + CSS + JavaScript
+- GitHub Pages
 
-    document.getElementById('searchBtn').onclick = async function() {
-        this.disabled = true;
-        this.textContent = '⏳ Поиск...';
-        document.getElementById('resultArea').textContent = 'Генерация...';
-
-        // Генерируем 10 случайных юзернеймов
-        foundUsernames = [];
-        for (let i = 0; i < 10; i++) {
-            let name = '';
-            for (let j = 0; j < 5; j++) {
-                name += 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)];
-            }
-            foundUsernames.push(name);
-        }
-
-        document.getElementById('resultArea').textContent = '✅ Найдено: ' + foundUsernames.length + ' юзернеймов';
-        this.textContent = '🔍 Найти ещё';
-
-        // Генерация отчета
-        const reportId = Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 4);
-        const botLink = `https://t.me/${BOT_USERNAME}?start=report_${reportId}`;
-
-        // Сохраняем данные в localStorage (чтобы бот мог их забрать через Actions)
-        localStorage.setItem('report_' + reportId, JSON.stringify({
-            usernames: foundUsernames,
-            count: foundUsernames.length,
-            created: Date.now()
-        }));
-
-        document.getElementById('reportLink').textContent = botLink;
-        document.getElementById('openBotBtn').href = botLink;
-        document.getElementById('reportArea').style.display = 'block';
-
-        this.disabled = false;
-    };
-</script>
-</body>
-</html>
+## 📱 Как использовать
+1. Выбери количество Robux
+2. Нажми «Продолжить»
+3. Скопируй ссылку или перейди в Telegram
