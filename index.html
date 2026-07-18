@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>RB Code</title>
+<title>RB Code — Заказ Robux</title>
 <meta name="theme-color" content="#00d26a">
 <style>
 :root{
 --bg:#050607;
 --card:#101214;
---card2:#181b20;
 --green:#00d26a;
 --green2:#00ff84;
 --text:#ffffff;
@@ -22,14 +21,14 @@ padding:0;
 box-sizing:border-box;
 font-family:Inter,Arial,sans-serif;
 }
-html{
-scroll-behavior:smooth;
-}
 body{
 background:var(--bg);
 color:var(--text);
 overflow-x:hidden;
 min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
 }
 .background{
 position:fixed;
@@ -68,6 +67,7 @@ animation-duration:22s;
 max-width:430px;
 margin:auto;
 padding:25px;
+width:100%;
 }
 .logo{
 font-size:34px;
@@ -156,7 +156,7 @@ font-weight:700;
 color:var(--green);
 }
 .btn{
-margin-top:28px;
+margin-top:12px;
 width:100%;
 padding:17px;
 border:none;
@@ -178,11 +178,106 @@ transform:none;
 box-shadow:none;
 cursor:not-allowed;
 }
+.btn-telegram {
+    background: linear-gradient(135deg, #0088cc, #00aaff);
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+}
+.btn-telegram:hover {
+    box-shadow: 0 10px 30px rgba(0, 136, 204, 0.35);
+}
+.btn-package {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 14px;
+    margin-top: 8px;
+}
+.btn-package:hover {
+    background: rgba(0,210,106,0.1);
+    border-color: var(--green);
+}
+.btn-package.active {
+    background: rgba(0,210,106,0.15);
+    border-color: var(--green);
+    color: var(--green);
+}
 .footer{
 margin-top:28px;
 text-align:center;
 font-size:13px;
 color:#68717d;
+}
+.hidden {
+    display: none;
+}
+.demo-badge {
+    background: rgba(255, 200, 0, 0.15);
+    border: 1px solid #ffcc00;
+    color: #ffcc00;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.packages {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+.packages .btn {
+    flex: 1;
+    min-width: 60px;
+    margin: 0;
+    padding: 12px 8px;
+    font-size: 13px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+.packages .btn.active {
+    background: rgba(0,210,106,0.15);
+    border-color: var(--green);
+    color: var(--green);
+}
+.custom-input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 16px;
+    margin-top: 12px;
+    text-align: center;
+}
+.custom-input:focus {
+    outline: none;
+    border-color: var(--green);
+}
+.link-box {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 14px;
+    border: 1px dashed var(--border);
+    word-break: break-all;
+    font-size: 13px;
+    color: var(--gray);
+    display: none;
+}
+.link-box a {
+    color: var(--green);
+    text-decoration: none;
+}
+.link-box a:hover {
+    text-decoration: underline;
 }
 </style>
 </head>
@@ -195,101 +290,228 @@ color:#68717d;
 <div class="logo">RB <span>Code</span></div>
 <div class="subtitle">Персональный заказ</div>
 <div class="card">
-<div class="order"><div class="label">Ордер</div><div class="value">#845217</div></div>
-<div class="order"><div class="label">Robux</div><div class="value robux">1000</div></div>
-<div class="order"><div class="label">Цена</div><div class="value price">$10.99</div></div>
+
+<!-- Выбор пакета (быстрые кнопки) -->
+<div class="packages">
+    <button class="btn" data-robux="160" data-price="1.98">160</button>
+    <button class="btn" data-robux="260" data-price="3.49">260</button>
+    <button class="btn" data-robux="500" data-price="5.99">500</button>
+    <button class="btn active" data-robux="1000" data-price="10.99">1000</button>
+    <button class="btn" data-robux="2500" data-price="24.99">2500</button>
+</div>
+
+<!-- Поле для своего количества -->
+<input type="number" class="custom-input" id="customRobux" placeholder="Или введи своё количество" min="1" value="1000">
+
+<div class="order"><div class="label">Ордер</div><div class="value" id="orderId">#845217</div></div>
+<div class="order"><div class="label">Robux</div><div class="value robux" id="robuxAmount">1000</div></div>
+<div class="order"><div class="label">Цена</div><div class="value price" id="priceAmount">$10.99</div></div>
+
+<!-- Блок с ссылкой -->
+<div class="link-box" id="linkBox">
+    🔗 <span id="linkText">Ссылка создана</span>
+    <br>
+    <button class="btn" id="copyLink" style="margin-top:10px;padding:10px;font-size:14px;">📋 Копировать ссылку</button>
+</div>
+
 <div class="badge" id="badge">Создан</div>
 <div class="progress"><div id="bar"></div></div>
 <div class="status">
 <span id="statusText">Ожидание</span>
 <div class="timer" id="timer">05:00</div>
 </div>
-<button class="btn" id="start">Начать</button>
-<div class="footer">RB Code © 2026</div>
+
+<!-- Кнопка "Создать ссылку" -->
+<button class="btn" id="generateLink">🔗 Создать ссылку</button>
+
+<!-- Кнопка "Начать" (запускает демо-процесс) -->
+<button class="btn" id="start">▶ Начать</button>
+
+<!-- Кнопка "Перейти в Telegram" -->
+<a href="https://t.me/твой_бот" target="_blank" class="btn btn-telegram hidden" id="telegramBtn">
+    📩 Перейти в Telegram
+</a>
+
+<div class="footer">
+    RB Code © 2026 
+    <span class="demo-badge">🔹 Демо-версия</span>
+</div>
 </div>
 </div>
 <script>
-let timerInterval;
-let progressInterval;
-let secondsLeft = 300;
+// ===== Выбор пакета (кнопки) =====
+const packageBtns = document.querySelectorAll('.packages .btn');
+const customInput = document.getElementById('customRobux');
+const robuxDisplay = document.getElementById('robuxAmount');
+const priceDisplay = document.getElementById('priceAmount');
+const orderDisplay = document.getElementById('orderId');
 
+// Цены за 1 Robux (примерные)
+const PRICE_PER_ROBUX = 0.011; // $0.011 за 1 Robux
+
+function updateOrder() {
+    let robux = parseInt(customInput.value) || 1000;
+    if (robux < 1) robux = 1;
+    const price = (robux * PRICE_PER_ROBUX).toFixed(2);
+    robuxDisplay.textContent = robux;
+    priceDisplay.textContent = '$' + price;
+    generateOrderNumber();
+}
+
+// Обновляем при вводе
+customInput.addEventListener('input', function() {
+    // Снимаем активную кнопку, если пользователь вводит своё
+    packageBtns.forEach(b => b.classList.remove('active'));
+    updateOrder();
+});
+
+// Клик по кнопке пакета
+packageBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+        packageBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const robux = this.dataset.robux;
+        customInput.value = robux;
+        updateOrder();
+    });
+});
+
+// Генерация номера ордера
+function generateOrderNumber() {
+    const num = String(Math.floor(100000 + Math.random() * 900000));
+    orderDisplay.textContent = '#' + num;
+}
+
+// ===== Генерация ссылки =====
+const generateLinkBtn = document.getElementById('generateLink');
+const linkBox = document.getElementById('linkBox');
+const linkText = document.getElementById('linkText');
+const copyBtn = document.getElementById('copyLink');
+
+generateLinkBtn.addEventListener('click', function() {
+    const robux = parseInt(customInput.value) || 1000;
+    const baseUrl = window.location.href.split('?')[0];
+    const link = baseUrl + '?robux=' + robux;
+    linkText.innerHTML = '<a href="' + link + '" target="_blank">' + link + '</a>';
+    linkBox.style.display = 'block';
+});
+
+// Копирование ссылки
+copyBtn.addEventListener('click', function() {
+    const link = linkText.querySelector('a')?.href || '';
+    if (link) {
+        navigator.clipboard.writeText(link).then(() => {
+            alert('✅ Ссылка скопирована!');
+        }).catch(() => {
+            // fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = link;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('✅ Ссылка скопирована!');
+        });
+    }
+});
+
+// ===== Если в URL есть параметр ?robux=XXX =====
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('robux')) {
+    const robux = urlParams.get('robux');
+    customInput.value = robux;
+    updateOrder();
+    // Показываем ссылку сразу
+    const baseUrl = window.location.href.split('?')[0];
+    const link = baseUrl + '?robux=' + robux;
+    linkText.innerHTML = '<a href="' + link + '" target="_blank">' + link + '</a>';
+    linkBox.style.display = 'block';
+}
+
+// ===== Логика демо-процесса =====
+let timerInterval, progressInterval;
+let secondsLeft = 300;
+let isRunning = false;
 const startBtn = document.getElementById('start');
+const telegramBtn = document.getElementById('telegramBtn');
 const timerDisplay = document.getElementById('timer');
 const statusText = document.getElementById('statusText');
 const progressBar = document.getElementById('bar');
 const badge = document.getElementById('badge');
 
 const statuses = [
-{ text: 'Ожидание', badge: 'Создан', progress: 0 },
-{ text: 'Вход в аккаунт...', badge: 'Вход', progress: 15 },
-{ text: 'Проверка данных...', badge: 'Проверка', progress: 30 },
-{ text: 'Подготовка доната...', badge: 'Подготовка', progress: 50 },
-{ text: 'Перевод Robux...', badge: 'Перевод', progress: 75 },
-{ text: 'Завершение сессии...', badge: 'Финал', progress: 90 },
-{ text: '✅ Готово!', badge: 'Завершён', progress: 100 }
+    { text: 'Ожидание', badge: 'Создан', progress: 0 },
+    { text: 'Вход в аккаунт...', badge: 'Вход', progress: 15 },
+    { text: 'Проверка данных...', badge: 'Проверка', progress: 30 },
+    { text: 'Подготовка доната...', badge: 'Подготовка', progress: 50 },
+    { text: 'Перевод Robux...', badge: 'Перевод', progress: 75 },
+    { text: 'Завершение сессии...', badge: 'Финал', progress: 90 },
+    { text: '✅ Готово!', badge: 'Завершён', progress: 100 }
 ];
-
 let step = 0;
-let isRunning = false;
 
 startBtn.addEventListener('click', function() {
-if (isRunning) return;
-isRunning = true;
-this.disabled = true;
-this.textContent = 'Обработка...';
+    if (isRunning) return;
+    isRunning = true;
+    this.disabled = true;
+    this.textContent = 'Обработка...';
+    telegramBtn.classList.add('hidden');
 
-step = 0;
-secondsLeft = 300;
-timerDisplay.textContent = '05:00';
-progressBar.style.width = '0%';
+    generateOrderNumber();
+    step = 0;
+    secondsLeft = 300;
+    timerDisplay.textContent = '05:00';
+    progressBar.style.width = '0%';
+    badge.style.color = 'var(--green2)';
+    badge.style.borderColor = 'rgba(0,210,106,.3)';
+    updateStep();
 
-updateStep();
+    timerInterval = setInterval(() => {
+        secondsLeft--;
+        updateTimer();
+        if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            clearInterval(progressInterval);
+            statusText.textContent = '⏰ Время вышло';
+            badge.textContent = 'Ошибка';
+            badge.style.color = '#ff6b6b';
+            badge.style.borderColor = '#ff6b6b';
+            startBtn.disabled = false;
+            startBtn.textContent = 'Повторить';
+            isRunning = false;
+        }
+    }, 1000);
 
-timerInterval = setInterval(() => {
-secondsLeft--;
-updateTimer();
-
-if (secondsLeft <= 0) {
-clearInterval(timerInterval);
-clearInterval(progressInterval);
-statusText.textContent = '⏰ Время вышло';
-badge.textContent = 'Ошибка';
-badge.style.color = '#ff6b6b';
-badge.style.borderColor = '#ff6b6b';
-startBtn.disabled = false;
-startBtn.textContent = 'Повторить';
-isRunning = false;
-}
-}, 1000);
-
-progressInterval = setInterval(() => {
-if (step < statuses.length - 1) {
-step++;
-updateStep();
-}
-}, 3500);
+    progressInterval = setInterval(() => {
+        if (step < statuses.length - 1) {
+            step++;
+            updateStep();
+        }
+    }, 3500);
 });
 
 function updateStep() {
-const s = statuses[step];
-statusText.textContent = s.text;
-badge.textContent = s.badge;
-progressBar.style.width = s.progress + '%';
-
-if (s.progress >= 100) {
-clearInterval(timerInterval);
-clearInterval(progressInterval);
-startBtn.disabled = false;
-startBtn.textContent = 'Закрыть';
-isRunning = false;
-}
+    const s = statuses[step];
+    statusText.textContent = s.text;
+    badge.textContent = s.badge;
+    progressBar.style.width = s.progress + '%';
+    if (s.progress >= 100) {
+        clearInterval(timerInterval);
+        clearInterval(progressInterval);
+        startBtn.classList.add('hidden');
+        telegramBtn.classList.remove('hidden');
+        isRunning = false;
+    }
 }
 
 function updateTimer() {
-const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
-const secs = String(secondsLeft % 60).padStart(2, '0');
-timerDisplay.textContent = `${mins}:${secs}`;
+    const mins = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+    const secs = String(secondsLeft % 60).padStart(2, '0');
+    timerDisplay.textContent = `${mins}:${secs}`;
 }
+
+// Инициализация
+updateOrder();
 </script>
 </body>
 </html>
