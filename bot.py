@@ -1,109 +1,82 @@
 import os
-import asyncio
-import aiohttp
-from datetime import datetime
+import logging
+import random
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# ===== ТОКЕН ИЗ ПЕРЕМЕННЫХ ОКРУЖЕНИЯ (НЕ В КОДЕ!) =====
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN не найден! Проверьте секреты GitHub или переменные Render.")
-
-BASE_URL = "https://otklix.github.io/test/"
+# === НАСТРОЙКИ ===
+BOT_TOKEN = os.getenv("BOT_TOKEN", "ТВОЙ_ТОКЕН")
+ADMIN_ID = int(os.getenv("ADMIN_ID", 123456789))
+BASE_URL = "https://твой-логин.github.io/kaktus-rbiks/"
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Хранилище использованных ссылок
-used_links = {}
+# === ХРАНИЛИЩЕ ===
+orders = {}
 
-# ===== КОМАНДА /START =====
+# === КЛАВИАТУРА ===
+def main_menu():
+    kb = InlineKeyboardMarkup(row_width=1)
+    kb.add(
+        InlineKeyboardButton("🌵 Кактус РБикс", url=BASE_URL),
+        InlineKeyboardButton("📦 Купить Robux", callback_data="buy"),
+        InlineKeyboardButton("🆘 Помощь", callback_data="help")
+    )
+    return kb
+
 @dp.message(Command("start"))
-async def start(message: types.Message):
-    text = message.text or ""
-    args = text.split()
-    
-    print(f"📩 Получена команда: {text}")
-    
-    if len(args) > 1 and args[1].startswith("report_"):
-        report_id = args[1].replace("report_", "")
-        print(f"📄 Обработка отчёта: {report_id}")
-        
-        if report_id in used_links and used_links[report_id]:
-            await message.answer(
-                "❌ **Эта ссылка уже была использована!**\n\n"
-                "🔒 Каждая ссылка одноразовая.",
-                parse_mode="Markdown"
-            )
-            return
-        
-        report_link = f"{BASE_URL}progress/{report_id}.html"
-        used_links[report_id] = True
-        
-        await message.answer(
-            f"📄 **Ваш отчёт готов!**\n\n"
-            f"🔗 Ссылка: {report_link}\n\n"
-            f"📅 {datetime.now().strftime('%d.%m.%Y %H:%M')}\n\n"
-            f"🔒 Ссылка одноразовая!",
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="🌐 Открыть отчёт", url=report_link)]
-            ])
-        )
-        return
-    
+async def start_cmd(message: types.Message):
     await message.answer(
-        "🌊 **AQUA CHECKER**\n\n"
-        "🔍 **Функции:**\n"
-        "• Проверка юзернеймов\n"
-        "• Получение отчётов\n\n"
-        "🌐 Сайт: https://otklix.github.io/test/",
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🌐 Открыть сайт", url="https://otklix.github.io/test/")]
-        ])
+        "🌵 Добро пожаловать в **Кактус РБикс**!\n\n"
+        "💰 Здесь ты можешь купить Robux по низкой цене.\n"
+        "📦 Выбери нужный пакет или перейди на сайт.",
+        reply_markup=main_menu()
     )
 
-# ===== ПРОВЕРКА ЮЗЕРНЕЙМА =====
-@dp.message()
-async def check(message: types.Message):
-    username = message.text.strip().lower().replace('@', '')
-    
-    if len(username) < 5:
-        await message.answer("❌ Минимум 5 символов!")
-        return
-    
-    try:
-        url = f"https://api.telegram.org/bot{BOT_TOKEN}/checkUsername"
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, json={"username": username}) as response:
-                data = await response.json()
-                is_available = data.get("result", False)
-    except Exception as e:
-        print(f"❌ Ошибка API: {e}")
-        await message.answer("❌ Ошибка подключения к Telegram API")
-        return
-    
-    if is_available:
-        await message.answer(
-            f"✅ @{username} — **СВОБОДЕН!**\n"
-            f"🔗 https://t.me/{username}",
-            parse_mode="Markdown"
-        )
-    else:
-        await message.answer(
-            f"❌ @{username} — **ЗАНЯТ!**\n\n"
-            f"🔍 Попробуйте другой юзернейм",
-            parse_mode="Markdown"
-        )
+@dp.callback_query(lambda c: c.data == "buy")
+async def buy_callback(callback: types.CallbackQuery):
+    kb = InlineKeyboardMarkup(row_width=2)
+    kb.add(
+        InlineKeyboardButton("160 Robux", callback_data="robux_160"),
+        InlineKeyboardButton("260 Robux", callback_data="robux_260"),
+        InlineKeyboardButton("500 Robux", callback_data="robux_500"),
+        InlineKeyboardButton("1000 Robux", callback_data="robux_1000"),
+        InlineKeyboardButton("2500 Robux", callback_data="robux_2500"),
+        InlineKeyboardButton("5000 Robux", callback_data="robux_5000")
+    )
+    await callback.message.edit_text("📦 Выбери пакет:", reply_markup=kb)
+    await callback.answer()
 
-# ===== ЗАПУСК =====
+@dp.callback_query(lambda c: c.data.startswith("robux_"))
+async def process_robux(callback: types.CallbackQuery):
+    amount = int(callback.data.split("_")[1])
+    order_id = f"#{random.randint(100000, 999999)}"
+    link = f"{BASE_URL}?robux={amount}"
+    await callback.message.edit_text(
+        f"✅ Ордер {order_id} создан!\n"
+        f"Robux: {amount}\n"
+        f"🔗 Перейди по ссылке для оплаты:\n{link}",
+        disable_web_page_preview=True
+    )
+    await callback.answer()
+
+@dp.callback_query(lambda c: c.data == "help")
+async def help_callback(callback: types.CallbackQuery):
+    await callback.message.edit_text(
+        "🆘 **Помощь:**\n"
+        "1. Выбери пакет.\n"
+        "2. Перейди по ссылке.\n"
+        "3. Оплати и получи Robux.\n\n"
+        "❓ Вопросы — пиши @твой_ник"
+    )
+    await callback.answer()
+
 async def main():
-    print("🌊 AQUA CHECKER БОТ ЗАПУЩЕН!")
-    print(f"🌐 Сайт: {BASE_URL}")
+    logging.basicConfig(level=logging.INFO)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
+    import asyncio
     asyncio.run(main())
