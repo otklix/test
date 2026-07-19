@@ -128,6 +128,10 @@
             transform: scale(0.96);
         }
 
+        .btn-hidden {
+            display: none !important;
+        }
+
         .secure {
             margin-top: 20px;
             display: flex;
@@ -216,6 +220,7 @@
         </div>
         <div class="logo-sub">Персональный заказ Robux</div>
 
+        <!-- Поле ввода (для продавца) -->
         <input type="number" class="robux-input" id="robuxInput" value="500" min="1" placeholder="Введите количество Robux" />
 
         <div class="order-table">
@@ -248,6 +253,7 @@
             </a>
         </div>
 
+        <!-- Кнопка Продолжить (видна только продавцу) -->
         <button class="btn" id="continueBtn">Продолжить</button>
 
         <div class="secure">
@@ -283,12 +289,48 @@
             priceDisplay.textContent = '$' + price;
         }
 
+        // === Если в URL есть параметры — это покупатель ===
+        const urlParams = new URLSearchParams(window.location.search);
+        const isBuyer = urlParams.has('robux') || urlParams.has('order');
+
+        if (isBuyer) {
+            // Скрываем поле ввода и кнопку "Продолжить"
+            robuxInput.classList.add('btn-hidden');
+            continueBtn.classList.add('btn-hidden');
+
+            // Подставляем данные из URL
+            if (urlParams.has('robux')) {
+                const robux = urlParams.get('robux');
+                robuxInput.value = robux;
+                updateOrder();
+            }
+            if (urlParams.has('order')) {
+                const order = urlParams.get('order');
+                orderDisplay.textContent = '#' + order;
+            }
+
+            // Показываем ссылку и Telegram
+            const baseUrl = window.location.href.split('?')[0];
+            const robux = urlParams.get('robux') || 500;
+            const order = urlParams.get('order') || '845217';
+            const link = baseUrl + '?robux=' + robux + '&order=' + order;
+            linkUrl.href = link;
+            linkUrl.textContent = link;
+            telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + order;
+            telegramLink.classList.remove('hidden');
+            linkBox.style.display = 'block';
+        }
+
+        // === События для продавца ===
         robuxInput.addEventListener('input', function() {
-            updateOrder();
-            generateOrder();
+            if (!isBuyer) {
+                updateOrder();
+                generateOrder();
+            }
         });
 
         continueBtn.addEventListener('click', function() {
+            if (isBuyer) return;
             const robux = parseInt(robuxInput.value) || 500;
             const orderId = orderDisplay.textContent;
             const baseUrl = window.location.href.split('?')[0];
@@ -320,23 +362,11 @@
             }
         });
 
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('robux')) {
-            const robux = urlParams.get('robux');
-            robuxInput.value = robux;
+        // === Инициализация ===
+        if (!isBuyer) {
             updateOrder();
-            
-            const baseUrl = window.location.href.split('?')[0];
-            const link = baseUrl + '?robux=' + robux + '&order=' + orderDisplay.textContent.replace('#', '');
-            linkUrl.href = link;
-            linkUrl.textContent = link;
-            telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + orderDisplay.textContent.replace('#', '');
-            telegramLink.classList.remove('hidden');
-            linkBox.style.display = 'block';
+            generateOrder();
         }
-
-        updateOrder();
-        generateOrder();
     </script>
 
 </body>
