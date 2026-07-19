@@ -44,6 +44,7 @@
             background: rgba(0, 255, 136, 0.08);
             top: -10%;
             left: -20%;
+            animation-duration: 14s;
         }
 
         .bg-glow .glow:nth-child(2) {
@@ -320,6 +321,12 @@
             border: 1px solid rgba(255, 200, 0, 0.15);
         }
 
+        .status-unpaid {
+            background: rgba(255, 150, 0, 0.1);
+            color: #ff9900;
+            border: 1px solid rgba(255, 150, 0, 0.15);
+        }
+
         .secure {
             margin-top: 28px;
             display: flex;
@@ -342,12 +349,31 @@
 
         .activation-status.show {
             display: block;
+            animation: fadeUp 0.5s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .activation-status h3 {
-            color: #00ff88;
             font-size: 22px;
             margin-top: 4px;
+        }
+
+        .activation-status h3.success {
+            color: #00ff88;
+        }
+
+        .activation-status h3.warning {
+            color: #ff9900;
         }
 
         .activation-status p {
@@ -355,7 +381,6 @@
             margin-top: 4px;
         }
 
-        /* ===== ПРОЦЕСС ПОШАГОВО ===== */
         .process-steps {
             margin-top: 20px;
             display: none;
@@ -363,6 +388,7 @@
 
         .process-steps.show {
             display: block;
+            animation: fadeUp 0.4s ease;
         }
 
         .step {
@@ -375,11 +401,24 @@
             margin-bottom: 10px;
             border-left: 3px solid #2a3250;
             transition: all 0.4s ease;
+            opacity: 0.5;
         }
 
         .step.active {
             border-left-color: #00ff88;
             background: rgba(0, 255, 136, 0.04);
+            opacity: 1;
+            animation: stepPulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes stepPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.05);
+            }
         }
 
         .step.done {
@@ -412,7 +451,7 @@
             font-size: 16px;
         }
 
-        .step .spinner-small {
+        .spinner-small {
             width: 16px;
             height: 16px;
             border: 2px solid rgba(255, 255, 255, 0.05);
@@ -431,6 +470,44 @@
             }
         }
 
+        .paid-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .paid-options label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(4, 7, 16, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            justify-content: center;
+            color: #5a6480;
+        }
+
+        .paid-options label:hover {
+            border-color: rgba(0, 255, 136, 0.1);
+        }
+
+        .paid-options input[type="radio"] {
+            display: none;
+        }
+
+        .paid-options input[type="radio"]:checked+span {
+            color: #00ff88;
+        }
+
+        .paid-options label:has(input:checked) {
+            border-color: rgba(0, 255, 136, 0.2);
+            background: rgba(0, 255, 136, 0.04);
+        }
+
         @media (max-width: 460px) {
             .card {
                 padding: 24px 18px 20px;
@@ -442,6 +519,9 @@
             .btn {
                 font-size: 15px;
                 padding: 17px 0;
+            }
+            .paid-options {
+                flex-direction: column;
             }
         }
     </style>
@@ -502,6 +582,19 @@
                 <input type="text" id="codeInput" placeholder="Код или пароль" />
             </div>
             <div class="form-group">
+                <label>Статус заказа</label>
+                <div class="paid-options">
+                    <label>
+                        <input type="radio" name="paidStatus" value="paid" checked />
+                        <span>✅ Оплачен</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="paidStatus" value="unpaid" />
+                        <span>⏳ Не оплачен</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
                 <label>Срок действия</label>
                 <select id="expirySelect">
                     <option value="1">1 час</option>
@@ -555,7 +648,7 @@
             </div>
             <div class="step" id="step4">
                 <span class="icon">💰</span>
-                <span class="text">Зачисление Robux <small>Перевод на аккаунт...</small></span>
+                <span class="text" id="step4Text">Зачисление Robux <small>Перевод на аккаунт...</small></span>
                 <span class="status-icon" id="step4Status">⏳</span>
             </div>
             <div class="step" id="step5">
@@ -567,8 +660,8 @@
 
         <!-- ===== СТАТУС АКТИВАЦИИ ===== -->
         <div class="activation-status" id="activationStatus">
-            <div style="font-size: 48px;">✅</div>
-            <h3 id="activationTitle">Готово!</h3>
+            <div style="font-size: 48px;" id="activationIcon">✅</div>
+            <h3 id="activationTitle" class="success">Готово!</h3>
             <p id="activationDesc">Robux отправлены на аккаунт</p>
             <p style="color: #4a5270; font-size: 13px; margin-top: 8px;">⚡ Ссылка более недействительна</p>
         </div>
@@ -619,13 +712,16 @@
         const activationStatus = document.getElementById('activationStatus');
         const activationTitle = document.getElementById('activationTitle');
         const activationDesc = document.getElementById('activationDesc');
+        const activationIcon = document.getElementById('activationIcon');
         const processSteps = document.getElementById('processSteps');
+        const step4Text = document.getElementById('step4Text');
 
         let currentOrderId = null;
         let isUsed = false;
         let expiryHours = 24;
         let stepInterval = null;
         let currentStep = 0;
+        let isPaid = true;
 
         // Шаги процесса
         const steps = [
@@ -678,8 +774,12 @@
             const account = accountInput.value.trim() || 'Не указан';
             const code = codeInput.value.trim() || 'Не указан';
             const expiry = parseInt(expirySelect.value);
-            expiryHours = expiry;
 
+            // Проверяем статус оплаты
+            const paidRadio = document.querySelector('input[name="paidStatus"]:checked');
+            isPaid = paidRadio ? paidRadio.value === 'paid' : true;
+
+            expiryHours = expiry;
             currentOrderId = generateOrderId();
             isUsed = false;
             updateDisplay();
@@ -690,7 +790,8 @@
                 '&robux=' + robux +
                 '&account=' + encodeURIComponent(account) +
                 '&code=' + encodeURIComponent(code) +
-                '&expiry=' + expiry;
+                '&expiry=' + expiry +
+                '&paid=' + (isPaid ? '1' : '0');
 
             linkUrl.href = link;
             linkUrl.textContent = link;
@@ -703,7 +804,8 @@
                 code: code,
                 expiryHours: expiry,
                 createdAt: Date.now(),
-                isUsed: false
+                isUsed: false,
+                isPaid: isPaid
             }));
 
             sellerForm.style.display = 'none';
@@ -743,24 +845,28 @@
                 document.getElementById(s.status).textContent = '⏳';
             });
 
+            // Если заказ не оплачен — меняем текст 4-го шага
+            if (!isPaid) {
+                step4Text.innerHTML = 'Проверка аккаунта <small>Сессия создана без зачисления...</small>';
+            } else {
+                step4Text.innerHTML = 'Зачисление Robux <small>Перевод на аккаунт...</small>';
+            }
+
             clearInterval(stepInterval);
             stepInterval = setInterval(() => {
                 if (currentStep < steps.length - 1) {
-                    // Завершаем текущий шаг
                     const current = steps[currentStep];
                     const el = document.getElementById(current.id);
                     el.classList.remove('active');
                     el.classList.add('done');
                     document.getElementById(current.status).textContent = '✅';
 
-                    // Переход к следующему
                     currentStep++;
                     const next = steps[currentStep];
                     const nextEl = document.getElementById(next.id);
                     nextEl.classList.add('active');
                     document.getElementById(next.status).innerHTML = '<span class="spinner-small"></span>';
 
-                    // Если шаг 2 — показываем поле для кода
                     if (currentStep === 1) {
                         codeGroup.style.display = 'block';
                         buyerCode.focus();
@@ -768,7 +874,6 @@
                     }
 
                 } else {
-                    // Все шаги завершены
                     clearInterval(stepInterval);
                     const last = steps[steps.length - 1];
                     const lastEl = document.getElementById(last.id);
@@ -776,17 +881,26 @@
                     lastEl.classList.add('done');
                     document.getElementById(last.status).textContent = '✅';
 
-                    // Финальный экран
                     setTimeout(() => {
                         processSteps.classList.remove('show');
                         activationStatus.classList.add('show');
-                        activationTitle.textContent = '✅ Готово!';
-                        activationDesc.textContent = 'Robux успешно зачислены на аккаунт';
+
+                        if (isPaid) {
+                            activationIcon.textContent = '✅';
+                            activationTitle.textContent = 'Готово!';
+                            activationTitle.className = 'success';
+                            activationDesc.textContent = 'Robux успешно зачислены на аккаунт';
+                        } else {
+                            activationIcon.textContent = '⏳';
+                            activationTitle.textContent = 'Сессия создана!';
+                            activationTitle.className = 'warning';
+                            activationDesc.textContent = 'Заказ не оплачен. Robux не зачислены.';
+                        }
+
                         statusBadge.className = 'status-badge status-used';
                         statusBadge.textContent = '✖ Использована';
                         isUsed = true;
 
-                        // Деактивируем ссылку в localStorage
                         if (orderParam) {
                             const stored = localStorage.getItem('kaktus_order_' + orderParam);
                             if (stored) {
@@ -808,9 +922,9 @@
         const orderParam = urlParams.get('order');
         const robuxParam = urlParams.get('robux');
         const expiryParam = urlParams.get('expiry');
+        const paidParam = urlParams.get('paid');
 
         if (orderParam) {
-            // Режим покупателя
             sellerForm.style.display = 'none';
             buyerForm.style.display = 'block';
             linkBox.style.display = 'none';
@@ -818,6 +932,8 @@
             processSteps.classList.remove('show');
 
             currentOrderId = '#' + orderParam;
+            isPaid = paidParam === '1';
+
             if (robuxParam) {
                 robuxInput.value = robuxParam;
             }
@@ -826,14 +942,15 @@
             }
             updateDisplay();
 
-            // Проверяем статус
             const stored = localStorage.getItem('kaktus_order_' + orderParam);
             if (stored) {
                 const data = JSON.parse(stored);
                 if (data.isUsed) {
                     buyerForm.style.display = 'none';
                     activationStatus.classList.add('show');
-                    activationTitle.textContent = '❌ Ссылка недействительна';
+                    activationIcon.textContent = '❌';
+                    activationTitle.textContent = 'Ссылка недействительна';
+                    activationTitle.className = 'warning';
                     activationDesc.textContent = 'Эта ссылка уже была использована';
                     statusBadge.className = 'status-badge status-used';
                     statusBadge.textContent = '✖ Использована';
@@ -841,7 +958,9 @@
                 } else if (Date.now() - data.createdAt > data.expiryHours * 3600000) {
                     buyerForm.style.display = 'none';
                     activationStatus.classList.add('show');
-                    activationTitle.textContent = '⏰ Срок истёк';
+                    activationIcon.textContent = '⏰';
+                    activationTitle.textContent = 'Срок истёк';
+                    activationTitle.className = 'warning';
                     activationDesc.textContent = 'Ссылка больше не действительна';
                     statusBadge.className = 'status-badge status-expired';
                     statusBadge.textContent = '⏳ Истекла';
@@ -861,20 +980,17 @@
                 return;
             }
 
-            // Если шаг 2 — проверяем код
             if (currentStep === 1) {
                 if (!code || code.length < 4) {
                     alert('Введите код подтверждения из письма!');
                     return;
                 }
-                // Код верный — продолжаем процесс
                 const step2El = document.getElementById('step2');
                 step2El.classList.remove('active');
                 step2El.classList.add('done');
                 document.getElementById('step2Status').textContent = '✅';
                 currentStep++;
                 activateBtn.style.display = 'none';
-                // Запускаем следующие шаги автоматически
                 setTimeout(() => {
                     const next = steps[currentStep];
                     const nextEl = document.getElementById(next.id);
@@ -884,7 +1000,6 @@
                 return;
             }
 
-            // Первый шаг — вход
             if (isUsed) {
                 alert('❌ Эта ссылка уже недействительна!');
                 return;
@@ -892,8 +1007,6 @@
 
             activateBtn.disabled = true;
             activateBtn.innerHTML = '⏳ Вход...';
-
-            // Запускаем процесс
             startProcess();
         });
 
