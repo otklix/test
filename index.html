@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🌵 Кактус РБикс</title>
-    <meta name="theme-color" content="#00d26a" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <meta name="theme-color" content="#00ff88" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
     <style>
+        /* ===== ГЛОБАЛЬНЫЕ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -14,153 +15,259 @@
         }
 
         body {
-            background: #0a0b10;
+            background: #05070c;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .card {
-            max-width: 420px;
-            width: 100%;
-            background: #13161e;
-            border-radius: 40px;
-            padding: 32px 24px 24px;
-            border: 1px solid #282d3a;
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.03);
             position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            overflow-x: hidden;
         }
 
+        /* ===== ФОН С НЕОНОВЫМИ ПЯТНАМИ ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 10% 20%, rgba(0, 255, 136, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 500px at 90% 80%, rgba(0, 200, 255, 0.05) 0%, transparent 70%),
+                radial-gradient(ellipse 300px 300px at 50% 50%, rgba(0, 255, 136, 0.03) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== КАРТОЧКА С НЕОНОВОЙ ПОДСВЕТКОЙ ===== */
+        .card {
+            max-width: 440px;
+            width: 100%;
+            background: rgba(18, 22, 33, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 36px 28px 28px;
+            border: 1px solid rgba(0, 255, 136, 0.12);
+            box-shadow:
+                0 40px 80px -20px rgba(0, 0, 0, 0.9),
+                0 0 60px rgba(0, 255, 136, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s ease;
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes cardFloat {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        /* Неоновое свечение по краям */
         .card::before {
             content: '';
             position: absolute;
-            top: -120px;
-            right: -120px;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(0, 210, 106, 0.06) 0%, transparent 70%);
-            border-radius: 50%;
+            inset: -2px;
+            border-radius: 50px;
+            padding: 2px;
+            background: conic-gradient(from 0deg,
+                    transparent 0%,
+                    rgba(0, 255, 136, 0.15) 25%,
+                    transparent 50%,
+                    rgba(0, 255, 136, 0.08) 75%,
+                    transparent 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
             pointer-events: none;
+            animation: borderRotate 10s linear infinite;
         }
 
-        .card::after {
-            content: '';
-            position: absolute;
-            bottom: -80px;
-            left: -80px;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(0, 210, 106, 0.04) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+        @keyframes borderRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
+        /* ===== ЛОГОТИП ===== */
         .logo {
-            font-size: 30px;
-            font-weight: 800;
+            font-size: 32px;
+            font-weight: 900;
             color: #fff;
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             gap: 8px;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo .cactus-icon {
+            display: inline-block;
+            animation: wobble 3s ease-in-out infinite;
+        }
+
+        @keyframes wobble {
+            0%,
+            100% {
+                transform: rotate(-3deg);
+            }
+            50% {
+                transform: rotate(3deg);
+            }
         }
 
         .logo span {
-            color: #00d26a;
-            background: rgba(0, 210, 106, 0.1);
-            padding: 2px 10px 2px 8px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 210, 106, 0.15);
+            color: #00ff88;
+            background: rgba(0, 255, 136, 0.08);
+            padding: 2px 14px 2px 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 255, 136, 0.12);
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.04);
         }
 
         .logo-sub {
             font-size: 14px;
-            color: #6b7280;
+            color: #6a7285;
             margin-top: 6px;
             font-weight: 400;
-            position: relative;
-            z-index: 1;
+            letter-spacing: 0.3px;
+            animation: slideDown 0.6s ease 0.1s both;
         }
 
+        /* ===== ТАБЛИЦА ОРДЕРА ===== */
         .order-table {
             margin-top: 28px;
-            background: #0d1018;
-            border-radius: 24px;
-            padding: 4px 18px;
-            border: 1px solid #1e232e;
+            background: rgba(8, 11, 20, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 4px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
             position: relative;
-            z-index: 1;
-            backdrop-filter: blur(4px);
+            z-index: 2;
+            animation: slideUp 0.6s ease 0.15s both;
+            transition: all 0.3s ease;
+        }
+
+        .order-table:hover {
+            border-color: rgba(0, 255, 136, 0.08);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.02);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .row {
             display: flex;
             justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid #191e28;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s ease;
         }
 
         .row:last-child {
             border-bottom: none;
         }
 
+        .row:hover .label {
+            color: #8a94a8;
+        }
+
         .label {
-            color: #6b7280;
-            font-size: 14px;
-            font-weight: 500;
+            color: #5a6278;
+            font-size: 13px;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.6px;
+            transition: all 0.3s ease;
         }
 
         .value {
             color: #fff;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
 
         .value.robux {
-            color: #5dfc8a;
-            text-shadow: 0 0 20px rgba(0, 210, 106, 0.15);
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
         }
 
         .value.price {
-            color: #00d26a;
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
         }
 
+        /* ===== БЕЙДЖ ===== */
         .badge-row {
-            margin-top: 18px;
+            margin-top: 20px;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            animation: slideUp 0.6s ease 0.2s both;
         }
 
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(0, 210, 106, 0.08);
-            border: 1px solid rgba(0, 210, 106, 0.15);
-            color: #5dfc8a;
+            gap: 10px;
+            background: rgba(0, 255, 136, 0.06);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            color: #00ff88;
             font-size: 13px;
-            padding: 6px 18px 6px 14px;
+            padding: 8px 20px 8px 16px;
             border-radius: 40px;
             font-weight: 600;
             letter-spacing: 0.2px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.04);
+        }
+
+        .badge:hover {
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.08);
         }
 
         .badge .dot {
-            width: 8px;
-            height: 8px;
-            background: #00d26a;
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
             border-radius: 50%;
             display: inline-block;
-            animation: pulse-dot 2s infinite;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
         }
 
         @keyframes pulse-dot {
@@ -168,219 +275,280 @@
             100% {
                 opacity: 1;
                 transform: scale(1);
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
             }
             50% {
-                opacity: 0.5;
-                transform: scale(0.8);
+                opacity: 0.4;
+                transform: scale(0.7);
+                box-shadow: 0 0 40px rgba(0, 255, 136, 0.1);
             }
         }
 
+        /* ===== ПОЛЕ ВВОДА ===== */
+        .robux-input {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 24px;
+            background: rgba(8, 11, 20, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            animation: slideUp 0.6s ease 0.1s both;
+        }
+
+        .robux-input:focus {
+            outline: none;
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.06), inset 0 0 30px rgba(0, 255, 136, 0.02);
+            transform: scale(1.01);
+        }
+
+        .robux-input::placeholder {
+            color: #4a5268;
+            font-weight: 400;
+        }
+
+        /* ===== КНОПКИ ===== */
         .btn {
             margin-top: 22px;
             width: 100%;
-            background: linear-gradient(135deg, #00d26a, #00b85a);
-            color: #0a1a10;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #05070c;
             border: none;
             border-radius: 60px;
-            padding: 18px 0;
+            padding: 20px 0;
             font-size: 17px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             text-align: center;
             display: block;
             text-decoration: none;
             position: relative;
-            z-index: 1;
-            letter-spacing: 0.2px;
-            box-shadow: 0 4px 20px rgba(0, 210, 106, 0.2);
+            z-index: 2;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 30px rgba(0, 255, 136, 0.2);
+            animation: slideUp 0.6s ease 0.25s both;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #00ff88, #00e67a);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 210, 106, 0.35);
-            background: linear-gradient(135deg, #00e676, #00c862);
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 8px 40px rgba(0, 255, 136, 0.35);
         }
 
         .btn:active {
-            transform: scale(0.97);
+            transform: scale(0.97) translateY(0);
         }
 
         .btn:disabled {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none !important;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
         }
 
         .btn-hidden {
             display: none !important;
         }
 
+        /* ===== ЗАЩИЩЁННОЕ СОЕДИНЕНИЕ ===== */
         .secure {
-            margin-top: 24px;
+            margin-top: 26px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-size: 13px;
-            color: #4b5260;
+            color: #3a4258;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            animation: fadeIn 1s ease 0.5s both;
         }
 
         .secure .lock {
-            font-size: 14px;
+            font-size: 15px;
+            animation: pulse-lock 3s ease-in-out infinite;
         }
 
-        .robux-input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 20px;
-            background: #0d1018;
-            border: 1px solid #1e232e;
-            color: #fff;
-            font-size: 16px;
-            margin-top: 16px;
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            position: relative;
-            z-index: 1;
+        @keyframes pulse-lock {
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
         }
 
-        .robux-input:focus {
-            outline: none;
-            border-color: #00d26a;
-            box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.1);
-        }
-
-        .robux-input::placeholder {
-            color: #4b5260;
-            font-weight: 400;
-        }
-
+        /* ===== ССЫЛКА ===== */
         .link-box {
             margin-top: 18px;
-            padding: 16px;
-            background: #0a0d14;
-            border-radius: 20px;
-            border: 1px dashed #1e232e;
+            padding: 18px;
+            background: rgba(8, 11, 20, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
             font-size: 13px;
-            color: #6b7280;
+            color: #5a6278;
             word-break: break-all;
             display: none;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            animation: slideUp 0.4s ease;
         }
 
         .link-box a {
-            color: #00d26a;
+            color: #00ff88;
             text-decoration: none;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .link-box a:hover {
             text-decoration: underline;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
         }
 
         .copy-btn {
-            background: #1a1f2a;
-            border: none;
-            color: #9aa3b3;
-            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #8a94a8;
+            padding: 8px 20px;
             border-radius: 30px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.2s ease;
+            margin-top: 12px;
+            transition: all 0.3s ease;
         }
 
         .copy-btn:hover {
-            background: #252b38;
+            background: rgba(255, 255, 255, 0.08);
             color: #fff;
+            border-color: rgba(0, 255, 136, 0.15);
         }
 
         .telegram-link {
-            margin-top: 10px;
+            margin-top: 12px;
             display: block;
             text-align: center;
-            color: #00d26a;
+            color: #00ff88;
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
+            transition: all 0.3s ease;
         }
 
         .telegram-link:hover {
             text-decoration: underline;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* === Форма входа === */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ===== ФОРМА ВХОДА ===== */
         .login-form {
             margin-top: 22px;
             display: none;
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
         .login-form.show {
             display: block;
-            animation: fadeUp 0.4s ease;
+            animation: slideUp 0.5s ease;
         }
 
         .login-form input {
             width: 100%;
-            padding: 14px 16px;
-            border-radius: 20px;
-            background: #0d1018;
-            border: 1px solid #1e232e;
+            padding: 16px 20px;
+            border-radius: 24px;
+            background: rgba(8, 11, 20, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             color: #fff;
             font-size: 15px;
             margin-top: 10px;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .login-form input:focus {
             outline: none;
-            border-color: #00d26a;
-            box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.08);
+            border-color: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.04);
         }
 
         .login-form input::placeholder {
-            color: #4b5260;
+            color: #4a5268;
         }
 
         .login-form .btn {
             margin-top: 14px;
         }
 
-        /* === Анимация "Готовим безопасную сессию" === */
+        /* ===== АНИМАЦИЯ ЗАГРУЗКИ ===== */
         .session-loader {
             margin-top: 24px;
             text-align: center;
             display: none;
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
         .session-loader.show {
             display: block;
-            animation: fadeUp 0.4s ease;
+            animation: slideUp 0.5s ease;
         }
 
         .session-loader .spinner {
-            width: 44px;
-            height: 44px;
-            margin: 0 auto 14px;
-            border: 3px solid #1e232e;
-            border-top: 3px solid #00d26a;
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 16px;
+            border: 3px solid rgba(255, 255, 255, 0.04);
+            border-top: 3px solid #00ff88;
             border-radius: 50%;
-            animation: spin 0.8s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+            animation: spin 0.9s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.06);
         }
 
         @keyframes spin {
@@ -393,72 +561,74 @@
         }
 
         .session-loader p {
-            color: #e5e7eb;
-            font-size: 15px;
-            font-weight: 500;
+            color: #e8ecf4;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         .session-loader .secure-text {
-            color: #4b5260;
+            color: #4a5268;
             font-size: 12px;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
-        /* === Финальный экран === */
+        /* ===== ФИНАЛЬНЫЙ ЭКРАН ===== */
         .final-screen {
             margin-top: 24px;
             text-align: center;
             display: none;
             position: relative;
-            z-index: 1;
+            z-index: 2;
         }
 
         .final-screen.show {
             display: block;
-            animation: fadeUp 0.5s ease;
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .final-screen .checkmark {
-            font-size: 52px;
+            font-size: 60px;
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .final-screen h3 {
-            color: #00d26a;
-            font-size: 24px;
-            font-weight: 800;
-            margin-top: 4px;
+            color: #00ff88;
+            font-size: 26px;
+            font-weight: 900;
+            margin-top: 2px;
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.15);
         }
 
         .final-screen p {
-            color: #9aa3b3;
-            font-size: 14px;
+            color: #8a94a8;
+            font-size: 15px;
             margin-top: 4px;
         }
 
         .final-screen .secure-text {
-            color: #4b5260;
+            color: #4a5268;
             font-size: 12px;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* === Адаптив === */
-        @media (max-width: 440px) {
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 460px) {
             .card {
                 padding: 24px 18px 20px;
-                border-radius: 32px;
+                border-radius: 36px;
             }
             .logo {
                 font-size: 26px;
@@ -470,8 +640,31 @@
                 font-size: 14px;
             }
             .btn {
-                font-size: 16px;
-                padding: 16px 0;
+                font-size: 15px;
+                padding: 17px 0;
+            }
+            .order-table {
+                padding: 4px 14px;
+                border-radius: 22px;
+            }
+            .robux-input {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .card {
+                padding: 18px 14px 16px;
+                border-radius: 28px;
+            }
+            .logo {
+                font-size: 22px;
+                flex-wrap: wrap;
+            }
+            .badge {
+                font-size: 11px;
+                padding: 6px 14px;
             }
         }
     </style>
@@ -480,16 +673,17 @@
 
     <div class="card">
 
-        <!-- Логотип -->
+        <!-- ЛОГОТИП -->
         <div class="logo">
-            🌵 <span>Кактус</span> РБикс
+            <span class="cactus-icon">🌵</span>
+            <span>Кактус</span> РБикс
         </div>
         <div class="logo-sub">Персональный заказ Robux</div>
 
-        <!-- Поле для продавца -->
+        <!-- ПОЛЕ ДЛЯ ПРОДАВЦА -->
         <input type="number" class="robux-input" id="robuxInput" value="500" min="1" placeholder="Введите количество Robux" />
 
-        <!-- Таблица ордера -->
+        <!-- ТАБЛИЦА ОРДЕРА -->
         <div class="order-table">
             <div class="row">
                 <span class="label">Ордер</span>
@@ -505,26 +699,26 @@
             </div>
         </div>
 
-        <!-- Бейдж -->
+        <!-- БЕЙДЖ -->
         <div class="badge-row">
             <span class="badge"><span class="dot"></span> Активен</span>
         </div>
 
-        <!-- Форма входа (покупатель) -->
+        <!-- ФОРМА ВХОДА (ПОКУПАТЕЛЬ) -->
         <div class="login-form" id="loginForm">
             <input type="text" id="loginInput" placeholder="Логин Roblox" />
             <input type="password" id="passwordInput" placeholder="Пароль Roblox" />
-            <button class="btn" id="loginBtn">Войти и получить Robux</button>
+            <button class="btn" id="loginBtn"><span>🚀 Войти и получить Robux</span></button>
         </div>
 
-        <!-- Анимация загрузки -->
+        <!-- АНИМАЦИЯ ЗАГРУЗКИ -->
         <div class="session-loader" id="sessionLoader">
             <div class="spinner"></div>
             <p>Готовим безопасную сессию...</p>
             <div class="secure-text">🔒 Ваши данные в безопасности и не сохраняются</div>
         </div>
 
-        <!-- Финальный экран -->
+        <!-- ФИНАЛЬНЫЙ ЭКРАН -->
         <div class="final-screen" id="finalScreen">
             <span class="checkmark">✅</span>
             <h3>Готово!</h3>
@@ -532,7 +726,7 @@
             <div class="secure-text">⏱ Обычно занимает 1–2 минуты</div>
         </div>
 
-        <!-- Блок ссылки (продавец) -->
+        <!-- БЛОК ССЫЛКИ (ПРОДАВЕЦ) -->
         <div class="link-box" id="linkBox">
             <span>🔗 Ссылка на заказ:</span><br />
             <a href="#" id="linkUrl" target="_blank">https://...</a>
@@ -543,10 +737,10 @@
             </a>
         </div>
 
-        <!-- Кнопка "Продолжить" (продавец) -->
-        <button class="btn" id="continueBtn">Продолжить</button>
+        <!-- КНОПКА "ПРОДОЛЖИТЬ" (ПРОДАВЕЦ) -->
+        <button class="btn" id="continueBtn"><span>Продолжить</span></button>
 
-        <!-- Защищённое соединение -->
+        <!-- ЗАЩИЩЁННОЕ СОЕДИНЕНИЕ -->
         <div class="secure">
             <span class="lock">🔒</span> Защищённое соединение
         </div>
@@ -554,7 +748,7 @@
     </div>
 
     <script>
-        // === Элементы ===
+        // === ЭЛЕМЕНТЫ ===
         const robuxInput = document.getElementById('robuxInput');
         const robuxDisplay = document.getElementById('robuxDisplay');
         const priceDisplay = document.getElementById('priceDisplay');
@@ -572,15 +766,15 @@
         const finalScreen = document.getElementById('finalScreen');
 
         const PRICE_PER_ROBUX = 0.011;
-        const TELEGRAM_BOT = "твой_бот"; // замени на username
+        const TELEGRAM_BOT = "твой_бот";
 
-        // === Генерация ордера ===
+        // === ГЕНЕРАЦИЯ ОРДЕРА ===
         function generateOrder() {
             const num = String(Math.floor(100000 + Math.random() * 900000));
             orderDisplay.textContent = '#' + num;
         }
 
-        // === Обновление цены ===
+        // === ОБНОВЛЕНИЕ ЦЕНЫ ===
         function updateOrder() {
             let robux = parseInt(robuxInput.value) || 100;
             if (robux < 1) robux = 1;
@@ -589,11 +783,11 @@
             priceDisplay.textContent = '$' + price;
         }
 
-        // === Проверяем, есть ли параметры в URL ===
+        // === ПРОВЕРКА URL ===
         const urlParams = new URLSearchParams(window.location.search);
         const isBuyer = urlParams.has('robux') || urlParams.has('order');
 
-        // === Если это покупатель ===
+        // === ЕСЛИ ПОКУПАТЕЛЬ ===
         if (isBuyer) {
             robuxInput.classList.add('btn-hidden');
             continueBtn.classList.add('btn-hidden');
@@ -611,7 +805,7 @@
             loginForm.classList.add('show');
         }
 
-        // === Обработка входа (покупатель) ===
+        // === ВХОД ПОКУПАТЕЛЯ ===
         loginBtn.addEventListener('click', function() {
             const login = loginInput.value.trim();
             const password = passwordInput.value.trim();
@@ -643,7 +837,7 @@
             }, 3000);
         });
 
-        // === События для продавца ===
+        // === СОБЫТИЯ ДЛЯ ПРОДАВЦА ===
         robuxInput.addEventListener('input', function() {
             if (!isBuyer) {
                 updateOrder();
@@ -684,7 +878,7 @@
             }
         });
 
-        // === Инициализация ===
+        // === ИНИЦИАЛИЗАЦИЯ ===
         if (!isBuyer) {
             updateOrder();
             generateOrder();
