@@ -5,126 +5,212 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🌵 Кактус РБикс</title>
     <meta name="theme-color" content="#00d26a" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            background: #08080e;
+            background: #0a0b10;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .card {
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
-            background: #12141c;
-            border-radius: 36px;
-            padding: 30px 24px 24px;
-            border: 1px solid #262a33;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            background: #13161e;
+            border-radius: 40px;
+            padding: 32px 24px 24px;
+            border: 1px solid #282d3a;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -120px;
+            right: -120px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 210, 106, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 210, 106, 0.04) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
         .logo {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 30px;
+            font-weight: 800;
             color: #fff;
             letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
         }
+
         .logo span {
             color: #00d26a;
+            background: rgba(0, 210, 106, 0.1);
+            padding: 2px 10px 2px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 210, 106, 0.15);
         }
+
         .logo-sub {
             font-size: 14px;
-            color: #8f94a3;
-            margin-top: 4px;
+            color: #6b7280;
+            margin-top: 6px;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
         }
 
         .order-table {
-            margin-top: 24px;
-            background: #0c0e14;
-            border-radius: 20px;
-            padding: 6px 16px;
-            border: 1px solid #22262f;
+            margin-top: 28px;
+            background: #0d1018;
+            border-radius: 24px;
+            padding: 4px 18px;
+            border: 1px solid #1e232e;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(4px);
         }
+
         .row {
             display: flex;
             justify-content: space-between;
-            padding: 14px 0;
-            border-bottom: 1px solid #1b1e26;
+            padding: 16px 0;
+            border-bottom: 1px solid #191e28;
         }
+
         .row:last-child {
             border-bottom: none;
         }
+
         .label {
-            color: #8f94a3;
-            font-size: 15px;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
+
         .value {
             color: #fff;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 15px;
         }
+
         .value.robux {
-            color: #79f8b0;
+            color: #5dfc8a;
+            text-shadow: 0 0 20px rgba(0, 210, 106, 0.15);
         }
+
         .value.price {
             color: #00d26a;
         }
 
         .badge-row {
-            margin-top: 16px;
+            margin-top: 18px;
+            position: relative;
+            z-index: 1;
         }
+
         .badge {
-            display: inline-block;
-            background: #1b2a1f;
-            border: 1px solid #1f3d2a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 210, 106, 0.08);
+            border: 1px solid rgba(0, 210, 106, 0.15);
             color: #5dfc8a;
             font-size: 13px;
-            padding: 4px 16px;
+            padding: 6px 18px 6px 14px;
             border-radius: 40px;
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: 0.2px;
         }
-        .badge i {
-            font-style: normal;
-            margin-right: 6px;
+
+        .badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #00d26a;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
         }
 
         .btn {
-            margin-top: 20px;
+            margin-top: 22px;
             width: 100%;
-            background: #00d26a;
-            color: #0c1a12;
+            background: linear-gradient(135deg, #00d26a, #00b85a);
+            color: #0a1a10;
             border: none;
             border-radius: 60px;
-            padding: 16px 0;
+            padding: 18px 0;
             font-size: 17px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.15s;
+            transition: all 0.2s ease;
             text-align: center;
             display: block;
             text-decoration: none;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.2px;
+            box-shadow: 0 4px 20px rgba(0, 210, 106, 0.2);
         }
+
         .btn:hover {
-            background: #00e676;
-            transform: scale(1.01);
-            box-shadow: 0 8px 28px rgba(0, 210, 106, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 210, 106, 0.35);
+            background: linear-gradient(135deg, #00e676, #00c862);
         }
+
         .btn:active {
-            transform: scale(0.96);
+            transform: scale(0.97);
         }
+
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none !important;
+            box-shadow: none !important;
         }
 
         .btn-hidden {
@@ -132,65 +218,87 @@
         }
 
         .secure {
-            margin-top: 20px;
+            margin-top: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
             font-size: 13px;
-            color: #5a606e;
+            color: #4b5260;
+            position: relative;
+            z-index: 1;
         }
+
         .secure .lock {
             font-size: 14px;
         }
 
         .robux-input {
             width: 100%;
-            padding: 12px;
-            border-radius: 16px;
-            background: #0c0e14;
-            border: 1px solid #22262f;
+            padding: 14px 16px;
+            border-radius: 20px;
+            background: #0d1018;
+            border: 1px solid #1e232e;
             color: #fff;
-            font-size: 15px;
-            margin-top: 14px;
+            font-size: 16px;
+            margin-top: 16px;
             text-align: center;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
         }
+
         .robux-input:focus {
             outline: none;
             border-color: #00d26a;
+            box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.1);
+        }
+
+        .robux-input::placeholder {
+            color: #4b5260;
+            font-weight: 400;
         }
 
         .link-box {
-            margin-top: 14px;
-            padding: 12px;
-            background: #0a0c12;
-            border-radius: 16px;
-            border: 1px dashed #262a33;
+            margin-top: 18px;
+            padding: 16px;
+            background: #0a0d14;
+            border-radius: 20px;
+            border: 1px dashed #1e232e;
             font-size: 13px;
-            color: #8f94a3;
+            color: #6b7280;
             word-break: break-all;
             display: none;
+            position: relative;
+            z-index: 1;
         }
+
         .link-box a {
             color: #00d26a;
             text-decoration: none;
+            font-weight: 500;
         }
+
         .link-box a:hover {
             text-decoration: underline;
         }
 
         .copy-btn {
-            background: #1b1e26;
+            background: #1a1f2a;
             border: none;
-            color: #8f94a3;
-            padding: 6px 14px;
+            color: #9aa3b3;
+            padding: 8px 18px;
             border-radius: 30px;
             font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 10px;
+            transition: all 0.2s ease;
         }
+
         .copy-btn:hover {
-            background: #262a33;
+            background: #252b38;
             color: #fff;
         }
 
@@ -200,71 +308,171 @@
             text-align: center;
             color: #00d26a;
             font-size: 14px;
+            font-weight: 600;
             text-decoration: none;
         }
+
         .telegram-link:hover {
             text-decoration: underline;
         }
+
         .hidden {
-            display: none;
+            display: none !important;
         }
 
-        /* === Форма входа (для покупателя) === */
+        /* === Форма входа === */
         .login-form {
-            margin-top: 20px;
+            margin-top: 22px;
             display: none;
+            position: relative;
+            z-index: 1;
         }
+
         .login-form.show {
             display: block;
+            animation: fadeUp 0.4s ease;
         }
+
         .login-form input {
             width: 100%;
-            padding: 14px;
-            border-radius: 16px;
-            background: #0c0e14;
-            border: 1px solid #22262f;
+            padding: 14px 16px;
+            border-radius: 20px;
+            background: #0d1018;
+            border: 1px solid #1e232e;
             color: #fff;
             font-size: 15px;
             margin-top: 10px;
+            transition: all 0.2s ease;
         }
+
         .login-form input:focus {
             outline: none;
             border-color: #00d26a;
+            box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.08);
         }
+
         .login-form input::placeholder {
-            color: #5a606e;
+            color: #4b5260;
+        }
+
+        .login-form .btn {
+            margin-top: 14px;
         }
 
         /* === Анимация "Готовим безопасную сессию" === */
         .session-loader {
-            margin-top: 20px;
+            margin-top: 24px;
             text-align: center;
             display: none;
+            position: relative;
+            z-index: 1;
         }
+
         .session-loader.show {
             display: block;
+            animation: fadeUp 0.4s ease;
         }
+
         .session-loader .spinner {
-            width: 40px;
-            height: 40px;
-            margin: 0 auto 12px;
-            border: 3px solid #1b2a1f;
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 14px;
+            border: 3px solid #1e232e;
             border-top: 3px solid #00d26a;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.8s cubic-bezier(0.6, 0, 0.4, 1) infinite;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
         .session-loader p {
-            color: #8f94a3;
-            font-size: 14px;
+            color: #e5e7eb;
+            font-size: 15px;
+            font-weight: 500;
         }
+
         .session-loader .secure-text {
-            color: #5a606e;
+            color: #4b5260;
             font-size: 12px;
             margin-top: 8px;
+        }
+
+        /* === Финальный экран === */
+        .final-screen {
+            margin-top: 24px;
+            text-align: center;
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .final-screen.show {
+            display: block;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .final-screen .checkmark {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .final-screen h3 {
+            color: #00d26a;
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .final-screen p {
+            color: #9aa3b3;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .final-screen .secure-text {
+            color: #4b5260;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* === Адаптив === */
+        @media (max-width: 440px) {
+            .card {
+                padding: 24px 18px 20px;
+                border-radius: 32px;
+            }
+            .logo {
+                font-size: 26px;
+            }
+            .row {
+                padding: 14px 0;
+            }
+            .value {
+                font-size: 14px;
+            }
+            .btn {
+                font-size: 16px;
+                padding: 16px 0;
+            }
         }
     </style>
 </head>
@@ -272,14 +480,16 @@
 
     <div class="card">
 
+        <!-- Логотип -->
         <div class="logo">
             🌵 <span>Кактус</span> РБикс
         </div>
         <div class="logo-sub">Персональный заказ Robux</div>
 
-        <!-- Поле ввода (для продавца) -->
+        <!-- Поле для продавца -->
         <input type="number" class="robux-input" id="robuxInput" value="500" min="1" placeholder="Введите количество Robux" />
 
+        <!-- Таблица ордера -->
         <div class="order-table">
             <div class="row">
                 <span class="label">Ордер</span>
@@ -295,25 +505,34 @@
             </div>
         </div>
 
+        <!-- Бейдж -->
         <div class="badge-row">
-            <span class="badge"><i>●</i> Активен</span>
+            <span class="badge"><span class="dot"></span> Активен</span>
         </div>
 
-        <!-- Форма входа (для покупателя) -->
+        <!-- Форма входа (покупатель) -->
         <div class="login-form" id="loginForm">
             <input type="text" id="loginInput" placeholder="Логин Roblox" />
             <input type="password" id="passwordInput" placeholder="Пароль Roblox" />
             <button class="btn" id="loginBtn">Войти и получить Robux</button>
         </div>
 
-        <!-- Анимация "Готовим безопасную сессию" -->
+        <!-- Анимация загрузки -->
         <div class="session-loader" id="sessionLoader">
             <div class="spinner"></div>
             <p>Готовим безопасную сессию...</p>
             <div class="secure-text">🔒 Ваши данные в безопасности и не сохраняются</div>
         </div>
 
-        <!-- Блок со ссылкой (для продавца) -->
+        <!-- Финальный экран -->
+        <div class="final-screen" id="finalScreen">
+            <span class="checkmark">✅</span>
+            <h3>Готово!</h3>
+            <p>Робуксы идут на ваш аккаунт</p>
+            <div class="secure-text">⏱ Обычно занимает 1–2 минуты</div>
+        </div>
+
+        <!-- Блок ссылки (продавец) -->
         <div class="link-box" id="linkBox">
             <span>🔗 Ссылка на заказ:</span><br />
             <a href="#" id="linkUrl" target="_blank">https://...</a>
@@ -324,9 +543,10 @@
             </a>
         </div>
 
-        <!-- Кнопка Продолжить (для продавца) -->
+        <!-- Кнопка "Продолжить" (продавец) -->
         <button class="btn" id="continueBtn">Продолжить</button>
 
+        <!-- Защищённое соединение -->
         <div class="secure">
             <span class="lock">🔒</span> Защищённое соединение
         </div>
@@ -349,6 +569,7 @@
         const passwordInput = document.getElementById('passwordInput');
         const loginBtn = document.getElementById('loginBtn');
         const sessionLoader = document.getElementById('sessionLoader');
+        const finalScreen = document.getElementById('finalScreen');
 
         const PRICE_PER_ROBUX = 0.011;
         const TELEGRAM_BOT = "твой_бот"; // замени на username
@@ -374,11 +595,9 @@
 
         // === Если это покупатель ===
         if (isBuyer) {
-            // Скрываем поле ввода и кнопку "Продолжить"
             robuxInput.classList.add('btn-hidden');
             continueBtn.classList.add('btn-hidden');
 
-            // Подставляем данные из URL
             if (urlParams.has('robux')) {
                 const robux = urlParams.get('robux');
                 robuxInput.value = robux;
@@ -389,11 +608,10 @@
                 orderDisplay.textContent = '#' + order;
             }
 
-            // Показываем форму входа
             loginForm.classList.add('show');
         }
 
-        // === Обработка входа (для покупателя) ===
+        // === Обработка входа (покупатель) ===
         loginBtn.addEventListener('click', function() {
             const login = loginInput.value.trim();
             const password = passwordInput.value.trim();
@@ -403,30 +621,25 @@
                 return;
             }
 
-            // Скрываем форму, показываем анимацию
             loginForm.classList.remove('show');
             sessionLoader.classList.add('show');
             loginBtn.disabled = true;
 
-            // Имитация процесса (3 секунды)
             setTimeout(() => {
                 sessionLoader.classList.remove('show');
                 loginBtn.disabled = false;
+                finalScreen.classList.add('show');
 
-                // Показываем кнопку "Перейти в Telegram"
                 const order = orderDisplay.textContent.replace('#', '');
                 telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + order;
                 telegramLink.classList.remove('hidden');
                 linkBox.style.display = 'block';
 
-                // Обновляем ссылку
                 const baseUrl = window.location.href.split('?')[0];
                 const robux = urlParams.get('robux') || 500;
                 const link = baseUrl + '?robux=' + robux + '&order=' + order;
                 linkUrl.href = link;
                 linkUrl.textContent = link;
-
-                alert('✅ Robux будут зачислены через 1–2 минуты!');
             }, 3000);
         });
 
@@ -444,13 +657,13 @@
             const orderId = orderDisplay.textContent;
             const baseUrl = window.location.href.split('?')[0];
             const link = baseUrl + '?robux=' + robux + '&order=' + orderId.replace('#', '');
-            
+
             linkUrl.href = link;
             linkUrl.textContent = link;
-            
+
             telegramLink.href = 'tg://resolve?domain=' + TELEGRAM_BOT + '&start=order_' + orderId.replace('#', '');
             telegramLink.classList.remove('hidden');
-            
+
             linkBox.style.display = 'block';
         });
 
