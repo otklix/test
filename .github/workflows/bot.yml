@@ -1,17 +1,22 @@
-name: Deploy to GitHub Pages
+name: DAsistent Bot
 
 on:
-  push:
-    branches: [ "main" ]
+  schedule:
+    - cron: "*/1 * * * *"
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  run:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run bot
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          ADMIN_ID: ${{ secrets.ADMIN_ID }}
+        run: python bot.py
