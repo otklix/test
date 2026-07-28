@@ -13,7 +13,6 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
-# Хранилище статусов
 user_connected = {}
 
 @dp.business_connection()
