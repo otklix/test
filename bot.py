@@ -1,65 +1,77 @@
 import os
 import logging
-import asyncio
-from aiogram import Bot, Dispatcher, types
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, MessageHandler, filters, CallbackQueryHandler, ContextTypes
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 ADMIN_ID = int(os.environ.get("ADMIN_ID", 0))
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher(storage=MemoryStorage())
-
-# Хранилище подключённых пользователей
+# Хранилище статусов (в памяти, для демонстрации)
 user_connected = {}
 
-@dp.business_connection()
-async def business_connect(connection: types.BusinessConnection):
-    if connection.is_enabled:
-        user_connected[connection.user_id] = True
-        await bot.send_message(connection.user_id, "✅ ДААСС подключён к твоим чатам!")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔍 Проверить подключение", callback_data="check")],
+        [InlineKeyboardButton("📊 Статус", callback_data="status")],
+        [InlineKeyboardButton("🌐 Сайт", url="https://ggcrachvvv-arch.github.io/Botiks/")]
+    ])
+    await update.message.reply_text(
+        "🤖 **ДААСС — твой помощник в Telegram**\n\n"
+        "✅ Бот активен\n"
+        "📌 Нажми кнопку, чтобы проверить подключение к чатам.",
+        reply_markup=keyboard
+    )
 
-@dp.message()
-async def start(message: types.Message):
-    if message.text == "/start":
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="🔍 Проверить подключение", callback_data="check")]
-            ]
+async def check_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
+
+    msg = await query.edit_message_text("🔄 Проверка подключения...")
+
+    for i in range(1, 11):
+        percent = i * 10
+        squares = "🟩" * i + "⬜" * (10 - i)
+        await msg.edit_text(f"📡 Проверка: {percent}%\n{squares}")
+        import asyncio
+        await asyncio.sleep(0.3)
+
+    if user_connected.get(user_id, False):
+        await msg.edit_text("✅ **ДААСС активирован!**\n\nБот видит твои чаты.")
+    else:
+        await msg.edit_text(
+            "❌ **ДААСС не подключён к чатам!**\n\n"
+            "📌 Проверь:\n"
+            "1️⃣ Есть ли Telegram Premium?\n"
+            "2️⃣ Бот добавлен в Настройки → Автоматизация чатов?\n"
+            "3️⃣ Ты написал кому-нибудь сообщение ПОСЛЕ добавления?\n\n"
+            "🔄 После выполнения условий нажми кнопку снова.",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔄 Проверить снова", callback_data="check")]
+            ])
         )
-        await message.reply(
-            "🔐 **ДААСС** — твой помощник в Telegram\n\n"
-            "Нажми кнопку, чтобы проверить подключение к чатам.",
-            reply_markup=keyboard
-        )
 
-@dp.callback_query()
-async def check_callback(callback: types.CallbackQuery):
-    if callback.data == "check":
-        user_id = callback.from_user.id
-        msg = await callback.message.edit_text("🔄 Проверка подключения...")
+async def status_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(
+        "📊 **Статус ДААСС**\n\n"
+        "🟢 Бот: активен\n"
+        "🔄 Режим: long polling\n"
+        "📦 Сообщений в памяти: 0\n"
+        "👤 Пользователей: 0\n\n"
+        "⚠️ Для отслеживания удалений нужен Telegram Premium и Business API."
+    )
 
-        for i in range(1, 11):
-            percent = i * 10
-            squares = "🟩" * i + "⬜" * (10 - i)
-            await msg.edit_text(f"📡 Проверка: {percent}%\n{squares}")
-            await asyncio.sleep(0.3)
-
-        if user_connected.get(user_id, False):
-            await msg.edit_text("✅ **ДААСС активирован!**\n\nТеперь бот видит твои чаты.")
-        else:
-            user_connected[user_id] = True
-            await msg.edit_text(
-                "✅ **ДААСС активирован (тестовый режим)**\n\n"
-                "⚠️ Для реальной работы нужен Telegram Premium и постоянный хостинг.\n"
-                "Но интерфейс и проверка работают!"
-            )
-
-async def main():
-    await dp.start_polling(bot, allowed_updates=["business_connection", "message", "callback_query"])
+def main():
+    app = Application.builder().token(BOT_TOKEN).build()
+    app.add_handler(MessageHandler(filters.COMMAND & filters.Regex(r'/start'), start))
+    app.add_handler(CallbackQueryHandler(check_callback, pattern="check"))
+    app.add_handler(CallbackQueryHandler(status_callback, pattern="status"))
+    logging.info("ДААСС запущен")
+    app.run_polling()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
