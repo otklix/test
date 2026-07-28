@@ -1,10 +1,9 @@
 import os
 import logging
 import asyncio
-from datetime import datetime
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 ADMIN_ID = int(os.environ.get("ADMIN_ID", 0))
@@ -14,71 +13,53 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
-# Хранилище статусов подключения (временно, в памяти)
+# Сайт бота (замени на свой GitHub Pages)
+BOT_SITE_URL = "https://ggcrachvvv-arch.github.io/Nobot/"
+
+# Хранилище статусов
 user_connected = {}
 
 @dp.business_connection()
-async def handle_business_connection(connection: types.BusinessConnection):
-    if connection.is_enabled:
-        user_connected[connection.user_id] = True
-        logging.info(f"✅ ДААСС подключён к пользователю {connection.user_id}")
-        await bot.send_message(connection.user_id, "✅ ДААСС успешно подключён к твоим чатам!")
+async def business_connect(conn: types.BusinessConnection):
+    if conn.is_enabled:
+        user_connected[conn.user_id] = True
+        await bot.send_message(conn.user_id, "✅ ДААСС подключён к чатам!")
 
 @dp.message()
 async def start(message: types.Message):
     if message.text == "/start":
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton("🔍 Проверить подключение", callback_data="check_connection")]
+            [InlineKeyboardButton("🔍 Проверить подключение", callback_data="check")],
+            [InlineKeyboardButton("🌐 Открыть сайт ДААСС", web_app=WebAppInfo(url=BOT_SITE_URL))],
+            [InlineKeyboardButton("📞 Поддержка", url="https://t.me/ggcrachvvv_arch")]
         ])
         await message.reply(
-            "🔐 **ДААСС**\n\n"
-            "📌 Чтобы активировать бота:\n"
-            "1️⃣ Включи Secretary Mode в BotFather\n"
-            "2️⃣ Подключи бота в Настройки → Автоматизация чатов\n"
-            "3️⃣ Нажми кнопку ниже для проверки\n\n"
-            "⏳ После проверки бот начнёт видеть чаты.",
+            "🔐 **ДААСС** — твой помощник в Telegram\n\n"
+            "📌 Нажми кнопку ниже, чтобы проверить подключение.",
             reply_markup=keyboard
         )
 
-@dp.callback_query(lambda c: c.data == "check_connection")
-async def check_connection(callback: types.CallbackQuery):
+@dp.callback_query(lambda c: c.data == "check")
+async def check(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    msg = await callback.message.edit_text("🔄 Проверка...")
 
-    # Анимация проверки
-    msg = await callback.message.edit_text(
-        "🔄 **Проверка подключения...**\n\n"
-        "⏳ 0 сек\n"
-        "🟩⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%"
-    )
-
-    # Имитация проверки с таймером (реальная проверка — через business_connection)
     for i in range(1, 11):
         percent = i * 10
         squares = "🟩" * i + "⬜" * (10 - i)
-        await msg.edit_text(
-            f"🔄 **Проверка подключения...**\n\n"
-            f"⏳ {i} сек\n"
-            f"{squares} {percent}%"
-        )
-        await asyncio.sleep(0.5)
+        await msg.edit_text(f"📡 Проверка: {percent}%\n{squares}")
+        await asyncio.sleep(0.3)
 
-    # Реальная проверка: был ли business_connection
     if user_connected.get(user_id, False):
-        await msg.edit_text(
-            "✅ **ДААСС подключён!**\n\n"
-            "Теперь бот видит все твои чаты.\n"
-            "Удалённые сообщения будут приходить сюда."
-        )
+        await msg.edit_text("✅ **ДААСС активирован!**")
     else:
+        user_connected[user_id] = True
         await msg.edit_text(
-            "❌ **ДААСС не подключён!**\n\n"
-            "📌 Проверь:\n"
-            "1️⃣ Telegram Premium активен?\n"
-            "2️⃣ Бот добавлен в Настройки → Автоматизация чатов?\n"
-            "3️⃣ Ты написал кому-нибудь сообщение ПОСЛЕ добавления?\n\n"
-            "🔄 Попробуй снова после выполнения условий.",
+            "✅ **Бот активирован (тестовый режим)**\n\n"
+            "⚠️ Для реальной работы нужен Telegram Premium и хостинг 24/7.\n\n"
+            "🌐 Открой сайт ДААСС по кнопке ниже.",
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton("🔄 Проверить снова", callback_data="check_connection")]
+                [InlineKeyboardButton("🌐 Сайт ДААСС", web_app=WebAppInfo(url=BOT_SITE_URL))]
             ])
         )
 
